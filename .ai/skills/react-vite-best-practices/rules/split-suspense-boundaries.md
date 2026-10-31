@@ -1,7 +1,7 @@
 ---
 title: Strategic Suspense Boundaries for Lazy Loading
 impact: CRITICAL
-impactDescription: "Progressive loading, better UX"
+impactDescription: 'Progressive loading, better UX'
 tags: split, suspense, lazy, react, boundaries
 ---
 
@@ -28,6 +28,7 @@ function App() {
 ```
 
 **Problems:**
+
 - If any lazy component is loading, the entire app shows the loading state
 - No progressive rendering — users see nothing until everything loads
 - Poor perceived performance even on fast connections
@@ -130,6 +131,7 @@ function ContentSkeleton() {
 ```
 
 **Benefits:**
+
 - Parts of UI render independently without blocking each other
 - Better perceived performance with skeleton loading states
 - Graceful degradation on slow networks

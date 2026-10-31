@@ -1,7 +1,7 @@
 ---
 title: Select Only Needed Columns
 impact: CRITICAL
-impactDescription: "Reduces memory usage and query transfer size by 40-80%"
+impactDescription: 'Reduces memory usage and query transfer size by 40-80%'
 tags: select, columns, memory, performance
 ---
 
@@ -27,6 +27,7 @@ return UserResource::collection(User::all());
 ```
 
 **Problems:**
+
 - `SELECT *` transfers large TEXT/BLOB columns even when unused, wasting bandwidth
 - Every row hydrates all attributes into PHP objects, consuming unnecessary memory
 - Prevents the database from using covering indexes, forcing table lookups
@@ -57,6 +58,7 @@ $users = User::select('id', 'name')
 ```
 
 **Benefits:**
+
 - Reduces data transfer between database and application by 40-80% on wide tables
 - Lower memory usage per model instance — only selected attributes are hydrated
 - Enables covering index usage, eliminating table lookups for read-heavy queries

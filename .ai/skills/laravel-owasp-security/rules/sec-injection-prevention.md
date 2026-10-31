@@ -50,6 +50,7 @@ $results = Payment::orderByRaw($request->input('column') . ' ' . $request->input
 ```
 
 **Problems:**
+
 - Any user input concatenated into a SQL string is injectable
 - `whereRaw`, `selectRaw`, `orderByRaw` all pass directly to the database engine
 - Attacker can exfiltrate all data, bypass WHERE clauses, or run destructive queries
@@ -119,6 +120,7 @@ $user->forceFill($request->all())->save();  // Bypasses $fillable entirely
 ```
 
 **Problems:**
+
 - `$guarded = []` allows attackers to set any field including `is_admin`, `role`, `user_id`
 - `$request->all()` passes every submitted parameter directly to the model
 - `forceFill` with unvalidated data completely bypasses Laravel's mass assignment protection
@@ -196,12 +198,12 @@ class NewPasswordController extends Controller
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `whereRaw('col = ?', [$value])` | Raw SQL with user input |
-| Whitelist array for column names | Dynamic ORDER BY / WHERE column |
-| `$fillable = ['field1', 'field2']` | All models — explicit allowlist |
-| `$request->validated()` | Mass operations in controllers |
-| Set `user_id` explicitly | Ownership fields — never in fillable |
+| Pattern                            | Use Case                             |
+| ---------------------------------- | ------------------------------------ |
+| `whereRaw('col = ?', [$value])`    | Raw SQL with user input              |
+| Whitelist array for column names   | Dynamic ORDER BY / WHERE column      |
+| `$fillable = ['field1', 'field2']` | All models — explicit allowlist      |
+| `$request->validated()`            | Mass operations in controllers       |
+| Set `user_id` explicitly           | Ownership fields — never in fillable |
 
 Reference: [OWASP Laravel Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Laravel_Cheat_Sheet.html) | [Laravel Eloquent Mass Assignment](https://laravel.com/docs/13.x/eloquent#mass-assignment)

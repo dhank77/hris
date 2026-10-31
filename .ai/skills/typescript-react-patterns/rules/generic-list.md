@@ -1,7 +1,7 @@
 ---
 title: Generic List Component
 impact: MEDIUM
-impactDescription: "enables reusable, type-safe list rendering for any data type"
+impactDescription: 'enables reusable, type-safe list rendering for any data type'
 tags: generic, list, component, type-inference
 ---
 
@@ -17,22 +17,23 @@ Generic components allow building reusable, type-safe components that work with 
 // ❌ Bad
 // Using any - no type safety
 interface ListProps {
-  items: any[]
-  renderItem: (item: any) => React.ReactNode
+    items: any[];
+    renderItem: (item: any) => React.ReactNode;
 }
 
 function List({ items, renderItem }: ListProps) {
-  return <ul>{items.map(renderItem)}</ul>
+    return <ul>{items.map(renderItem)}</ul>;
 }
 
 // No autocomplete, no type checking
 <List
-  items={users}
-  renderItem={(item) => <li>{item.nmae}</li>}  // Typo not caught!
-/>
+    items={users}
+    renderItem={(item) => <li>{item.nmae}</li>} // Typo not caught!
+/>;
 ```
 
 **Problems:**
+
 - Using `any` removes all type checking on list items
 - Typos in property names are not caught at compile time
 - No autocomplete for item properties in the render callback
@@ -189,6 +190,7 @@ function Table<T>({ data, columns, keyExtractor }: TableProps<T>) {
 ```
 
 **Benefits:**
+
 - Full type inference from items to render callbacks
 - Typos in property names are caught at compile time
 - IDE autocomplete works for item properties

@@ -1,7 +1,7 @@
 ---
 title: Use Covering Indexes for Read-Heavy Queries
 impact: HIGH
-impactDescription: "Eliminates table lookups — query served entirely from index"
+impactDescription: 'Eliminates table lookups — query served entirely from index'
 tags: indexes, covering-index, performance
 ---
 
@@ -28,6 +28,7 @@ $activeUsers = User::select('name', 'email')
 ```
 
 **Problems:**
+
 - Each matching row requires a random I/O table lookup to fetch non-indexed columns
 - On SSDs this adds microseconds per row; on HDDs, milliseconds per row
 - Large result sets (thousands of rows) multiply the lookup cost significantly
@@ -61,6 +62,7 @@ $plan = DB::select('EXPLAIN SELECT name, email FROM users WHERE status = ?', ['a
 ```
 
 **Benefits:**
+
 - Query returns results directly from the index B-tree — zero table lookups
 - Dramatically faster for queries returning many rows from a filtered subset
 - PostgreSQL INCLUDE clause keeps indexed columns minimal while covering SELECT columns

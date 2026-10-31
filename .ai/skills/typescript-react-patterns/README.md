@@ -16,24 +16,31 @@ Type-safe React with TypeScript.
 ## Categories
 
 ### 1. Component Typing (Critical)
+
 Props interface, children types, default props, forwardRef, polymorphic, FC vs function, display name, rest props.
 
 ### 2. Hook Typing (Critical)
+
 useState, useRef, useReducer, useCallback, useMemo, useContext, custom hooks, generic hooks.
 
 ### 3. Event Handling (High)
+
 Handler types, click events, form events, keyboard events.
 
 ### 4. Ref Typing (High)
+
 DOM element refs, callback refs, useImperativeHandle.
 
 ### 5. Generic Components (Medium)
+
 Generic list, select, table, constraints with extends/keyof.
 
 ### 6. Context & State (Medium)
+
 Typed context creation, provider pattern, context with useReducer.
 
 ### 7. Utility Types (Low)
+
 ComponentPropsWithoutRef, Pick/Omit/Partial, discriminated unions.
 
 ## Usage

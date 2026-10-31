@@ -1,7 +1,7 @@
 ---
 title: FC vs Function Declaration
 impact: CRITICAL
-impactDescription: "ensures consistent and future-proof component typing"
+impactDescription: 'ensures consistent and future-proof component typing'
 tags: component, FC, function, declaration
 ---
 
@@ -18,27 +18,28 @@ Choosing between `React.FC` and regular function declarations for component typi
 import React, { FC } from 'react';
 
 interface ButtonProps {
-  label: string;
-  onClick: () => void;
+    label: string;
+    onClick: () => void;
 }
 
 // FC used to include children implicitly (React 17 and earlier)
 // In React 18+, FC no longer includes children automatically
 const Button: FC<ButtonProps> = ({ label, onClick }) => {
-  return <button onClick={onClick}>{label}</button>;
+    return <button onClick={onClick}>{label}</button>;
 };
 
 // FC makes it harder to use generics
 const List: FC<{ items: string[] }> = ({ items }) => (
-  <ul>
-    {items.map((item) => (
-      <li key={item}>{item}</li>
-    ))}
-  </ul>
+    <ul>
+        {items.map((item) => (
+            <li key={item}>{item}</li>
+        ))}
+    </ul>
 );
 ```
 
 **Problems:**
+
 - `React.FC` had implicit children in React 17, causing confusion across versions
 - `React.FC` makes generic components awkward to type
 - `React.FC` had issues with `defaultProps` typing
@@ -50,46 +51,54 @@ const List: FC<{ items: string[] }> = ({ items }) => (
 // ✅ Good
 // Using regular function declarations with explicit return types
 interface ButtonProps {
-  label: string;
-  onClick: () => void;
+    label: string;
+    onClick: () => void;
 }
 
 function Button({ label, onClick }: ButtonProps): React.ReactElement {
-  return <button onClick={onClick}>{label}</button>;
+    return <button onClick={onClick}>{label}</button>;
 }
 
 // Arrow function with explicit typing
-const Card = ({ title, children }: {
-  title: string;
-  children: React.ReactNode;
+const Card = ({
+    title,
+    children,
+}: {
+    title: string;
+    children: React.ReactNode;
 }): React.ReactElement => {
-  return (
-    <div className="card">
-      <h2>{title}</h2>
-      {children}
-    </div>
-  );
+    return (
+        <div className="card">
+            <h2>{title}</h2>
+            {children}
+        </div>
+    );
 };
 
 // Generic components are cleaner without FC
 interface ListProps<T> {
-  items: T[];
-  renderItem: (item: T) => React.ReactNode;
+    items: T[];
+    renderItem: (item: T) => React.ReactNode;
 }
 
 function List<T>({ items, renderItem }: ListProps<T>): React.ReactElement {
-  return <ul>{items.map(renderItem)}</ul>;
+    return <ul>{items.map(renderItem)}</ul>;
 }
 
 // Named function export for better debugging
-interface User { id: string; name: string; email: string }
+interface User {
+    id: string;
+    name: string;
+    email: string;
+}
 
 export function UserProfile({ user }: { user: User }): React.ReactElement {
-  return <div>{user.name}</div>;
+    return <div>{user.name}</div>;
 }
 ```
 
 **Benefits:**
+
 - Explicit over implicit: regular functions require explicit children prop declaration
 - Generic support: regular functions work better with TypeScript generics
 - Consistency: avoids confusion about React 17 vs 18 FC behavior

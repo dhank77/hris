@@ -163,12 +163,12 @@ return [
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `APP_DEBUG=false` | Production environment always |
-| `Vite::useCspNonce()` | Eliminate `unsafe-inline` from script-src |
-| `SecurityHeaders` middleware | Apply all security headers in web group |
-| `allowed_origins: ['https://...']` | CORS — never use `*` for authenticated routes |
+| Pattern                                   | Use Case                                       |
+| ----------------------------------------- | ---------------------------------------------- |
+| `APP_DEBUG=false`                         | Production environment always                  |
+| `Vite::useCspNonce()`                     | Eliminate `unsafe-inline` from script-src      |
+| `SecurityHeaders` middleware              | Apply all security headers in web group        |
+| `allowed_origins: ['https://...']`        | CORS — never use `*` for authenticated routes  |
 | CDN handles HSTS, X-Frame, X-Content-Type | Avoid duplicate headers when behind Cloudflare |
 
 Reference: [OWASP Secure Headers](https://owasp.org/www-project-secure-headers/) | [MDN Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)

@@ -1,7 +1,7 @@
 ---
 title: Use cursor() for Memory-Efficient Iteration
 impact: HIGH
-impactDescription: "Reduces memory from O(n) to O(1) — iterate millions of rows without exhausting RAM"
+impactDescription: 'Reduces memory from O(n) to O(1) — iterate millions of rows without exhausting RAM'
 tags: cursor, lazy, memory, large-datasets
 ---
 
@@ -25,6 +25,7 @@ $users->each(function (User $user): void {
 ```
 
 **Problems:**
+
 - Entire result set is hydrated into memory before iteration begins
 - Memory usage grows linearly with row count — easily causes out-of-memory errors
 - No benefit from loading all rows upfront when processing them sequentially
@@ -59,6 +60,7 @@ DB::table('users')
 ```
 
 **Benefits:**
+
 - Constant memory usage regardless of result set size — safe for millions of rows
 - `cursor()` returns a `LazyCollection` backed by a PHP generator
 - `lazyById()` combines the memory efficiency of generators with the consistency of ID-based chunking

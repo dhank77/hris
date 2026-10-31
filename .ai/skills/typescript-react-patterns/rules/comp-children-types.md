@@ -1,7 +1,7 @@
 ---
 title: Component Children Types
 impact: CRITICAL
-impactDescription: "prevents runtime errors from invalid children"
+impactDescription: 'prevents runtime errors from invalid children'
 tags: component, children, ReactNode, typing
 ---
 
@@ -36,6 +36,7 @@ interface CardProps {
 ```
 
 **Problems:**
+
 - `React.ReactElement` rejects valid renderable values like strings, numbers, and fragments
 - Using `any` removes all type checking and allows invalid children
 - `JSX.Element` is not cross-platform compatible
@@ -138,6 +139,7 @@ function Card({ title, children }: PropsWithChildren<CardBaseProps>) {
 ```
 
 **Benefits:**
+
 - Correct types prevent runtime errors
 - Better autocomplete and documentation
 - Catches invalid children at compile time

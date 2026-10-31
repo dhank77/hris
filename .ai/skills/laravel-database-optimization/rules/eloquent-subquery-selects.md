@@ -1,7 +1,7 @@
 ---
 title: Use Subquery Selects for Computed Columns
 impact: HIGH
-impactDescription: "Single query replaces N+1 relationship loads for scalar values"
+impactDescription: 'Single query replaces N+1 relationship loads for scalar values'
 tags: subquery, select, performance, computed
 ---
 
@@ -32,6 +32,7 @@ foreach ($users as $user) {
 ```
 
 **Problems:**
+
 - Loads all login records into memory when only the latest is needed
 - Without eager loading, triggers N+1 queries (one per user)
 - Memory usage scales with total number of related records across all users
@@ -65,6 +66,7 @@ foreach ($users as $user) {
 ```
 
 **Benefits:**
+
 - Single SQL query with embedded subqueries — no additional round trips
 - Only the needed scalar value is returned, not the entire related collection
 - Computed columns can be used in `orderBy`, `having`, and other clauses

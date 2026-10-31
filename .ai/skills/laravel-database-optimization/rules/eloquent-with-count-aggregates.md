@@ -1,7 +1,7 @@
 ---
 title: Use withCount and withSum Instead of Loading Relations
 impact: HIGH
-impactDescription: "Eliminates loading entire relations into memory for simple counts or sums"
+impactDescription: 'Eliminates loading entire relations into memory for simple counts or sums'
 tags: with-count, with-sum, aggregates, performance
 ---
 
@@ -25,6 +25,7 @@ foreach ($users as $user) {
 ```
 
 **Problems:**
+
 - Loads every post and order record into memory even though only aggregate values are needed
 - Two additional queries (posts, orders) returning potentially thousands of rows
 - Memory usage grows linearly with the number of related records
@@ -58,6 +59,7 @@ echo $user->published_posts_count;
 ```
 
 **Benefits:**
+
 - Single query with subqueries — no extra round trips to the database
 - Only aggregate values are returned, not entire related collections
 - Dramatically lower memory usage when relations contain many records

@@ -1,7 +1,7 @@
 ---
 title: Table Naming Conventions
 impact: HIGH
-impactDescription: "Eloquent relies on naming conventions to auto-resolve models to tables"
+impactDescription: 'Eloquent relies on naming conventions to auto-resolve models to tables'
 tags: naming, tables, conventions, eloquent
 ---
 
@@ -40,6 +40,7 @@ Schema::create('tbl_users', function (Blueprint $table) {
 ```
 
 **Problems:**
+
 - Eloquent cannot auto-resolve `User` model to a `user` table (expects `users`)
 - PascalCase tables require explicit `$table` property on every model
 - Non-alphabetical pivot names break `belongsToMany` without manual table overrides
@@ -93,6 +94,7 @@ class Category extends Model
 ```
 
 **Benefits:**
+
 - Eloquent auto-resolves `User` to `users`, `OrderItem` to `order_items` with zero configuration
 - Alphabetical pivot naming (`role_user`) works with `belongsToMany` without specifying the table
 - Consistent naming makes migrations, queries, and team collaboration predictable

@@ -1,7 +1,7 @@
 ---
 title: Create Indexes Without Locking Tables
 impact: HIGH
-impactDescription: "Prevents table locks during index creation on large production tables"
+impactDescription: 'Prevents table locks during index creation on large production tables'
 tags: migrations, indexes, locking, production
 ---
 
@@ -31,6 +31,7 @@ return new class extends Migration
 ```
 
 **Problems:**
+
 - Table-level lock blocks all write operations for the duration of index creation
 - On large tables, index creation can take minutes, causing application downtime
 - No way to cancel without rolling back the entire migration
@@ -80,6 +81,7 @@ public bool $withinTransaction = false;
 ```
 
 **Benefits:**
+
 - Tables remain fully readable and writable during index creation
 - No application downtime or blocked requests during deployment
 - Standard `$table->index()` is still fine for small tables and initial migrations — only use raw SQL for large production tables

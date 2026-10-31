@@ -54,7 +54,6 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 **Impact:** MEDIUM
 **Description:** Bundle size analysis and monitoring. Using rollup-plugin-visualizer to identify large dependencies and optimization opportunities.
 
-
 ---
 
 ## Configure Manual Chunks for Vendor Separation
@@ -68,15 +67,16 @@ Without manual chunks, Vite bundles all vendor dependencies into a single chunk 
 ```typescript
 // vite.config.ts
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    // No manual chunks configured
-    // All code bundled together
-  },
-})
+    plugins: [react()],
+    build: {
+        // No manual chunks configured
+        // All code bundled together
+    },
+});
 ```
 
 **Problems:**
+
 - React, React DOM, and other vendors are bundled with application code
 - When you update your app, users must re-download everything
 - No parallel loading of separate chunks
@@ -86,63 +86,64 @@ export default defineConfig({
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          // Core React - rarely changes
-          'vendor-react': ['react', 'react-dom'],
+    plugins: [react()],
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Core React - rarely changes
+                    'vendor-react': ['react', 'react-dom'],
 
-          // Router - changes occasionally
-          'vendor-router': ['react-router-dom'],
+                    // Router - changes occasionally
+                    'vendor-router': ['react-router-dom'],
 
-          // UI library - if using one
-          // 'vendor-ui': ['@headlessui/react', '@heroicons/react'],
+                    // UI library - if using one
+                    // 'vendor-ui': ['@headlessui/react', '@heroicons/react'],
 
-          // State management
-          // 'vendor-state': ['zustand', '@tanstack/react-query'],
+                    // State management
+                    // 'vendor-state': ['zustand', '@tanstack/react-query'],
+                },
+            },
         },
-      },
     },
-  },
-})
+});
 ```
 
 ```typescript
 // vite.config.ts - Dynamic manual chunks function
 export default defineConfig({
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          // Node modules go to vendor chunk
-          if (id.includes('node_modules')) {
-            // Split large libraries into separate chunks
-            if (id.includes('react-dom')) {
-              return 'vendor-react-dom'
-            }
-            if (id.includes('react')) {
-              return 'vendor-react'
-            }
-            if (id.includes('@tanstack')) {
-              return 'vendor-tanstack'
-            }
-            // Other node_modules
-            return 'vendor'
-          }
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    // Node modules go to vendor chunk
+                    if (id.includes('node_modules')) {
+                        // Split large libraries into separate chunks
+                        if (id.includes('react-dom')) {
+                            return 'vendor-react-dom';
+                        }
+                        if (id.includes('react')) {
+                            return 'vendor-react';
+                        }
+                        if (id.includes('@tanstack')) {
+                            return 'vendor-tanstack';
+                        }
+                        // Other node_modules
+                        return 'vendor';
+                    }
+                },
+            },
         },
-      },
     },
-  },
-})
+});
 ```
 
 **Benefits:**
+
 - Vendor chunks cached separately from app code
 - Browser can download multiple chunks simultaneously
 - App changes don't invalidate vendor cache
@@ -151,7 +152,6 @@ export default defineConfig({
 > **Note:** Vite is transitioning from Rollup to Rolldown as its bundler. When Rolldown is fully integrated, `advancedChunks` will be the recommended replacement for `manualChunks`, offering more powerful and flexible chunking strategies. Keep an eye on Vite release notes for migration guidance.
 
 Reference: [Vite Build Options - rollupOptions](https://vitejs.dev/config/build-options.html#build-rollupoptions)
-
 
 ---
 
@@ -169,22 +169,22 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    // Minification disabled
-    minify: false,
-  },
+    plugins: [react()],
+    build: {
+        // Minification disabled
+        minify: false,
+    },
 });
 ```
 
 ```tsx
 // Or using terser without configuration
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    minify: 'terser',
-    // No terser options configured - uses defaults
-  },
+    plugins: [react()],
+    build: {
+        minify: 'terser',
+        // No terser options configured - uses defaults
+    },
 });
 ```
 
@@ -192,24 +192,25 @@ export default defineConfig({
 // Code patterns that prevent effective minification
 // constants.ts
 export const CONFIG = {
-  API_URL: 'https://api.example.com',
-  TIMEOUT: 5000,
-  RETRY_COUNT: 3,
+    API_URL: 'https://api.example.com',
+    TIMEOUT: 5000,
+    RETRY_COUNT: 3,
 };
 
 // component.tsx - Property access prevents minification
 function Component() {
-  // These property names won't be minified
-  return (
-    <div>
-      <span data-testid="user-name">{user.firstName}</span>
-      <span data-testid="user-email">{user.emailAddress}</span>
-    </div>
-  );
+    // These property names won't be minified
+    return (
+        <div>
+            <span data-testid="user-name">{user.firstName}</span>
+            <span data-testid="user-email">{user.emailAddress}</span>
+        </div>
+    );
 }
 ```
 
 **Problems:**
+
 - Disabled minification ships bloated bundles to production
 - Unconfigured terser uses suboptimal defaults and is slower than OXC
 - String property access patterns prevent effective mangling
@@ -223,16 +224,16 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    // OXC is the default minifier — fastest option, no config needed
-    // minify: 'oxc',
-    // Remove console and debugger in production
-    esbuild: {
-      drop: ['console', 'debugger'],
-      legalComments: 'none',
+    plugins: [react()],
+    build: {
+        // OXC is the default minifier — fastest option, no config needed
+        // minify: 'oxc',
+        // Remove console and debugger in production
+        esbuild: {
+            drop: ['console', 'debugger'],
+            legalComments: 'none',
+        },
     },
-  },
 });
 ```
 
@@ -242,30 +243,30 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true,
-        inline: 2,
-        dead_code: true,
-        booleans_as_integers: true,
-        passes: 2,
-      },
-      mangle: {
-        properties: {
-          // Only mangle properties starting with underscore
-          regex: /^_/,
+    plugins: [react()],
+    build: {
+        minify: 'terser',
+        terserOptions: {
+            compress: {
+                drop_console: true,
+                drop_debugger: true,
+                inline: 2,
+                dead_code: true,
+                booleans_as_integers: true,
+                passes: 2,
+            },
+            mangle: {
+                properties: {
+                    // Only mangle properties starting with underscore
+                    regex: /^_/,
+                },
+            },
+            format: {
+                comments: false,
+                ascii_only: true,
+            },
         },
-      },
-      format: {
-        comments: false,
-        ascii_only: true,
-      },
     },
-  },
 });
 ```
 
@@ -273,25 +274,25 @@ export default defineConfig({
 // Code patterns that support effective minification
 // Use private class fields for better mangling
 class UserService {
-  #apiClient;
-  #cache = new Map();
+    #apiClient;
+    #cache = new Map();
 
-  constructor(apiClient: ApiClient) {
-    this.#apiClient = apiClient;
-  }
-
-  async #fetchUser(id: string) {
-    if (this.#cache.has(id)) {
-      return this.#cache.get(id);
+    constructor(apiClient: ApiClient) {
+        this.#apiClient = apiClient;
     }
-    const user = await this.#apiClient.get(`/users/${id}`);
-    this.#cache.set(id, user);
-    return user;
-  }
 
-  getUser(id: string) {
-    return this.#fetchUser(id);
-  }
+    async #fetchUser(id: string) {
+        if (this.#cache.has(id)) {
+            return this.#cache.get(id);
+        }
+        const user = await this.#apiClient.get(`/users/${id}`);
+        this.#cache.set(id, user);
+        return user;
+    }
+
+    getUser(id: string) {
+        return this.#fetchUser(id);
+    }
 }
 ```
 
@@ -301,22 +302,23 @@ class UserService {
 const isDev = import.meta.env.DEV;
 
 export const logger = {
-  log: isDev ? console.log.bind(console) : () => {},
-  warn: isDev ? console.warn.bind(console) : () => {},
-  error: console.error.bind(console), // Keep errors in production
+    log: isDev ? console.log.bind(console) : () => {},
+    warn: isDev ? console.warn.bind(console) : () => {},
+    error: console.error.bind(console), // Keep errors in production
 };
 
 // Usage - logs are removed in production
 import { logger } from './logger';
 
 function processData(data: Data) {
-  logger.log('Processing:', data);
-  // ...
-  return result;
+    logger.log('Processing:', data);
+    // ...
+    return result;
 }
 ```
 
 **Benefits:**
+
 - OXC (default) provides the fastest minification with excellent compression
 - Terser produces 2-5% smaller bundles when every KB matters
 - Removing console/debugger prevents information leakage in production
@@ -324,7 +326,6 @@ function processData(data: Data) {
 - Environment-aware logging keeps errors visible while stripping debug logs
 
 Reference: [Vite Build Options - minify](https://vitejs.dev/config/build-options.html#build-minify)
-
 
 ---
 
@@ -339,13 +340,14 @@ Vite defaults to `'baseline-widely-available'`, which targets browser features t
 ```typescript
 // vite.config.ts - Targeting old browsers unnecessarily
 export default defineConfig({
-  build: {
-    target: 'es2015', // Too old, includes many polyfills
-  },
-})
+    build: {
+        target: 'es2015', // Too old, includes many polyfills
+    },
+});
 ```
 
 **Problems:**
+
 - Targeting es2015 adds polyfills for features all modern browsers support natively
 - Larger bundle size from unnecessary transpilation
 - Slower builds due to extra transformation passes
@@ -354,58 +356,58 @@ export default defineConfig({
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    // Default is 'baseline-widely-available' — good for most apps
-    // Use 'esnext' for the smallest bundle if you control the browser environment
-    target: 'esnext',
+    plugins: [react()],
+    build: {
+        // Default is 'baseline-widely-available' — good for most apps
+        // Use 'esnext' for the smallest bundle if you control the browser environment
+        target: 'esnext',
 
-    // Or be specific about browser versions
-    // target: ['es2022', 'edge88', 'firefox78', 'chrome87', 'safari14'],
-  },
-})
+        // Or be specific about browser versions
+        // target: ['es2022', 'edge88', 'firefox78', 'chrome87', 'safari14'],
+    },
+});
 ```
 
 ```typescript
 // vite.config.ts - With legacy browser support
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import legacy from '@vitejs/plugin-legacy'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import legacy from '@vitejs/plugin-legacy';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    legacy({
-      targets: ['defaults', 'not IE 11'],
-      // Modern chunks for modern browsers
-      // Legacy chunks only loaded by old browsers
-    }),
-  ],
-  build: {
-    target: 'esnext', // Modern build
-  },
-})
+    plugins: [
+        react(),
+        legacy({
+            targets: ['defaults', 'not IE 11'],
+            // Modern chunks for modern browsers
+            // Legacy chunks only loaded by old browsers
+        }),
+    ],
+    build: {
+        target: 'esnext', // Modern build
+    },
+});
 ```
 
 **Benefits:**
+
 - `esnext` produces the smallest bundles by using native browser features
 - `baseline-widely-available` (default) balances size with broad compatibility
 - The `@vitejs/plugin-legacy` plugin provides a fallback for older browsers without penalizing modern ones
 - Specific browser version targets give fine-grained control
 
-| Target | Use Case |
-|--------|----------|
-| `esnext` | Latest features, smallest bundle |
+| Target                      | Use Case                               |
+| --------------------------- | -------------------------------------- |
+| `esnext`                    | Latest features, smallest bundle       |
 | `baseline-widely-available` | Default — broad modern browser support |
-| `es2022` | Good balance, wide support |
-| Custom array | Specific browser versions |
+| `es2022`                    | Good balance, wide support             |
+| Custom array                | Specific browser versions              |
 
 Reference: [Vite Build Options - target](https://vitejs.dev/config/build-options.html#build-target)
-
 
 ---
 
@@ -423,25 +425,26 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    // ❌ Bad: Makes debugging production issues impossible
-    sourcemap: false,
-  },
+    plugins: [react()],
+    build: {
+        // ❌ Bad: Makes debugging production issues impossible
+        sourcemap: false,
+    },
 });
 ```
 
 ```tsx
 // ❌ Bad: Exposing full source maps in production
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    sourcemap: true, // Creates .map files served publicly
-  },
+    plugins: [react()],
+    build: {
+        sourcemap: true, // Creates .map files served publicly
+    },
 });
 ```
 
 **Problems:**
+
 - Disabled source maps make production debugging impossible
 - Full source maps expose your original source code publicly
 - No integration with error tracking services like Sentry
@@ -455,19 +458,19 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
-  build: {
-    // ✅ Good: 'hidden' for production, full maps for staging
-    sourcemap: mode === 'production' ? 'hidden' : true,
-    rollupOptions: {
-      output: {
-        sourcemapExcludeSources: mode === 'production',
-      },
+    plugins: [react()],
+    build: {
+        // ✅ Good: 'hidden' for production, full maps for staging
+        sourcemap: mode === 'production' ? 'hidden' : true,
+        rollupOptions: {
+            output: {
+                sourcemapExcludeSources: mode === 'production',
+            },
+        },
     },
-  },
-  css: {
-    devSourcemap: true,
-  },
+    css: {
+        devSourcemap: true,
+    },
 }));
 ```
 
@@ -478,24 +481,25 @@ import react from '@vitejs/plugin-react';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 
 export default defineConfig(({ mode }) => ({
-  plugins: [
-    react(),
-    mode === 'production' && sentryVitePlugin({
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      release: {
-        name: process.env.RELEASE_VERSION,
-      },
-      sourcemaps: {
-        assets: './dist/**',
-        filesToDeleteAfterUpload: './dist/**/*.map',
-      },
-    }),
-  ].filter(Boolean),
-  build: {
-    sourcemap: true, // Required for Sentry plugin
-  },
+    plugins: [
+        react(),
+        mode === 'production' &&
+            sentryVitePlugin({
+                org: process.env.SENTRY_ORG,
+                project: process.env.SENTRY_PROJECT,
+                authToken: process.env.SENTRY_AUTH_TOKEN,
+                release: {
+                    name: process.env.RELEASE_VERSION,
+                },
+                sourcemaps: {
+                    assets: './dist/**',
+                    filesToDeleteAfterUpload: './dist/**/*.map',
+                },
+            }),
+    ].filter(Boolean),
+    build: {
+        sourcemap: true, // Required for Sentry plugin
+    },
 }));
 ```
 
@@ -514,20 +518,20 @@ server {
 ```
 
 **Benefits:**
+
 - Hidden source maps enable error tracking without exposing source code
 - Sentry integration provides detailed production error reports with original file names
 - CSS source maps in development speed up styling work
 - Server-level blocking adds a second layer of source map protection
 
-| Option | Description | Use Case |
-|--------|-------------|----------|
-| `false` | No source maps | Not recommended |
-| `true` | Generates and links .map files | Development/Staging |
-| `'inline'` | Embeds maps in bundles | Development only |
-| `'hidden'` | Generates .map files without link | Production |
+| Option     | Description                       | Use Case            |
+| ---------- | --------------------------------- | ------------------- |
+| `false`    | No source maps                    | Not recommended     |
+| `true`     | Generates and links .map files    | Development/Staging |
+| `'inline'` | Embeds maps in bundles            | Development only    |
+| `'hidden'` | Generates .map files without link | Production          |
 
 Reference: [Vite Build Options - sourcemap](https://vitejs.dev/config/build-options.html#build-sourcemap)
-
 
 ---
 
@@ -552,8 +556,8 @@ export * from './objects';
 import * as utils from './utils';
 
 function Component() {
-  // Only using one function but importing everything
-  return <div>{utils.formatDate(new Date())}</div>;
+    // Only using one function but importing everything
+    return <div>{utils.formatDate(new Date())}</div>;
 }
 ```
 
@@ -563,24 +567,25 @@ import _ from 'lodash';
 import moment from 'moment';
 
 function processData(items: Item[]) {
-  return _.uniqBy(items, 'id').map(item => ({
-    ...item,
-    date: moment(item.date).format('YYYY-MM-DD'),
-  }));
+    return _.uniqBy(items, 'id').map((item) => ({
+        ...item,
+        date: moment(item.date).format('YYYY-MM-DD'),
+    }));
 }
 ```
 
 ```json
 // ❌ Bad: package.json missing sideEffects field
 {
-  "name": "my-app",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js"
+    "name": "my-app",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js"
 }
 ```
 
 **Problems:**
+
 - Barrel exports with `export *` pull in entire modules even when only one function is used
 - Namespace imports (`import *`) prevent the bundler from identifying unused exports
 - Libraries like `lodash` (CJS) and `moment` are not tree-shakeable
@@ -601,7 +606,7 @@ export { pick, omit, merge } from './objects';
 import { formatDate } from './utils';
 
 function Component() {
-  return <div>{formatDate(new Date())}</div>;
+    return <div>{formatDate(new Date())}</div>;
 }
 ```
 
@@ -611,25 +616,21 @@ import uniqBy from 'lodash-es/uniqBy';
 import { format } from 'date-fns';
 
 function processData(items: Item[]) {
-  return uniqBy(items, 'id').map(item => ({
-    ...item,
-    date: format(new Date(item.date), 'yyyy-MM-dd'),
-  }));
+    return uniqBy(items, 'id').map((item) => ({
+        ...item,
+        date: format(new Date(item.date), 'yyyy-MM-dd'),
+    }));
 }
 ```
 
 ```json
 // ✅ Good: package.json with proper sideEffects configuration
 {
-  "name": "my-app",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "sideEffects": [
-    "*.css",
-    "*.scss",
-    "./src/polyfills.ts"
-  ]
+    "name": "my-app",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "sideEffects": ["*.css", "*.scss", "./src/polyfills.ts"]
 }
 ```
 
@@ -639,23 +640,24 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      treeshake: {
-        moduleSideEffects: 'no-external',
-        propertyReadSideEffects: false,
-        tryCatchDeoptimization: false,
-      },
+    plugins: [react()],
+    build: {
+        rollupOptions: {
+            treeshake: {
+                moduleSideEffects: 'no-external',
+                propertyReadSideEffects: false,
+                tryCatchDeoptimization: false,
+            },
+        },
     },
-  },
-  optimizeDeps: {
-    include: ['lodash-es'],
-  },
+    optimizeDeps: {
+        include: ['lodash-es'],
+    },
 });
 ```
 
 **Benefits:**
+
 - Named exports let the bundler eliminate unused functions at build time
 - ESM-compatible libraries (`lodash-es`, `date-fns`) enable per-function tree shaking
 - The `sideEffects` field tells the bundler which files are safe to remove when unused
@@ -663,7 +665,6 @@ export default defineConfig({
 - Use `rollup-plugin-visualizer` to audit bundle contents and verify tree shaking effectiveness
 
 Reference: [Vite Build Options - rollupOptions](https://vitejs.dev/config/build-options.html#build-rollupoptions) | [Rollup Tree Shaking](https://rollupjs.org/configuration-options/#treeshake)
-
 
 ---
 
@@ -681,11 +682,11 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    // Relying only on server-side compression
-    // which adds CPU overhead on every request
-  },
+    plugins: [react()],
+    build: {
+        // Relying only on server-side compression
+        // which adds CPU overhead on every request
+    },
 });
 ```
 
@@ -702,6 +703,7 @@ app.use(express.static('dist'));
 ```
 
 **Problems:**
+
 - Server-side runtime compression adds CPU overhead and latency to every request
 - Lower compression levels used at runtime to keep latency acceptable
 - No Brotli support in most runtime compression middleware
@@ -716,25 +718,25 @@ import react from '@vitejs/plugin-react';
 import viteCompression from 'vite-plugin-compression';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    // Generate gzip compressed files
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-      threshold: 1024, // Only compress files > 1KB
-      deleteOriginFile: false,
-    }),
-    // Also generate Brotli compressed files for modern browsers
-    viteCompression({
-      algorithm: 'brotliCompress',
-      ext: '.br',
-      threshold: 1024,
-    }),
-  ],
-  build: {
-    cssMinify: true,
-  },
+    plugins: [
+        react(),
+        // Generate gzip compressed files
+        viteCompression({
+            algorithm: 'gzip',
+            ext: '.gz',
+            threshold: 1024, // Only compress files > 1KB
+            deleteOriginFile: false,
+        }),
+        // Also generate Brotli compressed files for modern browsers
+        viteCompression({
+            algorithm: 'brotliCompress',
+            ext: '.br',
+            threshold: 1024,
+        }),
+    ],
+    build: {
+        cssMinify: true,
+    },
 });
 ```
 
@@ -746,29 +748,29 @@ import viteCompression from 'vite-plugin-compression';
 import { constants as zlibConstants } from 'zlib';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    viteCompression({
-      algorithm: 'gzip',
-      ext: '.gz',
-      threshold: 1024,
-      compressionOptions: {
-        level: 9, // Maximum compression
-      },
-      filter: /\.(js|css|html|json|svg|txt|xml|wasm)$/i,
-    }),
-    viteCompression({
-      algorithm: 'brotliCompress',
-      ext: '.br',
-      threshold: 1024,
-      compressionOptions: {
-        params: {
-          [zlibConstants.BROTLI_PARAM_QUALITY]: 11, // Maximum quality
-        },
-      },
-      filter: /\.(js|css|html|json|svg|txt|xml|wasm)$/i,
-    }),
-  ],
+    plugins: [
+        react(),
+        viteCompression({
+            algorithm: 'gzip',
+            ext: '.gz',
+            threshold: 1024,
+            compressionOptions: {
+                level: 9, // Maximum compression
+            },
+            filter: /\.(js|css|html|json|svg|txt|xml|wasm)$/i,
+        }),
+        viteCompression({
+            algorithm: 'brotliCompress',
+            ext: '.br',
+            threshold: 1024,
+            compressionOptions: {
+                params: {
+                    [zlibConstants.BROTLI_PARAM_QUALITY]: 11, // Maximum quality
+                },
+            },
+            filter: /\.(js|css|html|json|svg|txt|xml|wasm)$/i,
+        }),
+    ],
 });
 ```
 
@@ -798,32 +800,35 @@ import expressStaticGzip from 'express-static-gzip';
 
 const app = express();
 
-app.use('/', expressStaticGzip('dist', {
-  enableBrotli: true,
-  orderPreference: ['br', 'gzip'],
-  serveStatic: {
-    maxAge: '1y',
-    immutable: true,
-  },
-}));
+app.use(
+    '/',
+    expressStaticGzip('dist', {
+        enableBrotli: true,
+        orderPreference: ['br', 'gzip'],
+        serveStatic: {
+            maxAge: '1y',
+            immutable: true,
+        },
+    }),
+);
 
 app.listen(3000);
 ```
 
 **Benefits:**
+
 - Pre-compressed files eliminate on-the-fly compression overhead
 - Maximum compression levels achievable without impacting response latency
 - Brotli offers 15-25% better compression than gzip for text-based content
 - Faster Time to First Byte with no compression overhead per request
 - Both gzip and Brotli versions provide maximum browser compatibility
 
-| Format | Browser Support | Typical Ratio | Best For |
-|--------|-----------------|---------------|----------|
-| Gzip | 95%+ | 70-80% | Universal fallback |
-| Brotli | 90%+ | 80-90% | Modern browsers |
+| Format | Browser Support | Typical Ratio | Best For           |
+| ------ | --------------- | ------------- | ------------------ |
+| Gzip   | 95%+            | 70-80%        | Universal fallback |
+| Brotli | 90%+            | 80-90%        | Modern browsers    |
 
 Reference: [vite-plugin-compression](https://github.com/vbenjs/vite-plugin-compression)
-
 
 ---
 
@@ -841,16 +846,16 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name].js',
-        chunkFileNames: 'assets/[name].js',
-        assetFileNames: 'assets/[name].[ext]',
-      },
+    plugins: [react()],
+    build: {
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/[name].js',
+                chunkFileNames: 'assets/[name].js',
+                assetFileNames: 'assets/[name].[ext]',
+            },
+        },
     },
-  },
 });
 ```
 
@@ -864,6 +869,7 @@ output: {
 ```
 
 **Problems:**
+
 - Without hashes, users see stale content after deployments
 - Version-based hashes invalidate all files even when only one changed
 - No way to set aggressive cache headers without risking stale content
@@ -877,30 +883,30 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/js/[name]-[hash].js',
-        chunkFileNames: 'assets/js/[name]-[hash].js',
-        assetFileNames: (assetInfo) => {
-          const info = assetInfo.name?.split('.') || [];
-          const ext = info[info.length - 1];
+    plugins: [react()],
+    build: {
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/js/[name]-[hash].js',
+                chunkFileNames: 'assets/js/[name]-[hash].js',
+                assetFileNames: (assetInfo) => {
+                    const info = assetInfo.name?.split('.') || [];
+                    const ext = info[info.length - 1];
 
-          if (/png|jpe?g|gif|svg|webp|avif|ico/i.test(ext)) {
-            return 'assets/images/[name]-[hash][extname]';
-          }
-          if (/woff2?|eot|ttf|otf/i.test(ext)) {
-            return 'assets/fonts/[name]-[hash][extname]';
-          }
-          if (/css/i.test(ext)) {
-            return 'assets/css/[name]-[hash][extname]';
-          }
-          return 'assets/[name]-[hash][extname]';
+                    if (/png|jpe?g|gif|svg|webp|avif|ico/i.test(ext)) {
+                        return 'assets/images/[name]-[hash][extname]';
+                    }
+                    if (/woff2?|eot|ttf|otf/i.test(ext)) {
+                        return 'assets/fonts/[name]-[hash][extname]';
+                    }
+                    if (/css/i.test(ext)) {
+                        return 'assets/css/[name]-[hash][extname]';
+                    }
+                    return 'assets/[name]-[hash][extname]';
+                },
+            },
         },
-      },
     },
-  },
 });
 ```
 
@@ -912,20 +918,25 @@ import path from 'path';
 const app = express();
 
 // Immutable caching for hashed assets (1 year)
-app.use('/assets', express.static(path.join(__dirname, 'dist/assets'), {
-  maxAge: '1y',
-  immutable: true,
-}));
+app.use(
+    '/assets',
+    express.static(path.join(__dirname, 'dist/assets'), {
+        maxAge: '1y',
+        immutable: true,
+    }),
+);
 
 // Short cache for index.html (always check for updates)
-app.use(express.static(path.join(__dirname, 'dist'), {
-  maxAge: '5m',
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache, must-revalidate');
-    }
-  },
-}));
+app.use(
+    express.static(path.join(__dirname, 'dist'), {
+        maxAge: '5m',
+        setHeaders: (res, path) => {
+            if (path.endsWith('.html')) {
+                res.setHeader('Cache-Control', 'no-cache, must-revalidate');
+            }
+        },
+    }),
+);
 ```
 
 ```nginx
@@ -954,19 +965,19 @@ server {
 ```
 
 **Benefits:**
+
 - Content hashes create new URLs when files change, bypassing cached versions automatically
 - Hashed files can be cached indefinitely with the `immutable` directive
 - Users receive new code immediately after deployment without clearing cache
 - Unchanged files remain cached while only updated files are downloaded
 - Works seamlessly with CDNs and edge caching strategies
 
-| Cache-Control | Target |
-|--------------|--------|
-| `public, max-age=31536000, immutable` | Hashed assets |
-| `no-cache, must-revalidate` | HTML files, service workers |
+| Cache-Control                         | Target                      |
+| ------------------------------------- | --------------------------- |
+| `public, max-age=31536000, immutable` | Hashed assets               |
+| `no-cache, must-revalidate`           | HTML files, service workers |
 
 Reference: [Vite Build Options - rollupOptions](https://vitejs.dev/config/build-options.html#build-rollupoptions)
-
 
 ---
 
@@ -1003,6 +1014,7 @@ function App() {
 ```
 
 **Problems:**
+
 - All 5 page components are bundled together and loaded on initial page load
 - Users download code for pages they may never visit
 - Larger initial bundle means slower Time to Interactive
@@ -1068,6 +1080,7 @@ function NavLink() {
 ```
 
 **Benefits:**
+
 - Initial bundle reduced by 50-80% since only the current route is loaded
 - Time to Interactive significantly improved
 - Each route loads only when navigated to
@@ -1075,7 +1088,6 @@ function NavLink() {
 - Preloading on hover makes navigation feel instant
 
 Reference: [React lazy](https://react.dev/reference/react/lazy) | [Vite Code Splitting](https://vitejs.dev/guide/build.html#chunking-strategy)
-
 
 ---
 
@@ -1102,6 +1114,7 @@ function App() {
 ```
 
 **Problems:**
+
 - If any lazy component is loading, the entire app shows the loading state
 - No progressive rendering — users see nothing until everything loads
 - Poor perceived performance even on fast connections
@@ -1204,13 +1217,13 @@ function ContentSkeleton() {
 ```
 
 **Benefits:**
+
 - Parts of UI render independently without blocking each other
 - Better perceived performance with skeleton loading states
 - Graceful degradation on slow networks
 - Error boundaries catch loading failures per section, not globally
 
 Reference: [React Suspense](https://react.dev/reference/react/Suspense) | [react-error-boundary](https://github.com/bvaughn/react-error-boundary)
-
 
 ---
 
@@ -1242,6 +1255,7 @@ function Dashboard() {
 ```
 
 **Problems:**
+
 - Chart.js, React Quill, PDF renderer, and Monaco are all loaded even if never used
 - Initial bundle bloated with hundreds of KBs of library code
 - Slower Time to Interactive for all users regardless of feature usage
@@ -1359,6 +1373,7 @@ function App({ user }) {
 ```
 
 **Benefits:**
+
 - Initial bundle can be 50%+ smaller by deferring heavy libraries
 - Faster Time to Interactive since only critical code is parsed upfront
 - Better user experience on slow connections and mobile devices
@@ -1366,6 +1381,7 @@ function App({ user }) {
 - Feature-flag loading avoids shipping admin code to regular users
 
 Libraries that should typically be dynamically imported:
+
 - Chart libraries (Chart.js, Recharts, D3)
 - Rich text editors (React Quill, TipTap, Slate)
 - Code editors (Monaco, CodeMirror)
@@ -1375,7 +1391,6 @@ Libraries that should typically be dynamically imported:
 - Markdown renderers
 
 Reference: [Vite Dynamic Import](https://vitejs.dev/guide/features.html#dynamic-import) | [React lazy](https://react.dev/reference/react/lazy)
-
 
 ---
 
@@ -1402,23 +1417,24 @@ import AdvancedFilters from './components/AdvancedFilters';
 import ExportDialog from './components/ExportDialog';
 
 function Dashboard() {
-  const [showSettings, setShowSettings] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
-  return (
-    <div>
-      <Header />
-      <Sidebar />
-      <MainContent />
-      {showSettings && <SettingsPanel />}
-      {showProfile && <UserProfileModal />}
-    </div>
-  );
+    return (
+        <div>
+            <Header />
+            <Sidebar />
+            <MainContent />
+            {showSettings && <SettingsPanel />}
+            {showProfile && <UserProfileModal />}
+        </div>
+    );
 }
 // All modals, drawers, and dialogs loaded even if never opened
 ```
 
 **Problems:**
+
 - All modal, drawer, and dialog code is downloaded on initial page load
 - Users pay the cost of parsing code they may never use
 - Larger initial bundle slows Time to Interactive
@@ -1435,7 +1451,9 @@ import MainContent from './components/MainContent';
 import { Skeleton } from './components/ui/Skeleton';
 
 const SettingsPanel = lazy(() => import('./components/SettingsPanel'));
-const NotificationCenter = lazy(() => import('./components/NotificationCenter'));
+const NotificationCenter = lazy(
+    () => import('./components/NotificationCenter'),
+);
 const UserProfileModal = lazy(() => import('./components/UserProfileModal'));
 const HelpDrawer = lazy(() => import('./components/HelpDrawer'));
 const FeedbackForm = lazy(() => import('./components/FeedbackForm'));
@@ -1443,43 +1461,43 @@ const AdvancedFilters = lazy(() => import('./components/AdvancedFilters'));
 const ExportDialog = lazy(() => import('./components/ExportDialog'));
 
 function LazyModal({
-  isOpen,
-  children
+    isOpen,
+    children,
 }: {
-  isOpen: boolean;
-  children: React.ReactNode
+    isOpen: boolean;
+    children: React.ReactNode;
 }) {
-  if (!isOpen) return null;
+    if (!isOpen) return null;
 
-  return (
-    <Suspense fallback={<Skeleton className="modal-skeleton" />}>
-      {children}
-    </Suspense>
-  );
+    return (
+        <Suspense fallback={<Skeleton className="modal-skeleton" />}>
+            {children}
+        </Suspense>
+    );
 }
 
 function Dashboard() {
-  const [showSettings, setShowSettings] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
+    const [showSettings, setShowSettings] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
-  return (
-    <div>
-      <Header
-        onSettingsClick={() => setShowSettings(true)}
-        onProfileClick={() => setShowProfile(true)}
-      />
-      <Sidebar />
-      <MainContent />
+    return (
+        <div>
+            <Header
+                onSettingsClick={() => setShowSettings(true)}
+                onProfileClick={() => setShowProfile(true)}
+            />
+            <Sidebar />
+            <MainContent />
 
-      <LazyModal isOpen={showSettings}>
-        <SettingsPanel onClose={() => setShowSettings(false)} />
-      </LazyModal>
+            <LazyModal isOpen={showSettings}>
+                <SettingsPanel onClose={() => setShowSettings(false)} />
+            </LazyModal>
 
-      <LazyModal isOpen={showProfile}>
-        <UserProfileModal onClose={() => setShowProfile(false)} />
-      </LazyModal>
-    </div>
-  );
+            <LazyModal isOpen={showProfile}>
+                <UserProfileModal onClose={() => setShowProfile(false)} />
+            </LazyModal>
+        </div>
+    );
 }
 ```
 
@@ -1487,31 +1505,34 @@ function Dashboard() {
 // ✅ Good: Lazy component with preloading
 import { lazy, ComponentType, LazyExoticComponent } from 'react';
 
-interface PreloadableComponent<T extends ComponentType<any>>
-  extends LazyExoticComponent<T> {
-  preload: () => Promise<{ default: T }>;
+interface PreloadableComponent<
+    T extends ComponentType<any>,
+> extends LazyExoticComponent<T> {
+    preload: () => Promise<{ default: T }>;
 }
 
 export function lazyWithPreload<T extends ComponentType<any>>(
-  factory: () => Promise<{ default: T }>
+    factory: () => Promise<{ default: T }>,
 ): PreloadableComponent<T> {
-  const Component = lazy(factory) as PreloadableComponent<T>;
-  Component.preload = factory;
-  return Component;
+    const Component = lazy(factory) as PreloadableComponent<T>;
+    Component.preload = factory;
+    return Component;
 }
 
-const SettingsPanel = lazyWithPreload(() => import('./components/SettingsPanel'));
+const SettingsPanel = lazyWithPreload(
+    () => import('./components/SettingsPanel'),
+);
 
 function SettingsButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => SettingsPanel.preload()}
-      onFocus={() => SettingsPanel.preload()}
-    >
-      Settings
-    </button>
-  );
+    return (
+        <button
+            onClick={onClick}
+            onMouseEnter={() => SettingsPanel.preload()}
+            onFocus={() => SettingsPanel.preload()}
+        >
+            Settings
+        </button>
+    );
 }
 ```
 
@@ -1524,46 +1545,46 @@ const RelatedProducts = lazy(() => import('./components/RelatedProducts'));
 const CustomerReviews = lazy(() => import('./components/CustomerReviews'));
 
 function ProductPage({ productId }: { productId: string }) {
-  const { ref: reviewsRef, inView: reviewsInView } = useInView({
-    triggerOnce: true,
-    rootMargin: '200px',
-  });
+    const { ref: reviewsRef, inView: reviewsInView } = useInView({
+        triggerOnce: true,
+        rootMargin: '200px',
+    });
 
-  return (
-    <div>
-      <ProductHeader productId={productId} />
-      <ProductGallery productId={productId} />
+    return (
+        <div>
+            <ProductHeader productId={productId} />
+            <ProductGallery productId={productId} />
 
-      <section ref={reviewsRef}>
-        {reviewsInView && (
-          <Suspense fallback={<ReviewsSkeleton />}>
-            <CustomerReviews productId={productId} />
-          </Suspense>
-        )}
-      </section>
-    </div>
-  );
+            <section ref={reviewsRef}>
+                {reviewsInView && (
+                    <Suspense fallback={<ReviewsSkeleton />}>
+                        <CustomerReviews productId={productId} />
+                    </Suspense>
+                )}
+            </section>
+        </div>
+    );
 }
 ```
 
 **Benefits:**
+
 - Modals, drawers, and dialogs only load when actually opened
 - Faster First Contentful Paint since critical UI renders immediately
 - Below-the-fold content loads as users scroll, not on initial page load
 - Preloading on hover eliminates perceived delay when opening components
 - Better memory usage since components only occupy memory when rendered
 
-| Component Type | Lazy Load? | Reason |
-|---------------|------------|--------|
-| Modals/Dialogs | Yes | Only shown on interaction |
-| Drawers/Panels | Yes | Hidden by default |
-| Below-fold content | Yes | Not in initial viewport |
-| Tabs (non-default) | Yes | Hidden until selected |
-| Header/Navigation | No | Always visible |
-| Above-fold content | No | Critical for FCP |
+| Component Type     | Lazy Load? | Reason                    |
+| ------------------ | ---------- | ------------------------- |
+| Modals/Dialogs     | Yes        | Only shown on interaction |
+| Drawers/Panels     | Yes        | Hidden by default         |
+| Below-fold content | Yes        | Not in initial viewport   |
+| Tabs (non-default) | Yes        | Hidden until selected     |
+| Header/Navigation  | No         | Always visible            |
+| Above-fold content | No         | Critical for FCP          |
 
 Reference: [React lazy](https://react.dev/reference/react/lazy) | [react-intersection-observer](https://github.com/thebuilder/react-intersection-observer)
-
 
 ---
 
@@ -1585,28 +1606,29 @@ const Analytics = lazy(() => import('./pages/Analytics'));
 const Settings = lazy(() => import('./pages/Settings'));
 
 function App() {
-  return (
-    <>
-      <nav>
-        <Link to="/">Dashboard</Link>
-        <Link to="/analytics">Analytics</Link>
-        <Link to="/settings">Settings</Link>
-      </nav>
+    return (
+        <>
+            <nav>
+                <Link to="/">Dashboard</Link>
+                <Link to="/analytics">Analytics</Link>
+                <Link to="/settings">Settings</Link>
+            </nav>
 
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </Suspense>
-    </>
-  );
+            <Suspense fallback={<Loading />}>
+                <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/settings" element={<Settings />} />
+                </Routes>
+            </Suspense>
+        </>
+    );
 }
 // User clicks link -> waits for chunk download -> sees loading -> page renders
 ```
 
 **Problems:**
+
 - Users see loading spinners on every navigation
 - Chunks only start downloading after the user clicks
 - No anticipation of user intent leads to perceived slowness
@@ -1620,11 +1642,11 @@ import { lazy, Suspense, useCallback } from 'react';
 import { Routes, Route, Link, LinkProps } from 'react-router-dom';
 
 function lazyWithPreload<T extends React.ComponentType<any>>(
-  factory: () => Promise<{ default: T }>
+    factory: () => Promise<{ default: T }>,
 ) {
-  const Component = lazy(factory);
-  (Component as any).preload = factory;
-  return Component as typeof Component & { preload: typeof factory };
+    const Component = lazy(factory);
+    (Component as any).preload = factory;
+    return Component as typeof Component & { preload: typeof factory };
 }
 
 const Dashboard = lazyWithPreload(() => import('./pages/Dashboard'));
@@ -1632,47 +1654,58 @@ const Analytics = lazyWithPreload(() => import('./pages/Analytics'));
 const Settings = lazyWithPreload(() => import('./pages/Settings'));
 
 interface PrefetchLinkProps extends LinkProps {
-  preload?: () => Promise<any>;
+    preload?: () => Promise<any>;
 }
 
-function PrefetchLink({ preload, onMouseEnter, onFocus, ...props }: PrefetchLinkProps) {
-  const handlePreload = useCallback(() => {
-    preload?.();
-  }, [preload]);
+function PrefetchLink({
+    preload,
+    onMouseEnter,
+    onFocus,
+    ...props
+}: PrefetchLinkProps) {
+    const handlePreload = useCallback(() => {
+        preload?.();
+    }, [preload]);
 
-  return (
-    <Link
-      {...props}
-      onMouseEnter={(e) => {
-        handlePreload();
-        onMouseEnter?.(e);
-      }}
-      onFocus={(e) => {
-        handlePreload();
-        onFocus?.(e);
-      }}
-    />
-  );
+    return (
+        <Link
+            {...props}
+            onMouseEnter={(e) => {
+                handlePreload();
+                onMouseEnter?.(e);
+            }}
+            onFocus={(e) => {
+                handlePreload();
+                onFocus?.(e);
+            }}
+        />
+    );
 }
 
 function App() {
-  return (
-    <>
-      <nav>
-        <PrefetchLink to="/" preload={Dashboard.preload}>Dashboard</PrefetchLink>
-        <PrefetchLink to="/analytics" preload={Analytics.preload}>Analytics</PrefetchLink>
-        <PrefetchLink to="/settings" preload={Settings.preload}>Settings</PrefetchLink>
-      </nav>
+    return (
+        <>
+            <nav>
+                <PrefetchLink to="/" preload={Dashboard.preload}>
+                    Dashboard
+                </PrefetchLink>
+                <PrefetchLink to="/analytics" preload={Analytics.preload}>
+                    Analytics
+                </PrefetchLink>
+                <PrefetchLink to="/settings" preload={Settings.preload}>
+                    Settings
+                </PrefetchLink>
+            </nav>
 
-      <Suspense fallback={<Loading />}>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </Suspense>
-    </>
-  );
+            <Suspense fallback={<Loading />}>
+                <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/settings" element={<Settings />} />
+                </Routes>
+            </Suspense>
+        </>
+    );
 }
 // User hovers link -> chunk downloads -> user clicks -> instant navigation
 ```
@@ -1682,38 +1715,38 @@ function App() {
 import { useEffect, useRef } from 'react';
 
 interface PrefetchOnVisibleProps {
-  children: React.ReactNode;
-  preload: () => Promise<any>;
-  rootMargin?: string;
+    children: React.ReactNode;
+    preload: () => Promise<any>;
+    rootMargin?: string;
 }
 
 export function PrefetchOnVisible({
-  children,
-  preload,
-  rootMargin = '200px',
+    children,
+    preload,
+    rootMargin = '200px',
 }: PrefetchOnVisibleProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const prefetched = useRef(false);
+    const ref = useRef<HTMLDivElement>(null);
+    const prefetched = useRef(false);
 
-  useEffect(() => {
-    if (!ref.current || prefetched.current) return;
+    useEffect(() => {
+        if (!ref.current || prefetched.current) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !prefetched.current) {
-          prefetched.current = true;
-          preload();
-          observer.disconnect();
-        }
-      },
-      { rootMargin }
-    );
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !prefetched.current) {
+                    prefetched.current = true;
+                    preload();
+                    observer.disconnect();
+                }
+            },
+            { rootMargin },
+        );
 
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [preload, rootMargin]);
+        observer.observe(ref.current);
+        return () => observer.disconnect();
+    }, [preload, rootMargin]);
 
-  return <div ref={ref}>{children}</div>;
+    return <div ref={ref}>{children}</div>;
 }
 ```
 
@@ -1756,21 +1789,21 @@ function App() {
 ```
 
 **Benefits:**
+
 - Code loads while users decide, making clicks feel instantaneous
 - Eliminates loading spinners for common navigation paths
 - Prefetching during idle time does not compete with critical resources
 - Maintains code splitting benefits with smarter preloading
 - Users on slow connections benefit the most from preloading
 
-| Strategy | Trigger | Best For |
-|----------|---------|----------|
-| Hover/Focus | User intent signal | Navigation links |
-| Viewport Entry | Scroll position | Below-fold sections |
-| Idle Time | After initial load | Common routes |
-| `modulepreload` | Page load | Critical vendors |
+| Strategy        | Trigger            | Best For            |
+| --------------- | ------------------ | ------------------- |
+| Hover/Focus     | User intent signal | Navigation links    |
+| Viewport Entry  | Scroll position    | Below-fold sections |
+| Idle Time       | After initial load | Common routes       |
+| `modulepreload` | Page load          | Critical vendors    |
 
 Reference: [Vite modulePreload](https://vitejs.dev/config/build-options.html#build-modulepreload) | [React lazy](https://react.dev/reference/react/lazy)
-
 
 ---
 
@@ -1785,11 +1818,12 @@ Vite pre-bundles dependencies to convert CommonJS/UMD to ESM and reduce the numb
 ```typescript
 // ❌ Bad: No optimizeDeps configuration
 export default defineConfig({
-  // Vite auto-detects but may miss some deps
-})
+    // Vite auto-detects but may miss some deps
+});
 ```
 
 **Problems:**
+
 - Some dependencies may not be pre-bundled, causing slow page loads
 - Cold start can be slow with many dependencies
 - Runtime errors from unbundled CommonJS modules
@@ -1799,62 +1833,59 @@ export default defineConfig({
 
 ```typescript
 // ✅ Good: Explicitly include dependencies for pre-bundling
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
+    plugins: [react()],
 
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      'react-router-dom',
-      '@tanstack/react-query',
-      'zustand',
-      'axios',
-      'date-fns',
-      'react-dom/client',
-    ],
+    optimizeDeps: {
+        include: [
+            'react',
+            'react-dom',
+            'react-router-dom',
+            '@tanstack/react-query',
+            'zustand',
+            'axios',
+            'date-fns',
+            'react-dom/client',
+        ],
 
-    exclude: [
-      // '@some/esm-only-package',
-    ],
-  },
-})
+        exclude: [
+            // '@some/esm-only-package',
+        ],
+    },
+});
 ```
 
 ```typescript
 // ✅ Good: Handle CommonJS dependencies
 export default defineConfig({
-  optimizeDeps: {
-    include: [
-      'lodash-es',
-      'linked-package > some-dep',
-    ],
+    optimizeDeps: {
+        include: ['lodash-es', 'linked-package > some-dep'],
 
-    esbuildOptions: {
-      define: {
-        global: 'globalThis',
-      },
+        esbuildOptions: {
+            define: {
+                global: 'globalThis',
+            },
+        },
     },
-  },
-})
+});
 ```
 
 ```typescript
 // ✅ Good: Warmup frequently used files (Vite 5+)
 export default defineConfig({
-  server: {
-    warmup: {
-      clientFiles: [
-        './src/main.tsx',
-        './src/App.tsx',
-        './src/components/index.ts',
-      ],
+    server: {
+        warmup: {
+            clientFiles: [
+                './src/main.tsx',
+                './src/App.tsx',
+                './src/components/index.ts',
+            ],
+        },
     },
-  },
-})
+});
 ```
 
 ```bash
@@ -1871,13 +1902,13 @@ ls node_modules/.vite/deps/
 ```
 
 **Benefits:**
+
 - 2-5x faster cold start by pre-bundling dependencies upfront
 - Eliminates "optimizing dependencies" interruptions during development
 - Prevents CommonJS/ESM compatibility issues at runtime
 - Server warmup pre-transforms critical files on start for instant page loads
 
 Reference: [Vite Dep Pre-Bundling](https://vitejs.dev/guide/dep-pre-bundling.html)
-
 
 ---
 
@@ -1892,7 +1923,7 @@ Structure components to take full advantage of React Fast Refresh for instant up
 ```tsx
 // ❌ Bad: Named exports can break Fast Refresh in some cases
 export const App = () => {
-  return <div>App</div>;
+    return <div>App</div>;
 };
 
 // Multiple component exports in one file
@@ -1908,20 +1939,18 @@ import { fetchUser } from './api';
 const initialUser = await fetchUser('current');
 
 export default function UserProfile() {
-  const [user] = useState(initialUser);
-  return <div>{user.name}</div>;
+    const [user] = useState(initialUser);
+    return <div>{user.name}</div>;
 }
 ```
 
 ```tsx
 // ❌ Bad: Mixing components with non-component exports
 export default function Counter() {
-  const [count, setCount] = useState(0);
-  return (
-    <button onClick={() => setCount(c => c + 1)}>
-      Count: {count}
-    </button>
-  );
+    const [count, setCount] = useState(0);
+    return (
+        <button onClick={() => setCount((c) => c + 1)}>Count: {count}</button>
+    );
 }
 
 export const MAX_COUNT = 100;
@@ -1931,11 +1960,12 @@ export const formatCount = (n: number) => n.toLocaleString();
 ```tsx
 // ❌ Bad: Anonymous component - Fast Refresh can't identify it
 export default () => {
-  return <div>Anonymous</div>;
+    return <div>Anonymous</div>;
 };
 ```
 
 **Problems:**
+
 - Multiple components per file may cause full page reloads instead of hot updates
 - Module-level side effects re-execute on every edit, breaking state
 - Non-component exports in component files trigger full module replacement
@@ -1946,15 +1976,15 @@ export default () => {
 ```tsx
 // ✅ Good: Default export for main component, one per file
 export default function App() {
-  return (
-    <div>
-      <Header />
-      <main>
-        <Outlet />
-      </main>
-      <Footer />
-    </div>
-  );
+    return (
+        <div>
+            <Header />
+            <main>
+                <Outlet />
+            </main>
+            <Footer />
+        </div>
+    );
 }
 ```
 
@@ -1966,7 +1996,7 @@ export const MIN_COUNT = 0;
 
 // utils/format.ts
 export function formatCount(n: number): string {
-  return n.toLocaleString();
+    return n.toLocaleString();
 }
 
 // components/Counter.tsx - Pure component file
@@ -1975,15 +2005,19 @@ import { MAX_COUNT, MIN_COUNT } from '../constants/counter';
 import { formatCount } from '../utils/format';
 
 export default function Counter() {
-  const [count, setCount] = useState(0);
+    const [count, setCount] = useState(0);
 
-  return (
-    <div className="counter">
-      <button onClick={() => setCount(c => Math.max(c - 1, MIN_COUNT))}>-</button>
-      <span>{formatCount(count)}</span>
-      <button onClick={() => setCount(c => Math.min(c + 1, MAX_COUNT))}>+</button>
-    </div>
-  );
+    return (
+        <div className="counter">
+            <button onClick={() => setCount((c) => Math.max(c - 1, MIN_COUNT))}>
+                -
+            </button>
+            <span>{formatCount(count)}</span>
+            <button onClick={() => setCount((c) => Math.min(c + 1, MAX_COUNT))}>
+                +
+            </button>
+        </div>
+    );
 }
 ```
 
@@ -1993,60 +2027,62 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchUser } from '../api/users';
 
 export default function UserProfile() {
-  const { data: user, isLoading, error } = useQuery({
-    queryKey: ['user', 'current'],
-    queryFn: () => fetchUser('current'),
-  });
+    const {
+        data: user,
+        isLoading,
+        error,
+    } = useQuery({
+        queryKey: ['user', 'current'],
+        queryFn: () => fetchUser('current'),
+    });
 
-  if (isLoading) return <Skeleton />;
-  if (error) return <ErrorMessage error={error} />;
+    if (isLoading) return <Skeleton />;
+    if (error) return <ErrorMessage error={error} />;
 
-  return (
-    <div className="user-profile">
-      <Avatar src={user.avatar} alt={user.name} />
-      <h1>{user.name}</h1>
-      <p>{user.email}</p>
-    </div>
-  );
+    return (
+        <div className="user-profile">
+            <Avatar src={user.avatar} alt={user.name} />
+            <h1>{user.name}</h1>
+            <p>{user.email}</p>
+        </div>
+    );
 }
 ```
 
 ```tsx
 // ✅ Good: Set displayName on HOCs for Fast Refresh and DevTools
-export function withAuth<P extends object>(
-  WrappedComponent: ComponentType<P>
-) {
-  function WithAuth(props: P) {
-    const { user, isLoading } = useAuth();
-    if (isLoading) return <LoadingSpinner />;
-    if (!user) return <Navigate to="/login" />;
-    return <WrappedComponent {...props} />;
-  }
+export function withAuth<P extends object>(WrappedComponent: ComponentType<P>) {
+    function WithAuth(props: P) {
+        const { user, isLoading } = useAuth();
+        if (isLoading) return <LoadingSpinner />;
+        if (!user) return <Navigate to="/login" />;
+        return <WrappedComponent {...props} />;
+    }
 
-  WithAuth.displayName = `WithAuth(${
-    WrappedComponent.displayName || WrappedComponent.name || 'Component'
-  })`;
+    WithAuth.displayName = `WithAuth(${
+        WrappedComponent.displayName || WrappedComponent.name || 'Component'
+    })`;
 
-  return WithAuth;
+    return WithAuth;
 }
 ```
 
 **Benefits:**
+
 - State preserved across edits — no losing form inputs or scroll position
 - Changes reflect in ~50ms, enabling rapid UI iteration
 - Error recovery restores previous state without full reload
 - Only changed components re-render, keeping the rest of the app intact
 
-| Pattern | Fast Refresh | Notes |
-|---------|--------------|-------|
-| Default export function | Works | Recommended |
-| Named export function | Usually works | Name must be PascalCase |
-| Anonymous function | Fails | Always name components |
-| Multiple components/file | May break | One component per file |
-| Non-component exports | May break | Separate into utility files |
+| Pattern                  | Fast Refresh  | Notes                       |
+| ------------------------ | ------------- | --------------------------- |
+| Default export function  | Works         | Recommended                 |
+| Named export function    | Usually works | Name must be PascalCase     |
+| Anonymous function       | Fails         | Always name components      |
+| Multiple components/file | May break     | One component per file      |
+| Non-component exports    | May break     | Separate into utility files |
 
 Reference: [React Fast Refresh](https://react.dev/learn/editor-setup#your-editor) | [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react)
-
 
 ---
 
@@ -2064,8 +2100,8 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  // HMR works with defaults but may have issues in certain environments
+    plugins: [react()],
+    // HMR works with defaults but may have issues in certain environments
 });
 ```
 
@@ -2074,24 +2110,25 @@ export default defineConfig({
 let userCache = {};
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    return userCache.current || null;
-  });
+    const [user, setUser] = useState(() => {
+        return userCache.current || null;
+    });
 
-  useEffect(() => {
-    userCache.current = user;
-  }, [user]);
+    useEffect(() => {
+        userCache.current = user;
+    }, [user]);
 
-  return (
-    <UserContext.Provider value={{ user, setUser }}>
-      {children}
-    </UserContext.Provider>
-  );
+    return (
+        <UserContext.Provider value={{ user, setUser }}>
+            {children}
+        </UserContext.Provider>
+    );
 }
 // HMR causes state loss and unexpected behavior
 ```
 
 **Problems:**
+
 - Default HMR config fails in Docker, WSL, and network drive environments
 - Module-level mutable state persists across HMR updates, causing bugs
 - Missing watch configuration leads to undetected file changes
@@ -2105,21 +2142,21 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [
-    react({
-      fastRefresh: true,
-    }),
-  ],
-  server: {
-    hmr: {
-      overlay: true,
-      protocol: 'ws',
+    plugins: [
+        react({
+            fastRefresh: true,
+        }),
+    ],
+    server: {
+        hmr: {
+            overlay: true,
+            protocol: 'ws',
+        },
+        watch: {
+            usePolling: process.env.USE_POLLING === 'true',
+            ignored: ['**/node_modules/**', '**/dist/**'],
+        },
     },
-    watch: {
-      usePolling: process.env.USE_POLLING === 'true',
-      ignored: ['**/node_modules/**', '**/dist/**'],
-    },
-  },
 });
 ```
 
@@ -2129,18 +2166,18 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: '0.0.0.0',
-    hmr: {
-      host: 'localhost',
-      clientPort: 5173,
+    plugins: [react()],
+    server: {
+        host: '0.0.0.0',
+        hmr: {
+            host: 'localhost',
+            clientPort: 5173,
+        },
+        watch: {
+            usePolling: true,
+            interval: 1000,
+        },
     },
-    watch: {
-      usePolling: true,
-      interval: 1000,
-    },
-  },
 });
 ```
 
@@ -2149,13 +2186,13 @@ export default defineConfig({
 import { create } from 'zustand';
 
 interface UserState {
-  user: User | null;
-  setUser: (user: User | null) => void;
+    user: User | null;
+    setUser: (user: User | null) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
+    user: null,
+    setUser: (user) => set({ user }),
 }));
 // HMR will preserve store state automatically
 ```
@@ -2165,23 +2202,23 @@ export const useUserStore = create<UserState>((set) => ({
 import axios from 'axios';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  timeout: 10000,
+    baseURL: import.meta.env.VITE_API_URL,
+    timeout: 10000,
 });
 
 if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    apiClient.interceptors.request.clear();
-    apiClient.interceptors.response.clear();
-  });
+    import.meta.hot.dispose(() => {
+        apiClient.interceptors.request.clear();
+        apiClient.interceptors.response.clear();
+    });
 }
 
 apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
 });
 ```
 
@@ -2192,41 +2229,41 @@ import { createContext, useContext, useState, useCallback } from 'react';
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+    const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
-  }, []);
+    const toggleTheme = useCallback(() => {
+        setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    }, []);
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+    return (
+        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+            {children}
+        </ThemeContext.Provider>
+    );
 }
 
 if (import.meta.hot) {
-  import.meta.hot.accept();
+    import.meta.hot.accept();
 }
 ```
 
 **Benefits:**
+
 - Changes reflect in the browser in milliseconds, not seconds
 - React Fast Refresh maintains component state during updates
 - Clear error overlays help quickly identify and fix issues
 - Docker/WSL configuration ensures HMR works in containerized environments
 - Custom `import.meta.hot` handling prevents memory leaks during long sessions
 
-| Issue | Cause | Solution |
-|-------|-------|----------|
-| Full page reload | Export not a component | Check default exports |
-| State lost | Module-level state | Use state management library |
-| Changes not detected | File system events | Enable polling |
-| Connection errors | Port/protocol mismatch | Configure hmr.clientPort |
-| Slow updates | Large dep chain | Optimize with optimizeDeps |
+| Issue                | Cause                  | Solution                     |
+| -------------------- | ---------------------- | ---------------------------- |
+| Full page reload     | Export not a component | Check default exports        |
+| State lost           | Module-level state     | Use state management library |
+| Changes not detected | File system events     | Enable polling               |
+| Connection errors    | Port/protocol mismatch | Configure hmr.clientPort     |
+| Slow updates         | Large dep chain        | Optimize with optimizeDeps   |
 
 Reference: [Vite HMR API](https://vitejs.dev/guide/api-hmr.html) | [Vite Server Options](https://vitejs.dev/config/server-options.html)
-
 
 ---
 
@@ -2253,6 +2290,7 @@ function Gallery() {
 ```
 
 **Problems:**
+
 - No lazy loading — all images downloaded immediately
 - No responsive images — oversized images on small screens
 - No explicit dimensions — causes Cumulative Layout Shift (CLS)
@@ -2326,18 +2364,18 @@ function ResponsiveImage() {
 ```typescript
 // ✅ Good: Vite image optimization plugin
 // vite.config.ts
-import { defineConfig } from 'vite'
-import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+import { defineConfig } from 'vite';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 export default defineConfig({
-  plugins: [
-    ViteImageOptimizer({
-      png: { quality: 80 },
-      jpeg: { quality: 80 },
-      webp: { lossless: true },
-    }),
-  ],
-})
+    plugins: [
+        ViteImageOptimizer({
+            png: { quality: 80 },
+            jpeg: { quality: 80 },
+            webp: { lossless: true },
+        }),
+    ],
+});
 ```
 
 ```typescript
@@ -2397,6 +2435,7 @@ function Hero() {
 ```
 
 **Benefits:**
+
 - 40-70% reduction in image payload with modern formats (WebP, AVIF)
 - Better LCP (Largest Contentful Paint) with priority loading for hero images
 - Reduced CLS (Cumulative Layout Shift) by specifying explicit dimensions
@@ -2404,7 +2443,6 @@ function Hero() {
 - Automatic inlining of small images eliminates extra HTTP requests
 
 Reference: [Vite Static Asset Handling](https://vitejs.dev/guide/assets.html) | [web.dev Image Optimization](https://web.dev/fast/#optimize-your-images)
-
 
 ---
 
@@ -2433,6 +2471,7 @@ function Icon() {
 ```
 
 **Problems:**
+
 - SVGs as `<img>` tags cannot be styled with CSS (no color changes, no hover effects)
 - Inline SVGs are duplicated across components, bloating the bundle
 - No tree shaking — unused icons still included in the build
@@ -2446,29 +2485,29 @@ npm install vite-plugin-svgr -D
 
 ```typescript
 // ✅ Good: vite.config.ts - Configure SVGR plugin
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import svgr from 'vite-plugin-svgr'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import svgr from 'vite-plugin-svgr';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    svgr({
-      exportAsDefault: false,
-      svgrOptions: {
-        plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
-        svgoConfig: {
-          plugins: [
-            {
-              name: 'removeViewBox',
-              active: false, // Keep viewBox for scaling
+    plugins: [
+        react(),
+        svgr({
+            exportAsDefault: false,
+            svgrOptions: {
+                plugins: ['@svgr/plugin-svgo', '@svgr/plugin-jsx'],
+                svgoConfig: {
+                    plugins: [
+                        {
+                            name: 'removeViewBox',
+                            active: false, // Keep viewBox for scaling
+                        },
+                    ],
+                },
             },
-          ],
-        },
-      },
-    }),
-  ],
-})
+        }),
+    ],
+});
 ```
 
 ```typescript
@@ -2496,14 +2535,14 @@ function Header() {
 /// <reference types="vite-plugin-svgr/client" />
 
 declare module '*.svg?react' {
-  import type { FunctionComponent, SVGProps } from 'react'
-  const content: FunctionComponent<SVGProps<SVGSVGElement>>
-  export default content
+    import type { FunctionComponent, SVGProps } from 'react';
+    const content: FunctionComponent<SVGProps<SVGSVGElement>>;
+    export default content;
 }
 
 declare module '*.svg' {
-  const content: string
-  export default content
+    const content: string;
+    export default content;
 }
 ```
 
@@ -2559,6 +2598,7 @@ export function Icon({ name, size = 24, className, ...props }: IconProps) {
 ```
 
 **Benefits:**
+
 - SVGs fully styleable with Tailwind CSS or any CSS framework
 - Dynamic colors via `currentColor` without maintaining multiple SVG files
 - Better tree shaking — unused icons excluded from the build
@@ -2566,7 +2606,6 @@ export function Icon({ name, size = 24, className, ...props }: IconProps) {
 - TypeScript support provides autocompletion for icon names
 
 Reference: [vite-plugin-svgr](https://github.com/pd4d10/vite-plugin-svgr) | [SVGR](https://react-svgr.com/)
-
 
 ---
 
@@ -2582,10 +2621,10 @@ Render-blocking external font requests add network round trips and cause layout 
 // ❌ Bad — render-blocking CDN font in index.html
 // index.html
 <head>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
-    rel="stylesheet"
-  />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet"
+    />
 </head>
 ```
 
@@ -2600,6 +2639,7 @@ body {
 ```
 
 **Problems:**
+
 - Render-blocking request to third-party CDN
 - Extra DNS lookup and TLS handshake for fonts.googleapis.com and fonts.gstatic.com
 - No control over font-display behavior
@@ -2617,69 +2657,73 @@ body {
 /* src/styles/fonts.css */
 /* ✅ Good — self-hosted, subsetted, font-display: swap */
 @font-face {
-  font-family: 'Inter';
-  src: url('/src/assets/fonts/Inter-Regular.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
+    font-family: 'Inter';
+    src: url('/src/assets/fonts/Inter-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('/src/assets/fonts/Inter-Medium.woff2') format('woff2');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
+    font-family: 'Inter';
+    src: url('/src/assets/fonts/Inter-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
 }
 
 @font-face {
-  font-family: 'Inter';
-  src: url('/src/assets/fonts/Inter-Bold.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
+    font-family: 'Inter';
+    src: url('/src/assets/fonts/Inter-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+2000-206F;
 }
 ```
 
 ```html
 <!-- ✅ Good — preload critical font in index.html -->
 <head>
-  <link
-    rel="preload"
-    href="/src/assets/fonts/Inter-Regular.woff2"
-    as="font"
-    type="font/woff2"
-    crossorigin
-  />
+    <link
+        rel="preload"
+        href="/src/assets/fonts/Inter-Regular.woff2"
+        as="font"
+        type="font/woff2"
+        crossorigin
+    />
 </head>
 ```
 
 ```typescript
 // ✅ Good — vite.config.ts handles font files
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      output: {
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name && /\.(woff2?|ttf|otf|eot)$/.test(assetInfo.name)) {
-            return 'assets/fonts/[name]-[hash][extname]'
-          }
-          return 'assets/[name]-[hash][extname]'
+    plugins: [react()],
+    build: {
+        rollupOptions: {
+            output: {
+                assetFileNames: (assetInfo) => {
+                    if (
+                        assetInfo.name &&
+                        /\.(woff2?|ttf|otf|eot)$/.test(assetInfo.name)
+                    ) {
+                        return 'assets/fonts/[name]-[hash][extname]';
+                    }
+                    return 'assets/[name]-[hash][extname]';
+                },
+            },
         },
-      },
     },
-  },
-})
+});
 ```
 
 **Benefits:**
+
 - No third-party network requests or DNS lookups
 - `font-display: swap` prevents invisible text during load
 - `unicode-range` limits download to needed character sets
@@ -2688,7 +2732,6 @@ export default defineConfig({
 - Full GDPR compliance with no external requests
 
 Reference: [Vite Static Asset Handling](https://vite.dev/guide/assets.html)
-
 
 ---
 
@@ -2702,27 +2745,28 @@ Vite offers two ways to serve assets: the `public/` directory and JavaScript imp
 
 ```tsx
 // ❌ Bad — importing files that should stay static in public/
-import robots from '../public/robots.txt?raw'
-import manifest from '../public/manifest.json'
+import robots from '../public/robots.txt?raw';
+import manifest from '../public/manifest.json';
 
 // ❌ Bad — putting everything in public/ to avoid imports
 function Logo() {
-  return <img src="/logo.png" alt="Logo" /> // No hash, no cache busting
+    return <img src="/logo.png" alt="Logo" />; // No hash, no cache busting
 }
 
 function App() {
-  return (
-    <div>
-      <Logo />
-      {/* All assets in public/ — none get hashed */}
-      <img src="/hero-banner.png" alt="Hero" />
-      <img src="/icons/arrow.svg" alt="Arrow" />
-    </div>
-  )
+    return (
+        <div>
+            <Logo />
+            {/* All assets in public/ — none get hashed */}
+            <img src="/hero-banner.png" alt="Hero" />
+            <img src="/icons/arrow.svg" alt="Arrow" />
+        </div>
+    );
 }
 ```
 
 **Problems:**
+
 - Assets in `public/` are served as-is with no content hashing — browser cache issues on updates
 - Importing from `public/` bypasses Vite's asset pipeline
 - No tree-shaking or dead code elimination for unused assets
@@ -2733,19 +2777,19 @@ function App() {
 
 ```tsx
 // ✅ Good — import assets that benefit from hashing and optimization
-import logo from './assets/logo.png'        // → /assets/logo-a1b2c3d4.png
-import heroBanner from './assets/hero.png'   // → /assets/hero-e5f6g7h8.png
-import ArrowIcon from './assets/arrow.svg?react'
+import logo from './assets/logo.png'; // → /assets/logo-a1b2c3d4.png
+import heroBanner from './assets/hero.png'; // → /assets/hero-e5f6g7h8.png
+import ArrowIcon from './assets/arrow.svg?react';
 
 function App() {
-  return (
-    <div>
-      {/* Imported — hashed filename, cache-busted on change */}
-      <img src={logo} alt="Logo" />
-      <img src={heroBanner} alt="Hero" />
-      <ArrowIcon />
-    </div>
-  )
+    return (
+        <div>
+            {/* Imported — hashed filename, cache-busted on change */}
+            <img src={logo} alt="Logo" />
+            <img src={heroBanner} alt="Hero" />
+            <ArrowIcon />
+        </div>
+    );
 }
 ```
 
@@ -2786,6 +2830,7 @@ function CountryFlag({ code }: { code: string }) {
 ```
 
 **Benefits:**
+
 - Imported assets get content-hashed filenames for reliable cache busting
 - Build fails if an imported asset is missing — no silent 404s at runtime
 - Small assets are automatically inlined as base64 (below `assetsInlineLimit`)
@@ -2793,7 +2838,6 @@ function CountryFlag({ code }: { code: string }) {
 - Clear separation of concerns between processed and static assets
 
 Reference: [Vite Static Asset Handling](https://vite.dev/guide/assets.html#the-public-directory)
-
 
 ---
 
@@ -2814,8 +2858,8 @@ APP_TITLE=My App
 
 ```typescript
 // ❌ Bad: Variables not exposed - returns undefined
-const apiKey = import.meta.env.API_KEY // undefined
-const title = import.meta.env.APP_TITLE // undefined
+const apiKey = import.meta.env.API_KEY; // undefined
+const title = import.meta.env.APP_TITLE; // undefined
 ```
 
 ```env
@@ -2826,6 +2870,7 @@ VITE_PRIVATE_KEY=...
 ```
 
 **Problems:**
+
 - Variables without `VITE_` prefix are not available in client code
 - Sensitive data with `VITE_` prefix is embedded in the bundle and visible to anyone
 - No type safety leads to runtime errors from undefined variables
@@ -2847,15 +2892,15 @@ API_SECRET=secret123
 
 ```typescript
 // ✅ Good: Access client-side variables
-const apiUrl = import.meta.env.VITE_API_URL
-const appTitle = import.meta.env.VITE_APP_TITLE
-const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true'
+const apiUrl = import.meta.env.VITE_API_URL;
+const appTitle = import.meta.env.VITE_APP_TITLE;
+const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true';
 
 // Built-in variables
-const isDev = import.meta.env.DEV
-const isProd = import.meta.env.PROD
-const mode = import.meta.env.MODE
-const baseUrl = import.meta.env.BASE_URL
+const isDev = import.meta.env.DEV;
+const isProd = import.meta.env.PROD;
+const mode = import.meta.env.MODE;
+const baseUrl = import.meta.env.BASE_URL;
 ```
 
 ```typescript
@@ -2864,13 +2909,13 @@ const baseUrl = import.meta.env.BASE_URL
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
-  readonly VITE_APP_TITLE: string
-  readonly VITE_ENABLE_ANALYTICS: string
+    readonly VITE_API_URL: string;
+    readonly VITE_APP_TITLE: string;
+    readonly VITE_ENABLE_ANALYTICS: string;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+    readonly env: ImportMetaEnv;
 }
 ```
 
@@ -2890,16 +2935,17 @@ VITE_API_URL=https://staging-api.example.com
 // ✅ Good: Runtime configuration for values that change without rebuild
 // public/config.js
 window.APP_CONFIG = {
-  apiUrl: 'https://api.example.com',
-}
+    apiUrl: 'https://api.example.com',
+};
 
 // src/config.ts
 export const config = {
-  apiUrl: window.APP_CONFIG?.apiUrl || import.meta.env.VITE_API_URL,
-}
+    apiUrl: window.APP_CONFIG?.apiUrl || import.meta.env.VITE_API_URL,
+};
 ```
 
 **Benefits:**
+
 - Prevents accidental exposure of secrets like database URLs and API keys
 - Clear separation between client-safe and server-only configuration
 - TypeScript declarations catch undefined variable access at compile time
@@ -2907,7 +2953,6 @@ export const config = {
 - Runtime configuration enables config changes without rebuilding
 
 Reference: [Vite Env Variables](https://vitejs.dev/guide/env-and-mode.html)
-
 
 ---
 
@@ -2921,7 +2966,7 @@ Vite supports multiple environment files that load based on the current mode. Us
 
 ```typescript
 // ❌ Bad — hardcoded API URLs toggled by comments
-const API_URL = 'https://api.example.com'
+const API_URL = 'https://api.example.com';
 // const API_URL = 'http://localhost:8000'     // uncomment for dev
 // const API_URL = 'https://staging.example.com' // uncomment for staging
 ```
@@ -2936,6 +2981,7 @@ VITE_FEATURE_DEBUG=true
 ```
 
 **Problems:**
+
 - Manual editing is error-prone — wrong URL can reach production
 - No separation between development, staging, and production configs
 - Debug flags accidentally left on in production
@@ -2984,12 +3030,12 @@ npx vite build --mode staging   # loads .env + .env.staging
 // ✅ Good — type-safe config using the loaded environment
 // src/config.ts
 export const config = {
-  appName: import.meta.env.VITE_APP_NAME,
-  apiUrl: import.meta.env.VITE_API_URL,
-  isDebug: import.meta.env.VITE_FEATURE_DEBUG === 'true',
-  sentryDsn: import.meta.env.VITE_SENTRY_DSN ?? null,
-  mode: import.meta.env.MODE, // "development" | "production" | "staging"
-} as const
+    appName: import.meta.env.VITE_APP_NAME,
+    apiUrl: import.meta.env.VITE_API_URL,
+    isDebug: import.meta.env.VITE_FEATURE_DEBUG === 'true',
+    sentryDsn: import.meta.env.VITE_SENTRY_DSN ?? null,
+    mode: import.meta.env.MODE, // "development" | "production" | "staging"
+} as const;
 ```
 
 ```gitignore
@@ -2998,6 +3044,7 @@ export const config = {
 ```
 
 **Benefits:**
+
 - Zero manual editing when switching environments
 - `.local` files let each developer override without affecting the team
 - `--mode` flag makes CI/CD pipelines explicit and auditable
@@ -3006,12 +3053,11 @@ export const config = {
 
 Reference: [Vite Env Variables and Modes](https://vite.dev/guide/env-and-mode.html)
 
-
 ---
 
 ## Never Expose Secrets in Client Code
 
-**Impact: MEDIUM (VITE_ variables are embedded in the client bundle — visible to anyone)**
+**Impact: MEDIUM (VITE\_ variables are embedded in the client bundle — visible to anyone)**
 
 Any environment variable with the `VITE_` prefix is statically replaced in the client bundle at build time. This means the raw value is embedded in JavaScript files served to the browser, where anyone can read it.
 
@@ -3029,16 +3075,17 @@ VITE_AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG
 ```typescript
 // ❌ Bad — calling external APIs directly with secrets from client
 const response = await fetch('https://api.stripe.com/v1/charges', {
-  headers: {
-    Authorization: `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`,
-  },
-})
+    headers: {
+        Authorization: `Bearer ${import.meta.env.VITE_STRIPE_SECRET_KEY}`,
+    },
+});
 
 // ❌ Bad — database connection string in client code
-const db = connect(import.meta.env.VITE_DATABASE_URL)
+const db = connect(import.meta.env.VITE_DATABASE_URL);
 ```
 
 **Problems:**
+
 - Secret keys are visible in the built JavaScript files (open DevTools > Sources)
 - Anyone can extract API keys and make unauthorized requests
 - Database credentials in the client enable direct database access
@@ -3067,12 +3114,15 @@ API_INTERNAL_TOKEN=tok_internal_xyz
 // ✅ Good — call your own backend, which holds the secret keys
 // src/api/payments.ts
 export async function createCharge(amount: number) {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/payments/charge`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ amount }),
-  })
-  return response.json()
+    const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/payments/charge`,
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount }),
+        },
+    );
+    return response.json();
 }
 
 // The backend proxy holds the Stripe secret key server-side
@@ -3083,22 +3133,23 @@ export async function createCharge(amount: number) {
 // ✅ Good — validate that no secrets leak through at build time
 // src/config.ts
 if (import.meta.env.DEV) {
-  const envKeys = Object.keys(import.meta.env)
-  const suspicious = envKeys.filter(
-    (key) =>
-      key.startsWith('VITE_') &&
-      /secret|password|private|token/i.test(key)
-  )
+    const envKeys = Object.keys(import.meta.env);
+    const suspicious = envKeys.filter(
+        (key) =>
+            key.startsWith('VITE_') &&
+            /secret|password|private|token/i.test(key),
+    );
 
-  if (suspicious.length > 0) {
-    console.warn(
-      `Potentially sensitive VITE_ variables detected: ${suspicious.join(', ')}`
-    )
-  }
+    if (suspicious.length > 0) {
+        console.warn(
+            `Potentially sensitive VITE_ variables detected: ${suspicious.join(', ')}`,
+        );
+    }
 }
 ```
 
 **Benefits:**
+
 - Secrets stay on the server, never reaching the browser
 - Backend proxy pattern keeps API keys safe while still calling third-party services
 - Only publishable/public keys use the `VITE_` prefix
@@ -3106,7 +3157,6 @@ if (import.meta.env.DEV) {
 - Clear naming convention makes security audits straightforward
 
 Reference: [Vite Env Variables](https://vite.dev/guide/env-and-mode.html#env-files)
-
 
 ---
 
@@ -3124,20 +3174,21 @@ Without bundle analysis, large dependencies go unnoticed and bundle size creeps 
 // "The bundle seems slow, maybe it's the icons?"
 
 // vite.config.ts — no analysis tooling
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  // No way to know:
-  // - Which dependency is the largest?
-  // - Is tree-shaking working?
-  // - Are there duplicate packages?
-  // - Did that new library add 200KB?
-})
+    plugins: [react()],
+    // No way to know:
+    // - Which dependency is the largest?
+    // - Is tree-shaking working?
+    // - Are there duplicate packages?
+    // - Did that new library add 200KB?
+});
 ```
 
 **Problems:**
+
 - No visibility into what makes the bundle large
 - Optimization efforts are based on guesswork
 - Regressions in bundle size go undetected
@@ -3152,53 +3203,53 @@ npm install -D rollup-plugin-visualizer
 
 ```typescript
 // ✅ Good — vite.config.ts with bundle visualizer
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    visualizer({
-      filename: 'stats.html',      // Output file
-      open: true,                   // Auto-open in browser after build
-      gzipSize: true,               // Show gzipped sizes
-      brotliSize: true,             // Show brotli-compressed sizes
-      template: 'treemap',          // 'treemap' | 'sunburst' | 'network'
-    }),
-  ],
-})
+    plugins: [
+        react(),
+        visualizer({
+            filename: 'stats.html', // Output file
+            open: true, // Auto-open in browser after build
+            gzipSize: true, // Show gzipped sizes
+            brotliSize: true, // Show brotli-compressed sizes
+            template: 'treemap', // 'treemap' | 'sunburst' | 'network'
+        }),
+    ],
+});
 ```
 
 ```typescript
 // ✅ Good — only enable visualizer when analyzing (not every build)
-import { defineConfig, type PluginOption } from 'vite'
-import react from '@vitejs/plugin-react'
-import { visualizer } from 'rollup-plugin-visualizer'
+import { defineConfig, type PluginOption } from 'vite';
+import react from '@vitejs/plugin-react';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
-  plugins: [
-    react(),
-    // Only include visualizer when ANALYZE env var is set
-    process.env.ANALYZE === 'true' &&
-      visualizer({
-        filename: 'stats.html',
-        open: true,
-        gzipSize: true,
-        brotliSize: true,
-        template: 'treemap',
-      }),
-  ].filter(Boolean) as PluginOption[],
-})
+    plugins: [
+        react(),
+        // Only include visualizer when ANALYZE env var is set
+        process.env.ANALYZE === 'true' &&
+            visualizer({
+                filename: 'stats.html',
+                open: true,
+                gzipSize: true,
+                brotliSize: true,
+                template: 'treemap',
+            }),
+    ].filter(Boolean) as PluginOption[],
+});
 ```
 
 ```json
 // ✅ Good — add an analyze script to package.json
 {
-  "scripts": {
-    "build": "vite build",
-    "analyze": "ANALYZE=true vite build"
-  }
+    "scripts": {
+        "build": "vite build",
+        "analyze": "ANALYZE=true vite build"
+    }
 }
 ```
 
@@ -3226,6 +3277,7 @@ npm run analyze
 ```
 
 **Benefits:**
+
 - Interactive visualization of every module in the bundle
 - Gzip and Brotli size estimates show real-world transfer sizes
 - Catches regressions when new dependencies are added
@@ -3234,6 +3286,4 @@ npm run analyze
 
 Reference: [rollup-plugin-visualizer](https://github.com/btd/rollup-plugin-visualizer)
 
-
 ---
-

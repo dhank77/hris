@@ -1,7 +1,7 @@
 ---
 title: Use lockForUpdate for Concurrent Writes
 impact: HIGH
-impactDescription: "Prevents race conditions — serializes access to rows under concurrent modification"
+impactDescription: 'Prevents race conditions — serializes access to rows under concurrent modification'
 tags: locking, pessimistic, race-condition, transactions
 ---
 
@@ -28,6 +28,7 @@ $account->update(['balance' => $account->balance - $amount]);
 ```
 
 **Problems:**
+
 - Two concurrent reads see the same stale value and both overwrite with their own calculation
 - Money, inventory, or credits can be silently lost or duplicated
 - The bug is intermittent — it only manifests under concurrent load, making it hard to reproduce
@@ -74,6 +75,7 @@ $account = Account::sharedLock()->find($id);
 ```
 
 **Benefits:**
+
 - Eliminates lost updates by serializing access to contested rows
 - `lockForUpdate()` blocks other transactions until the current one commits or rolls back
 - Combined with `attempts: 3`, handles transient deadlocks gracefully

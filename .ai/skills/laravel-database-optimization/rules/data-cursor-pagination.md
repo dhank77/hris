@@ -1,7 +1,7 @@
 ---
 title: Use Cursor Pagination for Large Datasets
 impact: HIGH
-impactDescription: "Eliminates slow OFFSET on deep pages — constant query time regardless of page depth"
+impactDescription: 'Eliminates slow OFFSET on deep pages — constant query time regardless of page depth'
 tags: pagination, cursor, performance, large-datasets
 ---
 
@@ -23,6 +23,7 @@ $users = User::paginate(15);
 ```
 
 **Problems:**
+
 - Query time degrades linearly as users navigate deeper pages
 - Database performs a full index scan up to the OFFSET value on every request
 - On tables with millions of rows, deep pages can take seconds or cause timeouts
@@ -50,6 +51,7 @@ return UserResource::collection(
 ```
 
 **Benefits:**
+
 - Constant query time regardless of how deep the user navigates — O(1) vs O(n)
 - Uses efficient index seeks (WHERE id > ?) instead of scanning and discarding rows
 - Ideal for infinite scroll, API feeds, and any dataset where users don't need to jump to arbitrary pages

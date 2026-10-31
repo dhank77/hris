@@ -1,7 +1,7 @@
 ---
 title: Always Eager Load Known Relationships
 impact: CRITICAL
-impactDescription: "Reduces N+1 queries — 101 queries down to 2"
+impactDescription: 'Reduces N+1 queries — 101 queries down to 2'
 tags: n-plus-one, eager-loading, with, performance
 ---
 
@@ -25,6 +25,7 @@ foreach ($posts as $post) {
 ```
 
 **Problems:**
+
 - Each loop iteration fires a separate SQL query for every accessed relationship
 - Query count grows linearly with the number of records, causing severe slowdowns
 - Database connection overhead multiplied across hundreds of round-trips
@@ -48,6 +49,7 @@ $posts = Post::with([
 ```
 
 **Benefits:**
+
 - Constant query count regardless of result set size (2-3 queries instead of 201)
 - Constrained eager loads reduce memory usage by loading only relevant related records
 - Predictable, measurable database load that scales with relationship count, not row count

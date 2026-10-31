@@ -11,12 +11,14 @@ OWASP Top 10 security audit checklist and secure coding reference for Laravel 13
 ### Step 1: Detect Stack
 
 Check if the project uses React + Inertia.js:
+
 - `app/Http/Middleware/HandleInertiaRequests.php` exists
 - `resources/js/` contains `.tsx` or `.jsx` files
 - `inertiajs/inertia-laravel` in `composer.json`
 - `@inertiajs/react` in `package.json`
 
 State at the top of report:
+
 - **Detected**: "React + Inertia.js detected — Laravel OWASP checklist AND React/Inertia security checks will both be applied."
 - **Not detected**: "No React/Inertia.js detected — applying Laravel OWASP checklist only."
 
@@ -123,6 +125,7 @@ SQL injection allows database exfiltration. Mass assignment allows setting field
 ### Checklist
 
 **SQL & Mass Assignment:**
+
 - [ ] No string concatenation in `whereRaw()`, `selectRaw()`, `orderByRaw()`
 - [ ] Column names from user input whitelist-validated
 - [ ] No `$request->all()` in `create()`, `fill()`, `update()`
@@ -131,6 +134,7 @@ SQL injection allows database exfiltration. Mass assignment allows setting field
 - [ ] Controllers use `$request->validated()`
 
 **XSS — Blade & React:**
+
 - [ ] No `{!! $userInput !!}` in Blade with untrusted data
 - [ ] No `dangerouslySetInnerHTML` without `DOMPurify.sanitize()`
 - [ ] `href`/`src` not set from unvalidated user input
@@ -178,11 +182,14 @@ protected $fillable = ['title', 'body', 'category_id'];
 import DOMPurify from 'dompurify';
 
 // ✅ Always sanitize
-<div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sessionNote.notes) }} />
+<div
+    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(sessionNote.notes) }}
+/>;
 
 // ✅ Validate URL scheme
-const safeUrl = url.startsWith('https://') || url.startsWith('http://') ? url : '#';
-<a href={safeUrl}>Link</a>
+const safeUrl =
+    url.startsWith('https://') || url.startsWith('http://') ? url : '#';
+<a href={safeUrl}>Link</a>;
 ```
 
 ---
@@ -284,6 +291,7 @@ Brute force and session fixation are prevented by throttling and session regener
 ### Checklist
 
 **Auth:**
+
 - [ ] Login throttled via `RateLimiter` in `LoginRequest`
 - [ ] Password reset and email verify routes throttled
 - [ ] Payment routes throttled (`throttle:10,1`)
@@ -292,6 +300,7 @@ Brute force and session fixation are prevented by throttling and session regener
 - [ ] `SESSION_LIFETIME` set to 30 minutes or less
 
 **Cookie & Session:**
+
 - [ ] `http_only = true` in `config/session.php`
 - [ ] `same_site = lax` or `strict`
 - [ ] `secure = null` or `true` (HTTPS only)
@@ -332,12 +341,14 @@ CSRF allows attackers to forge state-changing requests. Unsafe deserialization a
 ### Checklist
 
 **CSRF:**
+
 - [ ] `VerifyCsrfToken` active in web group
 - [ ] Only external webhook routes excluded
 - [ ] `@csrf` in all Blade forms
 - [ ] Inertia `X-XSRF-TOKEN` not disabled
 
 **Deserialization:**
+
 - [ ] No `unserialize($request->input(...))`
 - [ ] No `eval($request->input(...))`
 - [ ] No `extract($request->all())`

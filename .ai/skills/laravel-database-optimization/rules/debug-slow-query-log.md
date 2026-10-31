@@ -1,7 +1,7 @@
 ---
 title: Enable Slow Query Logging
 impact: MEDIUM
-impactDescription: "Catches slow queries in staging/production before they cause user-facing performance issues"
+impactDescription: 'Catches slow queries in staging/production before they cause user-facing performance issues'
 tags: slow-queries, monitoring, mysql, production
 ---
 
@@ -25,6 +25,7 @@ Slow queries that go unmonitored gradually degrade application performance as da
 ```
 
 **Problems:**
+
 - Slow queries accumulate silently as data grows over months
 - No early warning system to catch regressions before they impact users
 - Without logs, debugging production slowdowns requires real-time profiling under pressure
@@ -90,6 +91,7 @@ DB::whenQueryingForLongerThan(5000, function (Connection $connection, QueryExecu
 ```
 
 **Benefits:**
+
 - Catches slow queries before they cause user-facing performance issues
 - `DB::listen()` integrates with any logging/alerting system (Slack, PagerDuty, etc.)
 - `whenQueryingForLongerThan()` detects death-by-a-thousand-cuts — many fast queries that add up

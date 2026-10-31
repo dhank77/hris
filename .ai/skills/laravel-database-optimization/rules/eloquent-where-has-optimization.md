@@ -1,7 +1,7 @@
 ---
 title: Optimize whereHas with Joins or whereIn Subqueries
 impact: HIGH
-impactDescription: "10-100x faster than correlated subqueries on large tables"
+impactDescription: '10-100x faster than correlated subqueries on large tables'
 tags: where-has, joins, subquery, performance
 ---
 
@@ -29,6 +29,7 @@ $products = Product::whereHas('reviews', function ($query) {
 ```
 
 **Problems:**
+
 - Correlated subquery is re-evaluated for every row in the `products` table
 - Performance degrades rapidly as the products table grows
 - Database optimizer has limited ability to rewrite correlated subqueries
@@ -67,6 +68,7 @@ $products = Product::whereRelation('reviews', 'rating', '>=', 4)->get();
 ```
 
 **Benefits:**
+
 - `whereIn` subquery runs once, not per row — database can optimize with indexes
 - `join` approach processes both tables in a single pass with no subquery
 - 10-100x improvement on large datasets compared to correlated `whereHas`

@@ -1,7 +1,7 @@
 ---
 title: Event Handler Types
 impact: HIGH
-impactDescription: "provides autocomplete for event properties and catches errors at compile time"
+impactDescription: 'provides autocomplete for event properties and catches errors at compile time'
 tags: event, handler, ChangeEvent, FormEvent, KeyboardEvent
 ---
 
@@ -17,21 +17,23 @@ Event handlers in React use synthetic events with specific types. Using the corr
 // ❌ Bad
 // Using native Event instead of React event
 const handleClick = (e: Event) => {
-  // Missing React-specific properties
-}
+    // Missing React-specific properties
+};
 
 // Missing element type
 const handleChange = (e: React.ChangeEvent) => {
-  e.target.value  // Error: Property 'value' does not exist
-}
+    e.target.value; // Error: Property 'value' does not exist
+};
 
 // Wrong event type
-const handleSubmit = (e: React.MouseEvent) => {  // Should be FormEvent
-  e.preventDefault()
-}
+const handleSubmit = (e: React.MouseEvent) => {
+    // Should be FormEvent
+    e.preventDefault();
+};
 ```
 
 **Problems:**
+
 - Native `Event` type lacks React synthetic event properties
 - Missing element type generic means `target` properties are unknown
 - Wrong event type does not match the actual DOM event being handled
@@ -131,6 +133,7 @@ interface ButtonProps {
 ```
 
 **Benefits:**
+
 - Full autocomplete for event-specific properties like `clientX`, `key`, `target.value`
 - Compile-time errors when accessing properties that do not exist on the event type
 - Proper element type matching ensures `currentTarget` has the correct properties

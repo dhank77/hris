@@ -1,7 +1,7 @@
 ---
 title: Use chunkById for Batch Processing
 impact: HIGH
-impactDescription: "Prevents skipped/duplicated rows during batch operations on mutable data"
+impactDescription: 'Prevents skipped/duplicated rows during batch operations on mutable data'
 tags: chunking, batch, memory, processing
 ---
 
@@ -28,6 +28,7 @@ User::where('status', 'pending')->chunk(1000, function (Collection $users): void
 ```
 
 **Problems:**
+
 - OFFSET shifts when rows are inserted or deleted, causing rows to be skipped or processed twice
 - Updating the column used in the WHERE clause during iteration compounds the problem
 - Silent data corruption — no error is raised, but rows are missed
@@ -62,6 +63,7 @@ User::where('email_verified_at', null)
 ```
 
 **Benefits:**
+
 - Every row is processed exactly once, regardless of concurrent inserts, updates, or deletes
 - Uses indexed primary key lookups instead of OFFSET scanning
 - Safe for operations that modify the rows being iterated over

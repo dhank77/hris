@@ -1,7 +1,7 @@
 ---
 title: Run EXPLAIN on Slow Queries
 impact: MEDIUM
-impactDescription: "Identifies missing indexes, full table scans, and inefficient query plans"
+impactDescription: 'Identifies missing indexes, full table scans, and inefficient query plans'
 tags: explain, query-plan, debugging, slow-queries
 ---
 
@@ -25,6 +25,7 @@ Guessing why a query is slow wastes time and leads to wrong fixes. Running EXPLA
 ```
 
 **Problems:**
+
 - Optimizing without EXPLAIN often targets the wrong bottleneck
 - Adding indexes blindly wastes storage and slows writes without improving reads
 - Caching is a band-aid — the underlying query may grow slower as data increases
@@ -74,6 +75,7 @@ Log::debug('Query', [
 ```
 
 **Benefits:**
+
 - Data-driven optimization instead of guesswork — EXPLAIN shows exactly what the database does
 - Quickly identifies whether an index exists but isn't being used vs. missing entirely
 - EXPLAIN ANALYZE shows actual vs. estimated row counts, revealing stale statistics

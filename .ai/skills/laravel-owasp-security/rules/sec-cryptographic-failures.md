@@ -61,6 +61,7 @@ Route::get('/email/verify/{id}', function ($id) {
 ```
 
 **Problems:**
+
 - Plaintext passwords are exposed in any database breach
 - MD5/SHA1 hashes are pre-computed in rainbow tables and cracked in seconds
 - Plaintext API keys in the DB are exposed in any DB dump or admin query
@@ -164,12 +165,12 @@ class SettingsController extends Controller
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `'password' => 'hashed'` cast | User password fields |
-| `'value' => 'encrypted'` cast | API keys, secrets, tokens in DB |
-| `Crypt::encryptString()` / `decryptString()` | Manual encrypt/decrypt |
-| `URL::signedRoute()` | Password reset, email verify links |
-| `URL::temporarySignedRoute()` | Time-limited one-time links |
+| Pattern                                      | Use Case                           |
+| -------------------------------------------- | ---------------------------------- |
+| `'password' => 'hashed'` cast                | User password fields               |
+| `'value' => 'encrypted'` cast                | API keys, secrets, tokens in DB    |
+| `Crypt::encryptString()` / `decryptString()` | Manual encrypt/decrypt             |
+| `URL::signedRoute()`                         | Password reset, email verify links |
+| `URL::temporarySignedRoute()`                | Time-limited one-time links        |
 
 Reference: [Laravel Encryption](https://laravel.com/docs/13.x/encryption) | [OWASP A02:2021](https://owasp.org/Top10/A02_2021-Cryptographic_Failures/)

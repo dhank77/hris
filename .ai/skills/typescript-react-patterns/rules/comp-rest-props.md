@@ -1,7 +1,7 @@
 ---
 title: Rest Props Typing
 impact: CRITICAL
-impactDescription: "ensures type-safe prop spreading to HTML elements"
+impactDescription: 'ensures type-safe prop spreading to HTML elements'
 tags: component, rest-props, spread, Omit
 ---
 
@@ -17,33 +17,34 @@ Typing rest/spread props for components that pass through HTML attributes. Prope
 // ❌ Bad
 // Using 'any' for rest props
 interface ButtonProps {
-  variant: 'primary' | 'secondary';
-  [key: string]: any; // Loses all type safety
+    variant: 'primary' | 'secondary';
+    [key: string]: any; // Loses all type safety
 }
 
 const Button = ({ variant, ...rest }: ButtonProps) => {
-  return <button className={`btn-${variant}`} {...rest} />;
+    return <button className={`btn-${variant}`} {...rest} />;
 };
 
 // Not properly omitting custom props from HTML props
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  error: string;
+    label: string;
+    error: string;
 }
 
 const Input = ({ label, error, ...rest }: InputProps) => {
-  // 'label' and 'error' are valid HTML attributes, causing conflicts
-  return (
-    <div>
-      <label>{label}</label>
-      <input {...rest} />
-      <span>{error}</span>
-    </div>
-  );
+    // 'label' and 'error' are valid HTML attributes, causing conflicts
+    return (
+        <div>
+            <label>{label}</label>
+            <input {...rest} />
+            <span>{error}</span>
+        </div>
+    );
 };
 ```
 
 **Problems:**
+
 - Index signatures like `[key: string]: any` remove all type checking on spread props
 - Not omitting custom prop names that collide with HTML attributes causes conflicts
 - Missing `ComponentPropsWithoutRef` can lead to ref handling issues
@@ -181,6 +182,7 @@ function Card({
 ```
 
 **Benefits:**
+
 - Proper typing catches invalid props at compile time
 - IDE shows valid HTML attributes when using the component
 - Omit removes props that conflict with custom props

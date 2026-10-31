@@ -46,6 +46,7 @@ class User extends Model
 ```
 
 **Problems:**
+
 - `belongsTo` named `users()` makes Eloquent look for `users_id` instead of `user_id`
 - Singular `comment()` on a hasMany is misleading — the method returns a Collection, not a model
 - Vague names like `data()` make eager loading calls (`with('data')`) unreadable and unmaintainable
@@ -169,6 +170,7 @@ class Image extends Model
 ```
 
 **Benefits:**
+
 - `user()` on belongsTo auto-resolves to `user_id` — no manual FK specification needed
 - Plural `comments()` on hasMany clearly signals a Collection return type
 - Eager loading reads naturally: `Post::with(['user', 'comments', 'tags'])->get()`

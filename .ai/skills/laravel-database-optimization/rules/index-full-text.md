@@ -1,7 +1,7 @@
 ---
 title: Use Full-Text Indexes for Search
 impact: HIGH
-impactDescription: "Replaces full table scans with indexed text search"
+impactDescription: 'Replaces full table scans with indexed text search'
 tags: indexes, full-text, search, like-query
 ---
 
@@ -29,6 +29,7 @@ $results = Article::where('title', 'LIKE', "%{$term}%")
 ```
 
 **Problems:**
+
 - Leading wildcard `%term%` prevents the database from using any B-tree index
 - Full table scan reads every row, making query time proportional to table size
 - Multiple LIKE clauses on large TEXT columns consume excessive CPU and I/O
@@ -65,6 +66,7 @@ $results = Article::whereFullText(['title', 'body'], $term)
 ```
 
 **Benefits:**
+
 - Inverted index structure provides sub-millisecond text search on millions of rows
 - `whereFullText()` provides a clean, database-agnostic API for full-text queries
 - Supports natural language mode and boolean mode for flexible search behavior

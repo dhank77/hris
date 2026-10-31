@@ -3,8 +3,8 @@ name: typescript-react-patterns
 description: TypeScript best practices for React development. Use when writing typed React components, hooks, events, refs, or generic components. Triggers on tasks involving TypeScript errors, type definitions, props typing, or type-safe React patterns.
 license: MIT
 metadata:
-  author: agent-skills
-  version: "2.0.0"
+    author: agent-skills
+    version: '2.0.0'
 ---
 
 # TypeScript React Patterns
@@ -20,6 +20,7 @@ Type-safe React with TypeScript. Contains 33 rules across 7 categories covering 
 ## When to Apply
 
 Reference these guidelines when:
+
 - Typing React component props
 - Creating custom hooks with TypeScript
 - Handling events with proper types
@@ -30,15 +31,15 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Component Typing | CRITICAL | `comp-` |
-| 2 | Hook Typing | CRITICAL | `hook-` |
-| 3 | Event Handling | HIGH | `event-` |
-| 4 | Ref Typing | HIGH | `ref-` |
-| 5 | Generic Components | MEDIUM | `generic-` |
-| 6 | Context & State | MEDIUM | `ctx-` |
-| 7 | Utility Types | LOW | `util-` |
+| Priority | Category           | Impact   | Prefix     |
+| -------- | ------------------ | -------- | ---------- |
+| 1        | Component Typing   | CRITICAL | `comp-`    |
+| 2        | Hook Typing        | CRITICAL | `hook-`    |
+| 3        | Event Handling     | HIGH     | `event-`   |
+| 4        | Ref Typing         | HIGH     | `ref-`     |
+| 5        | Generic Components | MEDIUM   | `generic-` |
+| 6        | Context & State    | MEDIUM   | `ctx-`     |
+| 7        | Utility Types      | LOW      | `util-`    |
 
 ## Quick Reference
 
@@ -102,18 +103,18 @@ Reference these guidelines when:
 
 ```tsx
 interface ButtonProps {
-  variant: 'primary' | 'secondary' | 'danger'
-  size?: 'sm' | 'md' | 'lg'
-  children: React.ReactNode
-  onClick?: () => void
+    variant: 'primary' | 'secondary' | 'danger';
+    size?: 'sm' | 'md' | 'lg';
+    children: React.ReactNode;
+    onClick?: () => void;
 }
 
 function Button({ variant, size = 'md', children, onClick }: ButtonProps) {
-  return (
-    <button className={`btn-${variant} btn-${size}`} onClick={onClick}>
-      {children}
-    </button>
-  )
+    return (
+        <button className={`btn-${variant} btn-${size}`} onClick={onClick}>
+            {children}
+        </button>
+    );
 }
 ```
 
@@ -121,17 +122,17 @@ function Button({ variant, size = 'md', children, onClick }: ButtonProps) {
 
 ```tsx
 interface AuthContextType {
-  user: User | null
-  login: (credentials: Credentials) => Promise<void>
-  logout: () => void
+    user: User | null;
+    login: (credentials: Credentials) => Promise<void>;
+    logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null)
+const AuthContext = createContext<AuthContextType | null>(null);
 
 function useAuth() {
-  const context = useContext(AuthContext)
-  if (!context) throw new Error('useAuth must be used within AuthProvider')
-  return context
+    const context = useContext(AuthContext);
+    if (!context) throw new Error('useAuth must be used within AuthProvider');
+    return context;
 }
 ```
 
@@ -139,13 +140,19 @@ function useAuth() {
 
 ```tsx
 interface ListProps<T> {
-  items: T[]
-  renderItem: (item: T) => React.ReactNode
-  keyExtractor: (item: T) => string
+    items: T[];
+    renderItem: (item: T) => React.ReactNode;
+    keyExtractor: (item: T) => string;
 }
 
 function List<T>({ items, renderItem, keyExtractor }: ListProps<T>) {
-  return <ul>{items.map(item => <li key={keyExtractor(item)}>{renderItem(item)}</li>)}</ul>
+    return (
+        <ul>
+            {items.map((item) => (
+                <li key={keyExtractor(item)}>{renderItem(item)}</li>
+            ))}
+        </ul>
+    );
 }
 ```
 

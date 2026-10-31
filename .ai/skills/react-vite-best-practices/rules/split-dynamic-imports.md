@@ -1,7 +1,7 @@
 ---
 title: Use Dynamic Imports for Heavy Components
 impact: CRITICAL
-impactDescription: "30-50% reduction in initial bundle"
+impactDescription: '30-50% reduction in initial bundle'
 tags: split, dynamic-imports, lazy-loading, code-splitting, react
 ---
 
@@ -33,6 +33,7 @@ function Dashboard() {
 ```
 
 **Problems:**
+
 - Chart.js, React Quill, PDF renderer, and Monaco are all loaded even if never used
 - Initial bundle bloated with hundreds of KBs of library code
 - Slower Time to Interactive for all users regardless of feature usage
@@ -150,6 +151,7 @@ function App({ user }) {
 ```
 
 **Benefits:**
+
 - Initial bundle can be 50%+ smaller by deferring heavy libraries
 - Faster Time to Interactive since only critical code is parsed upfront
 - Better user experience on slow connections and mobile devices
@@ -157,6 +159,7 @@ function App({ user }) {
 - Feature-flag loading avoids shipping admin code to regular users
 
 Libraries that should typically be dynamically imported:
+
 - Chart libraries (Chart.js, Recharts, D3)
 - Rich text editors (React Quill, TipTap, Slate)
 - Code editors (Monaco, CodeMirror)

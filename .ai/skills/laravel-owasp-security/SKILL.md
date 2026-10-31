@@ -3,10 +3,10 @@ name: laravel-owasp-security
 description: OWASP Top 10 security audit and secure coding guidelines for Laravel + React/Inertia.js applications. Use when auditing for vulnerabilities ("run OWASP audit", "security review", "check my app security") or writing secure Laravel code involving auth, payments, file uploads, or API design. Triggers on security-related tasks, payment handling, authentication, or any request to audit a Laravel codebase.
 license: MIT
 metadata:
-  author: AsyrafHussin
-  version: "1.0.3"
-  laravelVersion: "13.x"
-  phpVersion: "8.3+"
+    author: AsyrafHussin
+    version: '1.0.3'
+    laravelVersion: '13.x'
+    phpVersion: '8.3+'
 ---
 
 # Laravel OWASP Security
@@ -18,15 +18,18 @@ Dual-purpose security skill for Laravel 13 + React/Inertia.js applications. Run 
 ### Step 1: Detect Stack
 
 Check if the project uses React + Inertia.js by looking for:
+
 - `app/Http/Middleware/HandleInertiaRequests.php` exists
 - `resources/js/` contains `.tsx` or `.jsx` files
 - `inertiajs/inertia-laravel` in `composer.json`
 - `@inertiajs/react` in `package.json`
 
 **If detected**, state at the top of the report:
+
 > "React + Inertia.js detected — Laravel OWASP checklist AND React/Inertia security checks will both be applied."
 
 **If not detected**, state:
+
 > "No React/Inertia.js detected — applying Laravel OWASP checklist only."
 
 ### Step 2: Determine Scope
@@ -37,6 +40,7 @@ Check if the project uses React + Inertia.js by looking for:
 ### Step 3: Run Checklist
 
 Work through every item below. For each, output:
+
 - **PASS** — brief confirmation of what was verified
 - **FAIL** — exact `file:line`, a description of the vulnerability (do NOT reproduce any code, values, API keys, tokens, or .env contents from the file), and a fix recommendation
 - **N/A** — if the check does not apply to this project
@@ -64,6 +68,7 @@ Work through every item below. For each, output:
 ### 3. Injection (A03:2021)
 
 **SQL & Mass Assignment:**
+
 - [ ] No string concatenation in `whereRaw()`, `selectRaw()`, `orderByRaw()` — use `?` bindings
 - [ ] Column names never derived from user input without a whitelist
 - [ ] No `$request->all()` passed directly to `create()`, `fill()`, or `update()`
@@ -72,6 +77,7 @@ Work through every item below. For each, output:
 - [ ] Controllers use `$request->validated()` for mass operations
 
 **XSS — Blade & React:**
+
 - [ ] No `{!! $userInput !!}` in Blade templates with untrusted data
 - [ ] `{{ }}` used for all user-supplied Blade output
 - [ ] No `dangerouslySetInnerHTML` in React without `DOMPurify.sanitize()` first
@@ -105,6 +111,7 @@ Work through every item below. For each, output:
 ### 7. Identification & Authentication Failures (A07:2021)
 
 **Auth:**
+
 - [ ] Using Laravel Breeze, Fortify, or Jetstream — not custom-rolled auth
 - [ ] Passwords hashed with bcrypt or argon2 (Laravel default)
 - [ ] Login route rate limited — `throttle` middleware or `RateLimiter` in `LoginRequest`
@@ -113,6 +120,7 @@ Work through every item below. For each, output:
 - [ ] `session()->regenerate()` called after successful login
 
 **Cookie & Session:**
+
 - [ ] `http_only = true` in `config/session.php`
 - [ ] `same_site = lax` or `strict` in `config/session.php`
 - [ ] `secure = true` or `null` (auto for HTTPS) in `config/session.php`
@@ -123,12 +131,14 @@ Work through every item below. For each, output:
 ### 8. Software & Data Integrity Failures (A08:2021)
 
 **CSRF:**
+
 - [ ] `VerifyCsrfToken` middleware active in the web group
 - [ ] Only stateless routes (webhooks, external callbacks) are excluded from CSRF
 - [ ] `@csrf` directive used in all non-Inertia POST forms
 - [ ] Excluded routes in `validateCsrfTokens(except: [...])` are justified
 
 **Deserialization:**
+
 - [ ] No `unserialize($request->input(...))`
 - [ ] No `eval($request->input(...))`
 - [ ] No `extract($request->all())`
@@ -252,6 +262,7 @@ npm audit
 ## When to Apply for Guidance
 
 Reference the rule files when:
+
 - Implementing authentication or password handling
 - Building payment or webhook integrations
 - Writing file upload or download logic
@@ -262,41 +273,49 @@ Reference the rule files when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Rule File |
-|----------|----------|--------|-----------|
-| 1 | Broken Access Control | CRITICAL | `sec-broken-access-control` |
-| 2 | Cryptographic Failures | CRITICAL | `sec-cryptographic-failures` |
-| 3 | Injection Prevention | CRITICAL | `sec-injection-prevention` |
-| 4 | XSS & React/Inertia | HIGH | `sec-xss-react-inertia` |
-| 5 | CSRF Protection | HIGH | `sec-csrf-protection` |
-| 6 | Security Misconfiguration | HIGH | `sec-security-misconfiguration` |
-| 7 | Authentication & Rate Limiting | HIGH | `sec-authentication-rate-limiting` |
-| 8 | Inertia Data Exposure | HIGH | `sec-inertia-data-exposure` |
+| Priority | Category                       | Impact   | Rule File                          |
+| -------- | ------------------------------ | -------- | ---------------------------------- |
+| 1        | Broken Access Control          | CRITICAL | `sec-broken-access-control`        |
+| 2        | Cryptographic Failures         | CRITICAL | `sec-cryptographic-failures`       |
+| 3        | Injection Prevention           | CRITICAL | `sec-injection-prevention`         |
+| 4        | XSS & React/Inertia            | HIGH     | `sec-xss-react-inertia`            |
+| 5        | CSRF Protection                | HIGH     | `sec-csrf-protection`              |
+| 6        | Security Misconfiguration      | HIGH     | `sec-security-misconfiguration`    |
+| 7        | Authentication & Rate Limiting | HIGH     | `sec-authentication-rate-limiting` |
+| 8        | Inertia Data Exposure          | HIGH     | `sec-inertia-data-exposure`        |
 
 ## Quick Reference
 
 ### 1. Broken Access Control (CRITICAL)
+
 - `sec-broken-access-control` — Middleware, ownership checks, policies, scoped queries
 
 ### 2. Cryptographic Failures (CRITICAL)
+
 - `sec-cryptographic-failures` — Password hashing, encrypted casts, signed URLs
 
 ### 3. Injection Prevention (CRITICAL)
+
 - `sec-injection-prevention` — SQL injection, mass assignment, raw query bindings
 
 ### 4. XSS & React/Inertia (HIGH)
+
 - `sec-xss-react-inertia` — dangerouslySetInnerHTML, DOMPurify, href/src validation
 
 ### 5. CSRF Protection (HIGH)
+
 - `sec-csrf-protection` — VerifyCsrfToken, webhook exclusions, Inertia CSRF
 
 ### 6. Security Misconfiguration (HIGH)
+
 - `sec-security-misconfiguration` — APP_DEBUG, APP_KEY, security headers, CORS
 
 ### 7. Authentication & Rate Limiting (HIGH)
+
 - `sec-authentication-rate-limiting` — Throttle, session regeneration, brute force prevention
 
 ### 8. Inertia Data Exposure (HIGH)
+
 - `sec-inertia-data-exposure` — data-page attribute exposure, secret props, API Resources
 
 ## How to Use
@@ -315,6 +334,7 @@ rules/sec-inertia-data-exposure.md
 ```
 
 Each rule file contains:
+
 - YAML frontmatter with metadata (title, impact, tags)
 - Why it matters in Laravel/React context
 - Incorrect code example with explanation

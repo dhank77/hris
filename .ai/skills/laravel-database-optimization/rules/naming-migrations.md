@@ -1,7 +1,7 @@
 ---
 title: Migration and Index Naming
 impact: HIGH
-impactDescription: "Consistent migration names enable rollbacks and team collaboration"
+impactDescription: 'Consistent migration names enable rollbacks and team collaboration'
 tags: naming, migrations, indexes, conventions
 ---
 
@@ -45,6 +45,7 @@ Schema::table('users', function (Blueprint $table) {
 ```
 
 **Problems:**
+
 - `update_users` gives no indication of what columns are added, removed, or modified
 - Multi-concern migrations cannot be partially rolled back and create confusing diffs
 - Non-standard index names make debugging and dropping indexes error-prone
@@ -103,6 +104,7 @@ Schema::table('users', function (Blueprint $table) {
 ```
 
 **Benefits:**
+
 - `add_phone_to_users_table` is immediately clear in `migrate:status` and git history
 - One concern per migration enables clean rollbacks with `migrate:rollback --step=1`
 - Laravel's auto-generated index names (`users_email_unique`) follow a predictable `{table}_{column}_{type}` pattern

@@ -34,6 +34,7 @@ class BadExample
 ```
 
 **Problems:**
+
 - Specific vulnerability 1
 - Specific vulnerability 2
 
@@ -56,13 +57,14 @@ class GoodExample
 ```
 
 **Why this is safe:**
+
 - Specific security benefit 1
 - Specific security benefit 2
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
+| Pattern   | Use Case    |
+| --------- | ----------- |
 | Pattern 1 | When to use |
 | Pattern 2 | When to use |
 

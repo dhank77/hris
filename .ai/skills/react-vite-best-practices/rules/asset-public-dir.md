@@ -1,7 +1,7 @@
 ---
 title: Public Directory vs Import
 impact: HIGH
-impactDescription: "Wrong asset handling breaks caching and increases bundle size"
+impactDescription: 'Wrong asset handling breaks caching and increases bundle size'
 tags: assets, public, import, static
 ---
 
@@ -15,27 +15,28 @@ Vite offers two ways to serve assets: the `public/` directory and JavaScript imp
 
 ```tsx
 // ❌ Bad — importing files that should stay static in public/
-import robots from '../public/robots.txt?raw'
-import manifest from '../public/manifest.json'
+import robots from '../public/robots.txt?raw';
+import manifest from '../public/manifest.json';
 
 // ❌ Bad — putting everything in public/ to avoid imports
 function Logo() {
-  return <img src="/logo.png" alt="Logo" /> // No hash, no cache busting
+    return <img src="/logo.png" alt="Logo" />; // No hash, no cache busting
 }
 
 function App() {
-  return (
-    <div>
-      <Logo />
-      {/* All assets in public/ — none get hashed */}
-      <img src="/hero-banner.png" alt="Hero" />
-      <img src="/icons/arrow.svg" alt="Arrow" />
-    </div>
-  )
+    return (
+        <div>
+            <Logo />
+            {/* All assets in public/ — none get hashed */}
+            <img src="/hero-banner.png" alt="Hero" />
+            <img src="/icons/arrow.svg" alt="Arrow" />
+        </div>
+    );
 }
 ```
 
 **Problems:**
+
 - Assets in `public/` are served as-is with no content hashing — browser cache issues on updates
 - Importing from `public/` bypasses Vite's asset pipeline
 - No tree-shaking or dead code elimination for unused assets
@@ -46,19 +47,19 @@ function App() {
 
 ```tsx
 // ✅ Good — import assets that benefit from hashing and optimization
-import logo from './assets/logo.png'        // → /assets/logo-a1b2c3d4.png
-import heroBanner from './assets/hero.png'   // → /assets/hero-e5f6g7h8.png
-import ArrowIcon from './assets/arrow.svg?react'
+import logo from './assets/logo.png'; // → /assets/logo-a1b2c3d4.png
+import heroBanner from './assets/hero.png'; // → /assets/hero-e5f6g7h8.png
+import ArrowIcon from './assets/arrow.svg?react';
 
 function App() {
-  return (
-    <div>
-      {/* Imported — hashed filename, cache-busted on change */}
-      <img src={logo} alt="Logo" />
-      <img src={heroBanner} alt="Hero" />
-      <ArrowIcon />
-    </div>
-  )
+    return (
+        <div>
+            {/* Imported — hashed filename, cache-busted on change */}
+            <img src={logo} alt="Logo" />
+            <img src={heroBanner} alt="Hero" />
+            <ArrowIcon />
+        </div>
+    );
 }
 ```
 
@@ -99,6 +100,7 @@ function CountryFlag({ code }: { code: string }) {
 ```
 
 **Benefits:**
+
 - Imported assets get content-hashed filenames for reliable cache busting
 - Build fails if an imported asset is missing — no silent 404s at runtime
 - Small assets are automatically inlined as base64 (below `assetsInlineLimit`)

@@ -1,7 +1,7 @@
 ---
 title: Automate Cache Invalidation with Model Observers
 impact: HIGH
-impactDescription: "Prevents stale data by coupling cache lifecycle to model events"
+impactDescription: 'Prevents stale data by coupling cache lifecycle to model events'
 tags: cache, invalidation, observers, events
 ---
 
@@ -41,6 +41,7 @@ class ProductController extends Controller
 ```
 
 **Problems:**
+
 - Cache keys must be tracked and cleared manually in every controller method
 - Missing a single `Cache::forget()` leads to stale data served to users
 - Cache logic is duplicated across controllers, commands, jobs, and listeners
@@ -96,6 +97,7 @@ class Product extends Model
 ```
 
 **Benefits:**
+
 - Cache invalidation runs automatically on every save and delete, regardless of where the change originates
 - Single source of truth for which cache keys relate to which model
 - Works for changes made via controllers, commands, jobs, tinker, and queued processes

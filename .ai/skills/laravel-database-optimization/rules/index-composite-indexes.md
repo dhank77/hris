@@ -1,7 +1,7 @@
 ---
 title: Create Composite Indexes Matching Query Patterns
 impact: CRITICAL
-impactDescription: "Serves multi-column filters from a single index scan"
+impactDescription: 'Serves multi-column filters from a single index scan'
 tags: indexes, composite, query-optimization
 ---
 
@@ -34,6 +34,7 @@ Order::where('status', 'pending')
 ```
 
 **Problems:**
+
 - MySQL and PostgreSQL can only efficiently use one single-column index per table in a query
 - The database must scan all rows matching the first index to apply the second filter
 - Index merge operations are unreliable and often slower than a single composite index
@@ -72,6 +73,7 @@ $userOrders = Order::where('user_id', $userId)
 ```
 
 **Benefits:**
+
 - Single index scan satisfies the entire WHERE clause — no post-filtering required
 - Equality-first, range-last ordering maximizes index selectivity
 - The leftmost prefix rule means the composite index also serves queries using only the first column(s)

@@ -1,7 +1,7 @@
 ---
 title: Never Use get() on Unbounded Queries
 impact: HIGH
-impactDescription: "Prevents memory exhaustion and timeouts from loading unpredictable result sets"
+impactDescription: 'Prevents memory exhaustion and timeouts from loading unpredictable result sets'
 tags: memory, unbounded, safety
 ---
 
@@ -31,6 +31,7 @@ public function scopeRecent(Builder $query): Builder
 ```
 
 **Problems:**
+
 - Memory usage is unpredictable and grows with data volume over time
 - A query safe in development can cause out-of-memory crashes in production
 - No early warning — the problem only surfaces when the dataset grows large enough
@@ -68,6 +69,7 @@ DB::whenQueryingForLongerThan(5000, function (Connection $connection, QueryExecu
 ```
 
 **Benefits:**
+
 - Predictable memory and time boundaries regardless of data growth
 - Explicit limits make resource consumption visible and reviewable in code review
 - Safety mechanisms like `whenQueryingForLongerThan()` catch issues before they escalate

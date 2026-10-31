@@ -71,7 +71,6 @@ The section ID (in parentheses) is the filename prefix used to group rules.
 **Impact:** HIGH
 **Description:** Laravel Eloquent relies heavily on naming conventions to auto-resolve models to tables, methods to foreign keys, and relationships to columns. Following consistent table, column, relationship, and migration naming conventions prevents silent bugs and enables Eloquent's convention-over-configuration approach.
 
-
 ---
 
 ## Always Eager Load Known Relationships
@@ -94,6 +93,7 @@ foreach ($posts as $post) {
 ```
 
 **Problems:**
+
 - Each loop iteration fires a separate SQL query for every accessed relationship
 - Query count grows linearly with the number of records, causing severe slowdowns
 - Database connection overhead multiplied across hundreds of round-trips
@@ -117,12 +117,12 @@ $posts = Post::with([
 ```
 
 **Benefits:**
+
 - Constant query count regardless of result set size (2-3 queries instead of 201)
 - Constrained eager loads reduce memory usage by loading only relevant related records
 - Predictable, measurable database load that scales with relationship count, not row count
 
 Reference: [Laravel Eager Loading](https://laravel.com/docs/13.x/eloquent-relationships#eager-loading)
-
 
 ---
 
@@ -152,6 +152,7 @@ foreach ($posts as $post) {
 ```
 
 **Problems:**
+
 - N+1 queries go completely undetected during development and code review
 - Performance regressions accumulate silently until production degrades noticeably
 - Developers have no feedback loop to learn about missing eager loads
@@ -182,12 +183,12 @@ foreach ($posts as $post) {
 ```
 
 **Benefits:**
+
 - Throws `LazyLoadingViolationException` immediately when a relationship is lazily loaded
 - Catches N+1 problems during development before they reach production
 - Safe to enable — only active in non-production environments, so production is never affected
 
 Reference: [Laravel Preventing Lazy Loading](https://laravel.com/docs/13.x/eloquent-relationships#preventing-lazy-loading)
-
 
 ---
 
@@ -216,6 +217,7 @@ foreach ($posts as $post) {
 ```
 
 **Problems:**
+
 - Every query site must remember to include the right `with()` calls
 - Blade templates and third-party packages cannot add `with()` themselves
 - Missing a single eager load silently introduces N+1 problems
@@ -249,12 +251,12 @@ foreach ($posts as $post) {
 ```
 
 **Benefits:**
+
 - Eliminates N+1 queries globally without modifying existing query code
 - Works in Blade templates, packages, and any code that iterates collections
 - Per-collection option provides fine-grained control when global activation is too broad
 
 Reference: [Laravel Automatic Eager Loading](https://laravel.com/docs/13.x/eloquent-relationships#automatic-eager-loading)
-
 
 ---
 
@@ -280,6 +282,7 @@ return UserResource::collection(User::all());
 ```
 
 **Problems:**
+
 - `SELECT *` transfers large TEXT/BLOB columns even when unused, wasting bandwidth
 - Every row hydrates all attributes into PHP objects, consuming unnecessary memory
 - Prevents the database from using covering indexes, forcing table lookups
@@ -310,12 +313,12 @@ $users = User::select('id', 'name')
 ```
 
 **Benefits:**
+
 - Reduces data transfer between database and application by 40-80% on wide tables
 - Lower memory usage per model instance — only selected attributes are hydrated
 - Enables covering index usage, eliminating table lookups for read-heavy queries
 
 Reference: [Laravel Eloquent Retrieving Models](https://laravel.com/docs/13.x/eloquent#retrieving-models)
-
 
 ---
 
@@ -344,6 +347,7 @@ $user->posts;
 ```
 
 **Problems:**
+
 - `WHERE user_id = ?` scans every row in the table without an index
 - JOIN operations between parent and child tables become prohibitively slow
 - CASCADE deletes on the parent table must scan the entire child table to find related rows
@@ -378,12 +382,12 @@ Schema::create('comments', function (Blueprint $table): void {
 ```
 
 **Benefits:**
+
 - `foreignId()->constrained()` creates the column, index, and foreign key constraint in one call
 - Index-backed WHERE clauses use B-tree lookups instead of full table scans
 - `morphs()` automatically creates a composite index on both polymorphic columns
 
 Reference: [Laravel Foreign Key Constraints](https://laravel.com/docs/13.x/migrations#foreign-key-constraints)
-
 
 ---
 
@@ -416,6 +420,7 @@ Order::where('status', 'pending')
 ```
 
 **Problems:**
+
 - MySQL and PostgreSQL can only efficiently use one single-column index per table in a query
 - The database must scan all rows matching the first index to apply the second filter
 - Index merge operations are unreliable and often slower than a single composite index
@@ -454,12 +459,12 @@ $userOrders = Order::where('user_id', $userId)
 ```
 
 **Benefits:**
+
 - Single index scan satisfies the entire WHERE clause — no post-filtering required
 - Equality-first, range-last ordering maximizes index selectivity
 - The leftmost prefix rule means the composite index also serves queries using only the first column(s)
 
 Reference: [Laravel Index Columns](https://laravel.com/docs/13.x/migrations#creating-indexes)
-
 
 ---
 
@@ -486,6 +491,7 @@ $activeUsers = User::select('name', 'email')
 ```
 
 **Problems:**
+
 - Each matching row requires a random I/O table lookup to fetch non-indexed columns
 - On SSDs this adds microseconds per row; on HDDs, milliseconds per row
 - Large result sets (thousands of rows) multiply the lookup cost significantly
@@ -519,12 +525,12 @@ $plan = DB::select('EXPLAIN SELECT name, email FROM users WHERE status = ?', ['a
 ```
 
 **Benefits:**
+
 - Query returns results directly from the index B-tree — zero table lookups
 - Dramatically faster for queries returning many rows from a filtered subset
 - PostgreSQL INCLUDE clause keeps indexed columns minimal while covering SELECT columns
 
 Reference: [Laravel Creating Indexes](https://laravel.com/docs/13.x/migrations#creating-indexes)
-
 
 ---
 
@@ -552,6 +558,7 @@ $results = Article::where('title', 'LIKE', "%{$term}%")
 ```
 
 **Problems:**
+
 - Leading wildcard `%term%` prevents the database from using any B-tree index
 - Full table scan reads every row, making query time proportional to table size
 - Multiple LIKE clauses on large TEXT columns consume excessive CPU and I/O
@@ -588,12 +595,12 @@ $results = Article::whereFullText(['title', 'body'], $term)
 ```
 
 **Benefits:**
+
 - Inverted index structure provides sub-millisecond text search on millions of rows
 - `whereFullText()` provides a clean, database-agnostic API for full-text queries
 - Supports natural language mode and boolean mode for flexible search behavior
 
 Reference: [Laravel Full Text Indexes](https://laravel.com/docs/13.x/migrations#available-index-types)
-
 
 ---
 
@@ -624,6 +631,7 @@ foreach ($activeUsers as $user) {
 ```
 
 **Problems:**
+
 - Each row triggers model instantiation, attribute casting, and accessor resolution
 - Model events (retrieved, etc.) fire for every single row
 - Memory usage scales with model weight, not just data size
@@ -650,13 +658,13 @@ foreach ($activeUsers as $user) {
 ```
 
 **Benefits:**
+
 - Skips model instantiation, casts, accessors, and event dispatching
 - Returns lightweight stdClass objects with minimal memory footprint
 - 30-50% faster on large result sets (benchmarked on 5,000+ rows)
 - Keep Eloquent for CRUD operations where events, casts, and mutators add value
 
 Reference: [Laravel Query Builder](https://laravel.com/docs/13.x/queries)
-
 
 ---
 
@@ -680,6 +688,7 @@ foreach ($users as $user) {
 ```
 
 **Problems:**
+
 - Loads every post and order record into memory even though only aggregate values are needed
 - Two additional queries (posts, orders) returning potentially thousands of rows
 - Memory usage grows linearly with the number of related records
@@ -713,13 +722,13 @@ echo $user->published_posts_count;
 ```
 
 **Benefits:**
+
 - Single query with subqueries — no extra round trips to the database
 - Only aggregate values are returned, not entire related collections
 - Dramatically lower memory usage when relations contain many records
 - Attributes follow a predictable naming convention: `{relation}_{function}_{column}`
 
 Reference: [Laravel Eloquent Aggregates](https://laravel.com/docs/13.x/eloquent-relationships#counting-related-models)
-
 
 ---
 
@@ -750,6 +759,7 @@ foreach ($users as $user) {
 ```
 
 **Problems:**
+
 - Loads all login records into memory when only the latest is needed
 - Without eager loading, triggers N+1 queries (one per user)
 - Memory usage scales with total number of related records across all users
@@ -783,13 +793,13 @@ foreach ($users as $user) {
 ```
 
 **Benefits:**
+
 - Single SQL query with embedded subqueries — no additional round trips
 - Only the needed scalar value is returned, not the entire related collection
 - Computed columns can be used in `orderBy`, `having`, and other clauses
 - Attributes are accessible directly on the model like regular columns
 
 Reference: [Laravel Subquery Selects](https://laravel.com/docs/13.x/eloquent#subquery-selects)
-
 
 ---
 
@@ -817,6 +827,7 @@ $products = Product::whereHas('reviews', function ($query) {
 ```
 
 **Problems:**
+
 - Correlated subquery is re-evaluated for every row in the `products` table
 - Performance degrades rapidly as the products table grows
 - Database optimizer has limited ability to rewrite correlated subqueries
@@ -855,13 +866,13 @@ $products = Product::whereRelation('reviews', 'rating', '>=', 4)->get();
 ```
 
 **Benefits:**
+
 - `whereIn` subquery runs once, not per row — database can optimize with indexes
 - `join` approach processes both tables in a single pass with no subquery
 - 10-100x improvement on large datasets compared to correlated `whereHas`
 - Choose `whereIn` for readability, `join` for maximum performance on hot paths
 
 Reference: [Laravel Eloquent whereHas](https://laravel.com/docs/13.x/eloquent-relationships#querying-relationship-existence)
-
 
 ---
 
@@ -890,6 +901,7 @@ return $products;
 ```
 
 **Problems:**
+
 - Race condition: concurrent requests during cache miss all execute the expensive query
 - Cache stampede on high-traffic endpoints — database gets hammered when cache expires
 - More code to maintain and more opportunities for bugs (e.g., forgetting to set TTL)
@@ -925,13 +937,13 @@ $userStats = Cache::remember(
 ```
 
 **Benefits:**
+
 - Atomic operation: only one request regenerates the cache on miss
 - Eliminates cache stampede — concurrent requests wait for or get the freshly cached value
 - Cleaner, less error-prone code with TTL and closure in a single call
 - `rememberForever()` variant for data that changes only via explicit invalidation
 
 Reference: [Laravel Cache Usage](https://laravel.com/docs/13.x/cache#retrieve-store)
-
 
 ---
 
@@ -971,6 +983,7 @@ class ProductController extends Controller
 ```
 
 **Problems:**
+
 - Cache keys must be tracked and cleared manually in every controller method
 - Missing a single `Cache::forget()` leads to stale data served to users
 - Cache logic is duplicated across controllers, commands, jobs, and listeners
@@ -1026,13 +1039,13 @@ class Product extends Model
 ```
 
 **Benefits:**
+
 - Cache invalidation runs automatically on every save and delete, regardless of where the change originates
 - Single source of truth for which cache keys relate to which model
 - Works for changes made via controllers, commands, jobs, tinker, and queued processes
 - `ObservedBy` attribute (Laravel 11+) makes the binding explicit and discoverable
 
 Reference: [Laravel Model Observers](https://laravel.com/docs/13.x/eloquent#observers)
-
 
 ---
 
@@ -1074,6 +1087,7 @@ class ProductService
 ```
 
 **Problems:**
+
 - Every new cache key must be tracked and added to the clear method
 - Flushing all entries for a group requires knowing every key or flushing the entire cache
 - Forgetting a single key in the clear method results in stale data
@@ -1122,6 +1136,7 @@ class ProductService
 ```
 
 **Benefits:**
+
 - Flush an entire group of cache entries with a single `flush()` call
 - No need to track individual cache keys — tags define the group
 - Multiple tags per entry allow flexible invalidation strategies (by product, by type, etc.)
@@ -1130,7 +1145,6 @@ class ProductService
 > **Note:** Cache tags are only supported by Redis and Memcached drivers. The `file`, `database`, and `array` drivers do not support tags.
 
 Reference: [Laravel Cache Tags](https://laravel.com/docs/13.x/cache#cache-tags)
-
 
 ---
 
@@ -1151,6 +1165,7 @@ Cache::put('products:featured', $products);                   // No TTL — defa
 ```
 
 **Problems:**
+
 - `forever()` on volatile data means users see stale profiles, stats, and counts
 - Short TTLs on static data cause unnecessary database queries on every expiry
 - No TTL argument relies on driver defaults, which vary and may be infinite
@@ -1197,23 +1212,23 @@ $notifications = Cache::remember(
 // 'ttl' => 3600, // 1 hour default — prevents accidental forever caching
 ```
 
-| Data Type | Volatility | Recommended TTL |
-|---|---|---|
-| Reference data (countries, config) | Very low | 24 hours or `rememberForever` |
-| Product catalog, categories | Low | 1-6 hours |
-| User profiles, preferences | Medium | 15-30 minutes |
-| Aggregations, dashboard stats | Medium-High | 5-15 minutes |
-| Feeds, notifications, activity | High | 1-5 minutes |
-| Real-time data (stock, bidding) | Very high | Do not cache |
+| Data Type                          | Volatility  | Recommended TTL               |
+| ---------------------------------- | ----------- | ----------------------------- |
+| Reference data (countries, config) | Very low    | 24 hours or `rememberForever` |
+| Product catalog, categories        | Low         | 1-6 hours                     |
+| User profiles, preferences         | Medium      | 15-30 minutes                 |
+| Aggregations, dashboard stats      | Medium-High | 5-15 minutes                  |
+| Feeds, notifications, activity     | High        | 1-5 minutes                   |
+| Real-time data (stock, bidding)    | Very high   | Do not cache                  |
 
 **Benefits:**
+
 - Data freshness matches user expectations for each data type
 - Static data stays cached longer, reducing unnecessary database queries
 - Volatile data expires quickly, preventing users from seeing stale information
 - Documented TTL guidelines help teams make consistent caching decisions
 
 Reference: [Laravel Cache Configuration](https://laravel.com/docs/13.x/cache#configuration)
-
 
 ---
 
@@ -1235,6 +1250,7 @@ $users = User::paginate(15);
 ```
 
 **Problems:**
+
 - Query time degrades linearly as users navigate deeper pages
 - Database performs a full index scan up to the OFFSET value on every request
 - On tables with millions of rows, deep pages can take seconds or cause timeouts
@@ -1262,12 +1278,12 @@ return UserResource::collection(
 ```
 
 **Benefits:**
+
 - Constant query time regardless of how deep the user navigates — O(1) vs O(n)
 - Uses efficient index seeks (WHERE id > ?) instead of scanning and discarding rows
 - Ideal for infinite scroll, API feeds, and any dataset where users don't need to jump to arbitrary pages
 
 Reference: [Laravel Cursor Pagination](https://laravel.com/docs/13.x/pagination#cursor-pagination)
-
 
 ---
 
@@ -1294,6 +1310,7 @@ User::where('status', 'pending')->chunk(1000, function (Collection $users): void
 ```
 
 **Problems:**
+
 - OFFSET shifts when rows are inserted or deleted, causing rows to be skipped or processed twice
 - Updating the column used in the WHERE clause during iteration compounds the problem
 - Silent data corruption — no error is raised, but rows are missed
@@ -1328,12 +1345,12 @@ User::where('email_verified_at', null)
 ```
 
 **Benefits:**
+
 - Every row is processed exactly once, regardless of concurrent inserts, updates, or deletes
 - Uses indexed primary key lookups instead of OFFSET scanning
 - Safe for operations that modify the rows being iterated over
 
 Reference: [Laravel Chunking Results](https://laravel.com/docs/13.x/eloquent#chunking-results)
-
 
 ---
 
@@ -1357,6 +1374,7 @@ $users->each(function (User $user): void {
 ```
 
 **Problems:**
+
 - Entire result set is hydrated into memory before iteration begins
 - Memory usage grows linearly with row count — easily causes out-of-memory errors
 - No benefit from loading all rows upfront when processing them sequentially
@@ -1391,12 +1409,12 @@ DB::table('users')
 ```
 
 **Benefits:**
+
 - Constant memory usage regardless of result set size — safe for millions of rows
 - `cursor()` returns a `LazyCollection` backed by a PHP generator
 - `lazyById()` combines the memory efficiency of generators with the consistency of ID-based chunking
 
 Reference: [Laravel Cursors](https://laravel.com/docs/13.x/eloquent#cursors)
-
 
 ---
 
@@ -1426,6 +1444,7 @@ public function scopeRecent(Builder $query): Builder
 ```
 
 **Problems:**
+
 - Memory usage is unpredictable and grows with data volume over time
 - A query safe in development can cause out-of-memory crashes in production
 - No early warning — the problem only surfaces when the dataset grows large enough
@@ -1463,12 +1482,12 @@ DB::whenQueryingForLongerThan(5000, function (Connection $connection, QueryExecu
 ```
 
 **Benefits:**
+
 - Predictable memory and time boundaries regardless of data growth
 - Explicit limits make resource consumption visible and reviewable in code review
 - Safety mechanisms like `whenQueryingForLongerThan()` catch issues before they escalate
 
 Reference: [Laravel Query Builder](https://laravel.com/docs/13.x/queries)
-
 
 ---
 
@@ -1503,6 +1522,7 @@ DB::transaction(function (): void {
 ```
 
 **Problems:**
+
 - External API latency extends lock duration from milliseconds to seconds
 - Other requests needing the same rows queue up, causing cascading timeouts
 - If the API call fails, the entire transaction rolls back — but the side effects (uploaded files, dispatched jobs) cannot be undone
@@ -1539,12 +1559,12 @@ dispatch(new SendOrderConfirmation($order))->afterCommit();
 ```
 
 **Benefits:**
+
 - Transaction holds locks only during fast database writes — milliseconds instead of seconds
 - Side effects like jobs and notifications only execute after successful commit
 - External service failures don't roll back valid database changes
 
 Reference: [Laravel Database Transactions](https://laravel.com/docs/13.x/database#database-transactions)
-
 
 ---
 
@@ -1572,6 +1592,7 @@ DB::transaction(function (): void {
 ```
 
 **Problems:**
+
 - A transient deadlock causes a permanent request failure with no recovery
 - Deadlocks are normal under concurrent load — they are not bugs, they are expected
 - Users see intermittent 500 errors that disappear on retry, undermining trust
@@ -1608,12 +1629,12 @@ DB::transaction(function () use ($senderId, $receiverId, $amount): void {
 ```
 
 **Benefits:**
+
 - Automatic recovery from transient deadlocks without user-facing errors
 - The `attempts` parameter is built into Laravel's `DB::transaction()` — no external packages needed
 - Consistent lock ordering combined with retry makes deadlocks rare and survivable
 
 Reference: [Laravel Database Transactions](https://laravel.com/docs/13.x/database#database-transactions)
-
 
 ---
 
@@ -1640,6 +1661,7 @@ $account->update(['balance' => $account->balance - $amount]);
 ```
 
 **Problems:**
+
 - Two concurrent reads see the same stale value and both overwrite with their own calculation
 - Money, inventory, or credits can be silently lost or duplicated
 - The bug is intermittent — it only manifests under concurrent load, making it hard to reproduce
@@ -1686,12 +1708,12 @@ $account = Account::sharedLock()->find($id);
 ```
 
 **Benefits:**
+
 - Eliminates lost updates by serializing access to contested rows
 - `lockForUpdate()` blocks other transactions until the current one commits or rolls back
 - Combined with `attempts: 3`, handles transient deadlocks gracefully
 
 Reference: [Laravel Pessimistic Locking](https://laravel.com/docs/13.x/queries#pessimistic-locking)
-
 
 ---
 
@@ -1723,6 +1745,7 @@ return new class extends Migration
 ```
 
 **Problems:**
+
 - Running application servers reference the old column name after the migration executes
 - In multi-server deployments, the gap between migration and full code rollout can be minutes
 - Rollback is destructive — renaming back may lose data written to the new column by new code
@@ -1778,12 +1801,12 @@ return new class extends Migration
 ```
 
 **Benefits:**
+
 - Zero downtime — old and new code both work at every step of the migration
 - Each deploy is independently reversible without data loss
 - Safe for multi-server rolling deployments where old and new code coexist
 
 Reference: [Laravel Migrations](https://laravel.com/docs/13.x/migrations)
-
 
 ---
 
@@ -1813,6 +1836,7 @@ return new class extends Migration
 ```
 
 **Problems:**
+
 - Table-level lock blocks all write operations for the duration of index creation
 - On large tables, index creation can take minutes, causing application downtime
 - No way to cancel without rolling back the entire migration
@@ -1862,12 +1886,12 @@ public bool $withinTransaction = false;
 ```
 
 **Benefits:**
+
 - Tables remain fully readable and writable during index creation
 - No application downtime or blocked requests during deployment
 - Standard `$table->index()` is still fine for small tables and initial migrations — only use raw SQL for large production tables
 
 Reference: [Laravel Migrations](https://laravel.com/docs/13.x/migrations)
-
 
 ---
 
@@ -1898,6 +1922,7 @@ return new class extends Migration
 ```
 
 **Problems:**
+
 - Database must rewrite every existing row to add the NOT NULL column
 - Table is locked during the rewrite, blocking all reads and writes
 - On large tables, this can take minutes or hours, causing extended downtime
@@ -1954,12 +1979,12 @@ return new class extends Migration
 ```
 
 **Benefits:**
+
 - Adding a nullable column is an instant metadata operation — no table rewrite
 - Backfilling in batches keeps the table available throughout the process
 - Modern databases handle NOT NULL with DEFAULT as instant operations, but nullable-first is universally safe
 
 Reference: [Laravel Migrations](https://laravel.com/docs/13.x/migrations)
-
 
 ---
 
@@ -1983,6 +2008,7 @@ Guessing why a query is slow wastes time and leads to wrong fixes. Running EXPLA
 ```
 
 **Problems:**
+
 - Optimizing without EXPLAIN often targets the wrong bottleneck
 - Adding indexes blindly wastes storage and slows writes without improving reads
 - Caching is a band-aid — the underlying query may grow slower as data increases
@@ -2032,12 +2058,12 @@ Log::debug('Query', [
 ```
 
 **Benefits:**
+
 - Data-driven optimization instead of guesswork — EXPLAIN shows exactly what the database does
 - Quickly identifies whether an index exists but isn't being used vs. missing entirely
 - EXPLAIN ANALYZE shows actual vs. estimated row counts, revealing stale statistics
 
 Reference: [Laravel Query Builder](https://laravel.com/docs/13.x/queries)
-
 
 ---
 
@@ -2063,6 +2089,7 @@ Without query monitoring, N+1 problems and duplicate queries silently accumulate
 ```
 
 **Problems:**
+
 - N+1 queries are invisible during normal development — pages still load fast with small datasets
 - Duplicate queries from multiple components rendering the same data go undetected
 - Memory leaks from eager loading too much data are only caught in production
@@ -2102,12 +2129,12 @@ return [
 ```
 
 **Benefits:**
+
 - Instant visibility into query count and execution time on every page load
 - Highlights duplicate queries automatically — easy to spot missing eager loads
 - Dev-only dependency with zero production overhead when properly configured
 
 Reference: [Laravel Debugbar](https://github.com/barryvdh/laravel-debugbar)
-
 
 ---
 
@@ -2131,6 +2158,7 @@ Slow queries that go unmonitored gradually degrade application performance as da
 ```
 
 **Problems:**
+
 - Slow queries accumulate silently as data grows over months
 - No early warning system to catch regressions before they impact users
 - Without logs, debugging production slowdowns requires real-time profiling under pressure
@@ -2196,12 +2224,12 @@ DB::whenQueryingForLongerThan(5000, function (Connection $connection, QueryExecu
 ```
 
 **Benefits:**
+
 - Catches slow queries before they cause user-facing performance issues
 - `DB::listen()` integrates with any logging/alerting system (Slack, PagerDuty, etc.)
 - `whenQueryingForLongerThan()` detects death-by-a-thousand-cuts — many fast queries that add up
 
 Reference: [Laravel Database Monitoring](https://laravel.com/docs/13.x/database#monitoring-cumulative-query-time)
-
 
 ---
 
@@ -2240,6 +2268,7 @@ Schema::create('tbl_users', function (Blueprint $table) {
 ```
 
 **Problems:**
+
 - Eloquent cannot auto-resolve `User` model to a `user` table (expects `users`)
 - PascalCase tables require explicit `$table` property on every model
 - Non-alphabetical pivot names break `belongsToMany` without manual table overrides
@@ -2293,13 +2322,13 @@ class Category extends Model
 ```
 
 **Benefits:**
+
 - Eloquent auto-resolves `User` to `users`, `OrderItem` to `order_items` with zero configuration
 - Alphabetical pivot naming (`role_user`) works with `belongsToMany` without specifying the table
 - Consistent naming makes migrations, queries, and team collaboration predictable
 - Custom `$table` overrides are explicit and self-documenting when needed
 
 Reference: [Laravel Eloquent Conventions](https://laravel.com/docs/13.x/eloquent#eloquent-model-conventions)
-
 
 ---
 
@@ -2342,6 +2371,7 @@ Schema::create('users', function (Blueprint $table) {
 ```
 
 **Problems:**
+
 - camelCase columns break Eloquent attribute accessors and mass assignment conventions
 - Non-standard FK names prevent `constrained()` and `belongsTo()` auto-resolution
 - Booleans without `is_`/`has_`/`can_` prefix are ambiguous (is `active` a scope, column, or method?)
@@ -2402,13 +2432,13 @@ class Comment extends Model
 ```
 
 **Benefits:**
+
 - `foreignId('user_id')->constrained()` auto-resolves table and column with zero configuration
 - `is_active`, `has_verified_email` clearly communicate boolean intent in queries and conditions
 - Standard `created_at`/`updated_at` work with Eloquent's `$timestamps` and date casting automatically
 - Polymorphic `_id`/`_type` columns match `morphTo()` method name, enabling auto-resolution
 
 Reference: [Laravel Eloquent Conventions](https://laravel.com/docs/13.x/eloquent#eloquent-model-conventions)
-
 
 ---
 
@@ -2453,6 +2483,7 @@ class User extends Model
 ```
 
 **Problems:**
+
 - `belongsTo` named `users()` makes Eloquent look for `users_id` instead of `user_id`
 - Singular `comment()` on a hasMany is misleading — the method returns a Collection, not a model
 - Vague names like `data()` make eager loading calls (`with('data')`) unreadable and unmaintainable
@@ -2576,13 +2607,13 @@ class Image extends Model
 ```
 
 **Benefits:**
+
 - `user()` on belongsTo auto-resolves to `user_id` — no manual FK specification needed
 - Plural `comments()` on hasMany clearly signals a Collection return type
 - Eager loading reads naturally: `Post::with(['user', 'comments', 'tags'])->get()`
 - `whereHas('comments')` and `withCount('orders')` work without additional configuration
 
 Reference: [Laravel Eloquent Relationships](https://laravel.com/docs/13.x/eloquent-relationships)
-
 
 ---
 
@@ -2626,6 +2657,7 @@ Schema::table('users', function (Blueprint $table) {
 ```
 
 **Problems:**
+
 - `update_users` gives no indication of what columns are added, removed, or modified
 - Multi-concern migrations cannot be partially rolled back and create confusing diffs
 - Non-standard index names make debugging and dropping indexes error-prone
@@ -2684,6 +2716,7 @@ Schema::table('users', function (Blueprint $table) {
 ```
 
 **Benefits:**
+
 - `add_phone_to_users_table` is immediately clear in `migrate:status` and git history
 - One concern per migration enables clean rollbacks with `migrate:rollback --step=1`
 - Laravel's auto-generated index names (`users_email_unique`) follow a predictable `{table}_{column}_{type}` pattern
@@ -2691,6 +2724,4 @@ Schema::table('users', function (Blueprint $table) {
 
 Reference: [Laravel Migrations](https://laravel.com/docs/13.x/migrations)
 
-
 ---
-

@@ -1,7 +1,7 @@
 ---
 title: Use Cache Tags for Group Invalidation
 impact: HIGH
-impactDescription: "Flush entire cache groups in one call instead of tracking individual keys"
+impactDescription: 'Flush entire cache groups in one call instead of tracking individual keys'
 tags: cache, tags, redis, invalidation
 ---
 
@@ -43,6 +43,7 @@ class ProductService
 ```
 
 **Problems:**
+
 - Every new cache key must be tracked and added to the clear method
 - Flushing all entries for a group requires knowing every key or flushing the entire cache
 - Forgetting a single key in the clear method results in stale data
@@ -91,6 +92,7 @@ class ProductService
 ```
 
 **Benefits:**
+
 - Flush an entire group of cache entries with a single `flush()` call
 - No need to track individual cache keys — tags define the group
 - Multiple tags per entry allow flexible invalidation strategies (by product, by type, etc.)

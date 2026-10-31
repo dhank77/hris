@@ -1,7 +1,7 @@
 ---
 title: Polymorphic Component Typing
 impact: CRITICAL
-impactDescription: "enables type-safe rendering as different HTML elements"
+impactDescription: 'enables type-safe rendering as different HTML elements'
 tags: component, polymorphic, as-prop, generic
 ---
 
@@ -17,30 +17,31 @@ Creating type-safe polymorphic components that can render as different HTML elem
 // ❌ Bad
 // Using 'any' loses all type safety
 interface BoxProps {
-  as?: any;
-  children?: React.ReactNode;
+    as?: any;
+    children?: React.ReactNode;
 }
 
 const Box = ({ as: Component = 'div', ...props }: BoxProps) => {
-  return <Component {...props} />;
+    return <Component {...props} />;
 };
 
 // No validation of props for the rendered element
-<Box as="a">This should have href</Box> // No type error, but missing required href
+<Box as="a">This should have href</Box>; // No type error, but missing required href
 
 // String union doesn't provide prop inference
 interface TextProps {
-  as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
-  children: React.ReactNode;
+    as?: 'h1' | 'h2' | 'h3' | 'p' | 'span';
+    children: React.ReactNode;
 }
 
 const Text = ({ as: Component = 'p', children }: TextProps) => {
-  return <Component>{children}</Component>;
+    return <Component>{children}</Component>;
 };
 // Can't pass element-specific props like htmlFor to label
 ```
 
 **Problems:**
+
 - Using `any` for the `as` prop removes all type safety and autocomplete
 - No validation that passed props match the rendered element type
 - String unions cannot infer element-specific props
@@ -170,6 +171,7 @@ function Button(props: ButtonProps): React.ReactElement {
 ```
 
 **Benefits:**
+
 - Full type safety: props are validated based on the rendered element
 - IDE autocomplete suggests valid props for each element type
 - Single component can render as any HTML element or custom component

@@ -1,7 +1,7 @@
 ---
 title: Configure Build for Effective Tree Shaking
 impact: CRITICAL
-impactDescription: "15-30% smaller bundles"
+impactDescription: '15-30% smaller bundles'
 tags: build, tree-shaking, optimization, dead-code, vite
 ---
 
@@ -26,8 +26,8 @@ export * from './objects';
 import * as utils from './utils';
 
 function Component() {
-  // Only using one function but importing everything
-  return <div>{utils.formatDate(new Date())}</div>;
+    // Only using one function but importing everything
+    return <div>{utils.formatDate(new Date())}</div>;
 }
 ```
 
@@ -37,24 +37,25 @@ import _ from 'lodash';
 import moment from 'moment';
 
 function processData(items: Item[]) {
-  return _.uniqBy(items, 'id').map(item => ({
-    ...item,
-    date: moment(item.date).format('YYYY-MM-DD'),
-  }));
+    return _.uniqBy(items, 'id').map((item) => ({
+        ...item,
+        date: moment(item.date).format('YYYY-MM-DD'),
+    }));
 }
 ```
 
 ```json
 // ❌ Bad: package.json missing sideEffects field
 {
-  "name": "my-app",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js"
+    "name": "my-app",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js"
 }
 ```
 
 **Problems:**
+
 - Barrel exports with `export *` pull in entire modules even when only one function is used
 - Namespace imports (`import *`) prevent the bundler from identifying unused exports
 - Libraries like `lodash` (CJS) and `moment` are not tree-shakeable
@@ -75,7 +76,7 @@ export { pick, omit, merge } from './objects';
 import { formatDate } from './utils';
 
 function Component() {
-  return <div>{formatDate(new Date())}</div>;
+    return <div>{formatDate(new Date())}</div>;
 }
 ```
 
@@ -85,25 +86,21 @@ import uniqBy from 'lodash-es/uniqBy';
 import { format } from 'date-fns';
 
 function processData(items: Item[]) {
-  return uniqBy(items, 'id').map(item => ({
-    ...item,
-    date: format(new Date(item.date), 'yyyy-MM-dd'),
-  }));
+    return uniqBy(items, 'id').map((item) => ({
+        ...item,
+        date: format(new Date(item.date), 'yyyy-MM-dd'),
+    }));
 }
 ```
 
 ```json
 // ✅ Good: package.json with proper sideEffects configuration
 {
-  "name": "my-app",
-  "version": "1.0.0",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "sideEffects": [
-    "*.css",
-    "*.scss",
-    "./src/polyfills.ts"
-  ]
+    "name": "my-app",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "module": "dist/index.esm.js",
+    "sideEffects": ["*.css", "*.scss", "./src/polyfills.ts"]
 }
 ```
 
@@ -113,23 +110,24 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    rollupOptions: {
-      treeshake: {
-        moduleSideEffects: 'no-external',
-        propertyReadSideEffects: false,
-        tryCatchDeoptimization: false,
-      },
+    plugins: [react()],
+    build: {
+        rollupOptions: {
+            treeshake: {
+                moduleSideEffects: 'no-external',
+                propertyReadSideEffects: false,
+                tryCatchDeoptimization: false,
+            },
+        },
     },
-  },
-  optimizeDeps: {
-    include: ['lodash-es'],
-  },
+    optimizeDeps: {
+        include: ['lodash-es'],
+    },
 });
 ```
 
 **Benefits:**
+
 - Named exports let the bundler eliminate unused functions at build time
 - ESM-compatible libraries (`lodash-es`, `date-fns`) enable per-function tree shaking
 - The `sideEffects` field tells the bundler which files are safe to remove when unused

@@ -1,7 +1,7 @@
 ---
 title: Use Query Builder for Hot Paths
 impact: HIGH
-impactDescription: "30-50% faster on large result sets by skipping model hydration"
+impactDescription: '30-50% faster on large result sets by skipping model hydration'
 tags: query-builder, eloquent, performance, db-table
 ---
 
@@ -32,6 +32,7 @@ foreach ($activeUsers as $user) {
 ```
 
 **Problems:**
+
 - Each row triggers model instantiation, attribute casting, and accessor resolution
 - Model events (retrieved, etc.) fire for every single row
 - Memory usage scales with model weight, not just data size
@@ -58,6 +59,7 @@ foreach ($activeUsers as $user) {
 ```
 
 **Benefits:**
+
 - Skips model instantiation, casts, accessors, and event dispatching
 - Returns lightweight stdClass objects with minimal memory footprint
 - 30-50% faster on large result sets (benchmarked on 5,000+ rows)

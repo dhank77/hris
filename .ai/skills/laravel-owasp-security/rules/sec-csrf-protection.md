@@ -57,6 +57,7 @@ async function deleteAccount() {
 ```
 
 **Problems:**
+
 - Excluding authenticated routes from CSRF allows cross-site forged requests
 - Custom `fetch` calls bypass Inertia's automatic CSRF header injection
 - Blade forms without `@csrf` are either rejected (if protection is on) or vulnerable (if excluded)
@@ -88,7 +89,7 @@ router.post('/profile', { name: 'John' });
 
 // ✅ useForm also handles CSRF automatically
 const { data, setData, post } = useForm({ name: '' });
-post('/profile');  // X-XSRF-TOKEN sent automatically
+post('/profile'); // X-XSRF-TOKEN sent automatically
 ```
 
 ### Custom fetch Must Include CSRF Token
@@ -101,10 +102,12 @@ await axios.delete('/account');
 
 // ✅ If using native fetch, read the token from the cookie
 function getCsrfToken(): string {
-    return document.cookie
-        .split('; ')
-        .find(row => row.startsWith('XSRF-TOKEN='))
-        ?.split('=')[1] ?? '';
+    return (
+        document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1] ?? ''
+    );
 }
 
 await fetch('/account', {
@@ -155,13 +158,13 @@ class ToyyibPayController extends Controller
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `validateCsrfTokens(except: ['/webhooks/*'])` | Only exclude third-party callbacks |
-| Inertia `router.post/put/delete` | All form submissions — CSRF automatic |
-| `useForm` hook | Forms with Inertia — CSRF automatic |
-| `axios` for custom HTTP calls | Reads XSRF-TOKEN cookie automatically |
-| `@csrf` in Blade forms | Non-Inertia forms |
-| Webhook signature verification | Authenticate excluded routes differently |
+| Pattern                                       | Use Case                                 |
+| --------------------------------------------- | ---------------------------------------- |
+| `validateCsrfTokens(except: ['/webhooks/*'])` | Only exclude third-party callbacks       |
+| Inertia `router.post/put/delete`              | All form submissions — CSRF automatic    |
+| `useForm` hook                                | Forms with Inertia — CSRF automatic      |
+| `axios` for custom HTTP calls                 | Reads XSRF-TOKEN cookie automatically    |
+| `@csrf` in Blade forms                        | Non-Inertia forms                        |
+| Webhook signature verification                | Authenticate excluded routes differently |
 
 Reference: [Laravel CSRF Protection](https://laravel.com/docs/13.x/csrf) | [Inertia.js Security](https://inertiajs.com/security)

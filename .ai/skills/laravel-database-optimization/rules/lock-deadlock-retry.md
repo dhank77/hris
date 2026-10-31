@@ -1,7 +1,7 @@
 ---
 title: Use Transaction Retry for Deadlocks
 impact: HIGH
-impactDescription: "Automatically recovers from transient deadlocks instead of crashing the request"
+impactDescription: 'Automatically recovers from transient deadlocks instead of crashing the request'
 tags: transactions, deadlock, retry
 ---
 
@@ -29,6 +29,7 @@ DB::transaction(function (): void {
 ```
 
 **Problems:**
+
 - A transient deadlock causes a permanent request failure with no recovery
 - Deadlocks are normal under concurrent load — they are not bugs, they are expected
 - Users see intermittent 500 errors that disappear on retry, undermining trust
@@ -65,6 +66,7 @@ DB::transaction(function () use ($senderId, $receiverId, $amount): void {
 ```
 
 **Benefits:**
+
 - Automatic recovery from transient deadlocks without user-facing errors
 - The `attempts` parameter is built into Laravel's `DB::transaction()` — no external packages needed
 - Consistent lock ordering combined with retry makes deadlocks rare and survivable

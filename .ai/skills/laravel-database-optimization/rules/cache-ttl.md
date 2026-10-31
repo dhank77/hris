@@ -1,7 +1,7 @@
 ---
 title: Set Appropriate TTLs by Data Volatility
 impact: HIGH
-impactDescription: "Prevents stale data and cache bloat by matching TTL to data change frequency"
+impactDescription: 'Prevents stale data and cache bloat by matching TTL to data change frequency'
 tags: cache, ttl, strategy, stale-data
 ---
 
@@ -22,6 +22,7 @@ Cache::put('products:featured', $products);                   // No TTL — defa
 ```
 
 **Problems:**
+
 - `forever()` on volatile data means users see stale profiles, stats, and counts
 - Short TTLs on static data cause unnecessary database queries on every expiry
 - No TTL argument relies on driver defaults, which vary and may be infinite
@@ -68,16 +69,17 @@ $notifications = Cache::remember(
 // 'ttl' => 3600, // 1 hour default — prevents accidental forever caching
 ```
 
-| Data Type | Volatility | Recommended TTL |
-|---|---|---|
-| Reference data (countries, config) | Very low | 24 hours or `rememberForever` |
-| Product catalog, categories | Low | 1-6 hours |
-| User profiles, preferences | Medium | 15-30 minutes |
-| Aggregations, dashboard stats | Medium-High | 5-15 minutes |
-| Feeds, notifications, activity | High | 1-5 minutes |
-| Real-time data (stock, bidding) | Very high | Do not cache |
+| Data Type                          | Volatility  | Recommended TTL               |
+| ---------------------------------- | ----------- | ----------------------------- |
+| Reference data (countries, config) | Very low    | 24 hours or `rememberForever` |
+| Product catalog, categories        | Low         | 1-6 hours                     |
+| User profiles, preferences         | Medium      | 15-30 minutes                 |
+| Aggregations, dashboard stats      | Medium-High | 5-15 minutes                  |
+| Feeds, notifications, activity     | High        | 1-5 minutes                   |
+| Real-time data (stock, bidding)    | Very high   | Do not cache                  |
 
 **Benefits:**
+
 - Data freshness matches user expectations for each data type
 - Static data stays cached longer, reducing unnecessary database queries
 - Volatile data expires quickly, preventing users from seeing stale information

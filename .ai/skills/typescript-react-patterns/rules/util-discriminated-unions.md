@@ -1,7 +1,7 @@
 ---
 title: Discriminated Unions for State
 impact: LOW
-impactDescription: "makes impossible states unrepresentable at the type level"
+impactDescription: 'makes impossible states unrepresentable at the type level'
 tags: utility-types, discriminated-unions, state-machine, exhaustive-check
 ---
 
@@ -16,36 +16,37 @@ Instead of combining booleans and nullable fields (where impossible combinations
 ```tsx
 // ❌ Bad
 interface RequestState<T> {
-  isLoading: boolean;
-  error: string | null;
-  data: T | null;
+    isLoading: boolean;
+    error: string | null;
+    data: T | null;
 }
 
 function UserProfile() {
-  const [state, setState] = useState<RequestState<User>>({
-    isLoading: false,
-    error: null,
-    data: null,
-  });
+    const [state, setState] = useState<RequestState<User>>({
+        isLoading: false,
+        error: null,
+        data: null,
+    });
 
-  // Impossible states are representable:
-  // { isLoading: true, error: "fail", data: someUser } — loading AND error AND data?
-  // { isLoading: false, error: null, data: null } — not loading, no error, no data?
+    // Impossible states are representable:
+    // { isLoading: true, error: "fail", data: someUser } — loading AND error AND data?
+    // { isLoading: false, error: null, data: null } — not loading, no error, no data?
 
-  if (state.isLoading) {
-    return <p>Loading...</p>;
-  }
+    if (state.isLoading) {
+        return <p>Loading...</p>;
+    }
 
-  if (state.error) {
-    return <p>Error: {state.error}</p>;
-  }
+    if (state.error) {
+        return <p>Error: {state.error}</p>;
+    }
 
-  // TypeScript still thinks data could be null here
-  return <div>{state.data?.name}</div>;
+    // TypeScript still thinks data could be null here
+    return <div>{state.data?.name}</div>;
 }
 ```
 
 **Problems:**
+
 - `isLoading: true` + `data: someUser` is representable but makes no sense
 - `isLoading: true` + `error: "fail"` is representable but contradictory
 - After checking `isLoading` and `error`, TypeScript still can't narrow `data` to non-null
@@ -160,6 +161,7 @@ function Notification(props: NotificationProps) {
 ```
 
 **Benefits:**
+
 - Impossible states (loading + data, error + success) cannot be represented
 - TypeScript narrows the type inside each `case` branch, so `data` and `error` are non-null where guaranteed
 - `assertNever` in the default case causes a compile error when a new variant is added but not handled

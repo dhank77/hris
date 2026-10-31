@@ -42,11 +42,12 @@ React auto-escapes `{variable}` expressions. However, `dangerouslySetInnerHTML` 
 
 ```tsx
 // ❌ eval() or new Function() with user-controlled strings
-const fn = new Function(userInput)  // Executes arbitrary user code
-eval(userDefinedExpression)
+const fn = new Function(userInput); // Executes arbitrary user code
+eval(userDefinedExpression);
 ```
 
 **Problems:**
+
 - `dangerouslySetInnerHTML` passes raw HTML directly to the DOM — no React escaping
 - A teacher/admin with edit access becomes an attack vector for all users viewing their content
 - `javascript:` scheme in `href` executes on click even in React
@@ -116,7 +117,7 @@ function getSafeUrl(url: string): string {
 
 <a href={getSafeUrl(user.website)} target="_blank" rel="noopener noreferrer">
     Visit Website
-</a>
+</a>;
 ```
 
 ### Server-Side Sanitization as an Extra Layer
@@ -150,21 +151,21 @@ class SessionNoteController extends Controller
 
 ## What DOMPurify Allows vs. Strips
 
-| Allowed (safe) | Stripped (dangerous) |
-|----------------|---------------------|
-| `<p>`, `<b>`, `<i>`, `<ul>`, `<li>` | `<script>`, `<iframe>`, `<object>` |
-| `<a href="https://...">` | `<a href="javascript:...">` |
-| `<img src="https://...">` | `onclick`, `onerror`, `onload` attributes |
-| `<h1>`–`<h6>`, `<blockquote>` | `<style>` with expression() |
+| Allowed (safe)                      | Stripped (dangerous)                      |
+| ----------------------------------- | ----------------------------------------- |
+| `<p>`, `<b>`, `<i>`, `<ul>`, `<li>` | `<script>`, `<iframe>`, `<object>`        |
+| `<a href="https://...">`            | `<a href="javascript:...">`               |
+| `<img src="https://...">`           | `onclick`, `onerror`, `onload` attributes |
+| `<h1>`–`<h6>`, `<blockquote>`       | `<style>` with expression()               |
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `DOMPurify.sanitize(html)` | All `dangerouslySetInnerHTML` usage |
-| `<SafeHtml html={...} />` | Reusable sanitized renderer |
-| `getSafeUrl(url)` | User-supplied `href` or `src` attributes |
-| Server-side HTMLPurifier | Belt-and-suspenders for stored content |
-| `{{ }}` in Blade | User content in Blade templates (auto-escaped) |
+| Pattern                    | Use Case                                       |
+| -------------------------- | ---------------------------------------------- |
+| `DOMPurify.sanitize(html)` | All `dangerouslySetInnerHTML` usage            |
+| `<SafeHtml html={...} />`  | Reusable sanitized renderer                    |
+| `getSafeUrl(url)`          | User-supplied `href` or `src` attributes       |
+| Server-side HTMLPurifier   | Belt-and-suspenders for stored content         |
+| `{{ }}` in Blade           | User content in Blade templates (auto-escaped) |
 
 Reference: [DOMPurify](https://github.com/cure53/DOMPurify) | [OWASP XSS Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)

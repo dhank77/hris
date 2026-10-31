@@ -60,6 +60,7 @@ class ReportController extends Controller
 ```
 
 **Problems:**
+
 - Any authenticated user can access any record by changing the ID in the URL
 - Role checks only on the frontend are trivially bypassed — users can call routes directly
 - Missing middleware on admin route groups exposes privileged actions to all users
@@ -177,12 +178,12 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `->where('user_id', auth()->id())->findOrFail($id)` | Scope any resource to current user |
-| `$this->authorize('action', $model)` | Policy-based authorization per action |
-| `Route::middleware('role:admin')` | Protect admin route groups |
-| `abort_unless($condition, 403)` | Inline authorization guard |
-| `Gate::authorize('action', $model)` | Gate-based authorization in services |
+| Pattern                                             | Use Case                              |
+| --------------------------------------------------- | ------------------------------------- |
+| `->where('user_id', auth()->id())->findOrFail($id)` | Scope any resource to current user    |
+| `$this->authorize('action', $model)`                | Policy-based authorization per action |
+| `Route::middleware('role:admin')`                   | Protect admin route groups            |
+| `abort_unless($condition, 403)`                     | Inline authorization guard            |
+| `Gate::authorize('action', $model)`                 | Gate-based authorization in services  |
 
 Reference: [OWASP Laravel Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Laravel_Cheat_Sheet.html)

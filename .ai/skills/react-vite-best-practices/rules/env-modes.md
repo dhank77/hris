@@ -1,7 +1,7 @@
 ---
 title: Mode-Specific Environment Files
 impact: MEDIUM
-impactDescription: "Wrong env config leaks secrets or uses wrong API URLs"
+impactDescription: 'Wrong env config leaks secrets or uses wrong API URLs'
 tags: environment, modes, env-files, configuration
 ---
 
@@ -15,7 +15,7 @@ Vite supports multiple environment files that load based on the current mode. Us
 
 ```typescript
 // ❌ Bad — hardcoded API URLs toggled by comments
-const API_URL = 'https://api.example.com'
+const API_URL = 'https://api.example.com';
 // const API_URL = 'http://localhost:8000'     // uncomment for dev
 // const API_URL = 'https://staging.example.com' // uncomment for staging
 ```
@@ -30,6 +30,7 @@ VITE_FEATURE_DEBUG=true
 ```
 
 **Problems:**
+
 - Manual editing is error-prone — wrong URL can reach production
 - No separation between development, staging, and production configs
 - Debug flags accidentally left on in production
@@ -78,12 +79,12 @@ npx vite build --mode staging   # loads .env + .env.staging
 // ✅ Good — type-safe config using the loaded environment
 // src/config.ts
 export const config = {
-  appName: import.meta.env.VITE_APP_NAME,
-  apiUrl: import.meta.env.VITE_API_URL,
-  isDebug: import.meta.env.VITE_FEATURE_DEBUG === 'true',
-  sentryDsn: import.meta.env.VITE_SENTRY_DSN ?? null,
-  mode: import.meta.env.MODE, // "development" | "production" | "staging"
-} as const
+    appName: import.meta.env.VITE_APP_NAME,
+    apiUrl: import.meta.env.VITE_API_URL,
+    isDebug: import.meta.env.VITE_FEATURE_DEBUG === 'true',
+    sentryDsn: import.meta.env.VITE_SENTRY_DSN ?? null,
+    mode: import.meta.env.MODE, // "development" | "production" | "staging"
+} as const;
 ```
 
 ```gitignore
@@ -92,6 +93,7 @@ export const config = {
 ```
 
 **Benefits:**
+
 - Zero manual editing when switching environments
 - `.local` files let each developer override without affecting the team
 - `--mode` flag makes CI/CD pipelines explicit and auditable

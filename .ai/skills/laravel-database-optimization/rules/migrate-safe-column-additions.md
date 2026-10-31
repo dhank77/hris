@@ -1,7 +1,7 @@
 ---
 title: Never Add NOT NULL Columns Without Defaults in Production
 impact: HIGH
-impactDescription: "Prevents table rewrites and lock-ups when adding columns to large tables"
+impactDescription: 'Prevents table rewrites and lock-ups when adding columns to large tables'
 tags: migrations, columns, production, safety
 ---
 
@@ -32,6 +32,7 @@ return new class extends Migration
 ```
 
 **Problems:**
+
 - Database must rewrite every existing row to add the NOT NULL column
 - Table is locked during the rewrite, blocking all reads and writes
 - On large tables, this can take minutes or hours, causing extended downtime
@@ -88,6 +89,7 @@ return new class extends Migration
 ```
 
 **Benefits:**
+
 - Adding a nullable column is an instant metadata operation — no table rewrite
 - Backfilling in batches keeps the table available throughout the process
 - Modern databases handle NOT NULL with DEFAULT as instant operations, but nullable-first is universally safe

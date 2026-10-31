@@ -1,7 +1,7 @@
 ---
 title: Use Expand-Contract Pattern for Zero-Downtime Migrations
 impact: HIGH
-impactDescription: "Prevents broken deploys — running code continues working while schema evolves"
+impactDescription: 'Prevents broken deploys — running code continues working while schema evolves'
 tags: migrations, zero-downtime, deployment
 ---
 
@@ -33,6 +33,7 @@ return new class extends Migration
 ```
 
 **Problems:**
+
 - Running application servers reference the old column name after the migration executes
 - In multi-server deployments, the gap between migration and full code rollout can be minutes
 - Rollback is destructive — renaming back may lose data written to the new column by new code
@@ -88,6 +89,7 @@ return new class extends Migration
 ```
 
 **Benefits:**
+
 - Zero downtime — old and new code both work at every step of the migration
 - Each deploy is independently reversible without data loss
 - Safe for multi-server rolling deployments where old and new code coexist

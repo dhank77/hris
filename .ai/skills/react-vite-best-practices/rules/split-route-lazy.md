@@ -1,7 +1,7 @@
 ---
 title: Use React.lazy() for Route-Based Splitting
 impact: CRITICAL
-impactDescription: "50-80% smaller initial bundle"
+impactDescription: '50-80% smaller initial bundle'
 tags: split, lazy, routes, code-splitting, react
 ---
 
@@ -38,6 +38,7 @@ function App() {
 ```
 
 **Problems:**
+
 - All 5 page components are bundled together and loaded on initial page load
 - Users download code for pages they may never visit
 - Larger initial bundle means slower Time to Interactive
@@ -103,6 +104,7 @@ function NavLink() {
 ```
 
 **Benefits:**
+
 - Initial bundle reduced by 50-80% since only the current route is loaded
 - Time to Interactive significantly improved
 - Each route loads only when navigated to

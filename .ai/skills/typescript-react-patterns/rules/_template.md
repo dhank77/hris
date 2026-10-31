@@ -1,6 +1,9 @@
 ---
 title: [Rule Title]
-category: [Component Typing | Hook Typing | Event Handling | Ref Typing | Generic Components | Context & State | Utility Types]
+category:
+    [
+        Component Typing | Hook Typing | Event Handling | Ref Typing | Generic Components | Context & State | Utility Types,
+    ]
 priority: [CRITICAL | HIGH | MEDIUM | LOW]
 ---
 
@@ -9,6 +12,7 @@ priority: [CRITICAL | HIGH | MEDIUM | LOW]
 ## Why It Matters
 
 [Brief explanation of why this pattern is important. Focus on:
+
 - What problem it solves
 - What errors it prevents
 - When you need this pattern]
@@ -24,6 +28,7 @@ priority: [CRITICAL | HIGH | MEDIUM | LOW]
 ```
 
 **Why this is problematic:**
+
 - [Specific issue 1]
 - [Specific issue 2]
 - [What errors this causes]
@@ -39,6 +44,7 @@ priority: [CRITICAL | HIGH | MEDIUM | LOW]
 ```
 
 **Why this works:**
+
 - [Benefit 1]
 - [Benefit 2]
 - [Type safety gained]
@@ -88,19 +94,19 @@ priority: [CRITICAL | HIGH | MEDIUM | LOW]
 1. **Title**: Use clear, descriptive titles that match the file name
 2. **Category**: Must match one of the 7 defined categories
 3. **Priority**:
-   - CRITICAL: Fundamental patterns every project needs
-   - HIGH: Common patterns most projects use
-   - MEDIUM: Advanced patterns for specific needs
-   - LOW: Specialized edge cases
+    - CRITICAL: Fundamental patterns every project needs
+    - HIGH: Common patterns most projects use
+    - MEDIUM: Advanced patterns for specific needs
+    - LOW: Specialized edge cases
 4. **Code Examples**:
-   - Use ✅ for correct examples
-   - Use ❌ for incorrect examples
-   - Include inline comments explaining key points
-   - Show both the problem and solution
+    - Use ✅ for correct examples
+    - Use ❌ for incorrect examples
+    - Include inline comments explaining key points
+    - Show both the problem and solution
 5. **Focus on TypeScript + React**:
-   - Emphasize type safety
-   - Show how types flow through the code
-   - Include actual type annotations
-   - Show IDE autocomplete benefits
+    - Emphasize type safety
+    - Show how types flow through the code
+    - Include actual type annotations
+    - Show IDE autocomplete benefits
 6. **Be Concise**: Each rule should be scannable in 2-3 minutes
 7. **Show Real Examples**: Use realistic code, not foo/bar placeholders

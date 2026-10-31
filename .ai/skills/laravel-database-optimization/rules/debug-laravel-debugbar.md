@@ -1,7 +1,7 @@
 ---
 title: Install Debugbar in Development
 impact: MEDIUM
-impactDescription: "Surfaces N+1 queries, duplicate queries, and slow queries automatically during development"
+impactDescription: 'Surfaces N+1 queries, duplicate queries, and slow queries automatically during development'
 tags: debugbar, debugging, development, queries
 ---
 
@@ -27,6 +27,7 @@ Without query monitoring, N+1 problems and duplicate queries silently accumulate
 ```
 
 **Problems:**
+
 - N+1 queries are invisible during normal development — pages still load fast with small datasets
 - Duplicate queries from multiple components rendering the same data go undetected
 - Memory leaks from eager loading too much data are only caught in production
@@ -66,6 +67,7 @@ return [
 ```
 
 **Benefits:**
+
 - Instant visibility into query count and execution time on every page load
 - Highlights duplicate queries automatically — easy to spot missing eager loads
 - Dev-only dependency with zero production overhead when properly configured

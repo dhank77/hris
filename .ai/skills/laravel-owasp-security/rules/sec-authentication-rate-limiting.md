@@ -61,6 +61,7 @@ class AuthenticatedSessionController extends Controller
 ```
 
 **Problems:**
+
 - No throttle allows unlimited login attempts — brute force and credential stuffing are trivial
 - No session regeneration after login allows session fixation — attacker sets victim's session ID and takes over after they log in
 - Plaintext password comparison bypasses all hashing protections
@@ -206,13 +207,13 @@ return [
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `RateLimiter::hit()` in `LoginRequest` | Login brute force prevention |
-| `throttle:5,1` middleware | Password reset, email verify routes |
-| `throttle:10,1` middleware | Payment and sensitive action routes |
-| `session()->regenerate()` | Always call after successful login |
-| `session()->invalidate()` | Always call on logout |
-| `SESSION_LIFETIME=30` | Reduce idle session window |
+| Pattern                                | Use Case                            |
+| -------------------------------------- | ----------------------------------- |
+| `RateLimiter::hit()` in `LoginRequest` | Login brute force prevention        |
+| `throttle:5,1` middleware              | Password reset, email verify routes |
+| `throttle:10,1` middleware             | Payment and sensitive action routes |
+| `session()->regenerate()`              | Always call after successful login  |
+| `session()->invalidate()`              | Always call on logout               |
+| `SESSION_LIFETIME=30`                  | Reduce idle session window          |
 
 Reference: [Laravel Authentication](https://laravel.com/docs/13.x/authentication) | [Laravel Rate Limiting](https://laravel.com/docs/13.x/rate-limiting)

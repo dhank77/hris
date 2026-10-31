@@ -1,7 +1,7 @@
 ---
 title: Use Automatic Eager Loading (Laravel 13+)
 impact: CRITICAL
-impactDescription: "Eliminates N+1 queries without manual with() calls"
+impactDescription: 'Eliminates N+1 queries without manual with() calls'
 tags: auto-eager-loading, n-plus-one, laravel-12
 ---
 
@@ -30,6 +30,7 @@ foreach ($posts as $post) {
 ```
 
 **Problems:**
+
 - Every query site must remember to include the right `with()` calls
 - Blade templates and third-party packages cannot add `with()` themselves
 - Missing a single eager load silently introduces N+1 problems
@@ -63,6 +64,7 @@ foreach ($posts as $post) {
 ```
 
 **Benefits:**
+
 - Eliminates N+1 queries globally without modifying existing query code
 - Works in Blade templates, packages, and any code that iterates collections
 - Per-collection option provides fine-grained control when global activation is too broad

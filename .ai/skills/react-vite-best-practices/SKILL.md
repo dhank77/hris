@@ -3,8 +3,8 @@ name: react-vite-best-practices
 description: React and Vite performance optimization guidelines. Use when writing, reviewing, or optimizing React components built with Vite. Triggers on tasks involving Vite configuration, build optimization, code splitting, lazy loading, HMR, bundle size, or React performance.
 license: MIT
 metadata:
-  author: agent-skills
-  version: "2.0.0"
+    author: agent-skills
+    version: '2.0.0'
 ---
 
 # React + Vite Best Practices
@@ -21,6 +21,7 @@ Comprehensive performance optimization guide for React applications built with V
 ## When to Apply
 
 Reference these guidelines when:
+
 - Configuring Vite for React projects
 - Implementing code splitting and lazy loading
 - Optimizing build output and bundle size
@@ -31,14 +32,14 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Build Optimization | CRITICAL | `build-` |
-| 2 | Code Splitting | CRITICAL | `split-` |
-| 3 | Development | HIGH | `dev-` |
-| 4 | Asset Handling | HIGH | `asset-` |
-| 5 | Environment Config | MEDIUM | `env-` |
-| 6 | Bundle Analysis | MEDIUM | `bundle-` |
+| Priority | Category           | Impact   | Prefix    |
+| -------- | ------------------ | -------- | --------- |
+| 1        | Build Optimization | CRITICAL | `build-`  |
+| 2        | Code Splitting     | CRITICAL | `split-`  |
+| 3        | Development        | HIGH     | `dev-`    |
+| 4        | Asset Handling     | HIGH     | `asset-`  |
+| 5        | Environment Config | MEDIUM   | `env-`    |
+| 6        | Bundle Analysis    | MEDIUM   | `bundle-` |
 
 ## Quick Reference
 
@@ -88,43 +89,43 @@ Reference these guidelines when:
 ### Recommended vite.config.ts
 
 ```typescript
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+    plugins: [react()],
 
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-
-  build: {
-    target: 'baseline-widely-available',
-    sourcemap: false,
-    chunkSizeWarningLimit: 500,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
+    resolve: {
+        alias: {
+            '@': path.resolve(__dirname, './src'),
         },
-      },
     },
-  },
 
-  optimizeDeps: {
-    include: ['react', 'react-dom'],
-  },
-
-  server: {
-    port: 3000,
-    hmr: {
-      overlay: true,
+    build: {
+        target: 'baseline-widely-available',
+        sourcemap: false,
+        chunkSizeWarningLimit: 500,
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['react', 'react-dom'],
+                },
+            },
+        },
     },
-  },
-})
+
+    optimizeDeps: {
+        include: ['react', 'react-dom'],
+    },
+
+    server: {
+        port: 3000,
+        hmr: {
+            overlay: true,
+        },
+    },
+});
 ```
 
 ### Route-Based Code Splitting
@@ -152,12 +153,12 @@ function App() {
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
-  readonly VITE_APP_TITLE: string
+    readonly VITE_API_URL: string;
+    readonly VITE_APP_TITLE: string;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+    readonly env: ImportMetaEnv;
 }
 ```
 

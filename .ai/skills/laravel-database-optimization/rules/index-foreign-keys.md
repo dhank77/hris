@@ -1,7 +1,7 @@
 ---
 title: Index All Foreign Key Columns
 impact: CRITICAL
-impactDescription: "Prevents full table scans on JOINs and relationship queries"
+impactDescription: 'Prevents full table scans on JOINs and relationship queries'
 tags: indexes, foreign-keys, migrations, performance
 ---
 
@@ -30,6 +30,7 @@ $user->posts;
 ```
 
 **Problems:**
+
 - `WHERE user_id = ?` scans every row in the table without an index
 - JOIN operations between parent and child tables become prohibitively slow
 - CASCADE deletes on the parent table must scan the entire child table to find related rows
@@ -64,6 +65,7 @@ Schema::create('comments', function (Blueprint $table): void {
 ```
 
 **Benefits:**
+
 - `foreignId()->constrained()` creates the column, index, and foreign key constraint in one call
 - Index-backed WHERE clauses use B-tree lookups instead of full table scans
 - `morphs()` automatically creates a composite index on both polymorphic columns

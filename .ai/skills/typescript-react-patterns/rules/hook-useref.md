@@ -1,7 +1,7 @@
 ---
 title: useRef Hook Typing
 impact: CRITICAL
-impactDescription: "prevents null reference errors and unnecessary null checks"
+impactDescription: 'prevents null reference errors and unnecessary null checks'
 tags: hook, useRef, ref, DOM, mutable
 ---
 
@@ -31,6 +31,7 @@ if (countRef.current !== null) {  // Unnecessary check
 ```
 
 **Problems:**
+
 - Missing element type generic means `current` has no useful properties
 - Using `undefined` instead of `null` for DOM refs causes type incompatibility
 - Unnecessary null checks on mutable refs add noise and reduce readability
@@ -45,18 +46,18 @@ if (countRef.current !== null) {  // Unnecessary check
 // const divRef = useRef<HTMLDivElement>(null)
 
 function Form() {
-  const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  const focusInput = () => {
-    // Optional chaining because ref might not be attached yet
-    inputRef.current?.focus()
-  }
+    const focusInput = () => {
+        // Optional chaining because ref might not be attached yet
+        inputRef.current?.focus();
+    };
 
-  useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
 
-  return <input ref={inputRef} />
+    return <input ref={inputRef} />;
 }
 
 // Common DOM Element Types (standalone declarations for reference)
@@ -71,86 +72,87 @@ function Form() {
 
 // Mutable Value Refs - pass actual initial value
 function Timer() {
-  const intervalRef = useRef<number | undefined>(undefined)
-  const countRef = useRef(0)  // Inferred as MutableRefObject<number>
+    const intervalRef = useRef<number | undefined>(undefined);
+    const countRef = useRef(0); // Inferred as MutableRefObject<number>
 
-  useEffect(() => {
-    intervalRef.current = window.setInterval(() => {
-      countRef.current++  // No null check needed
-    }, 1000)
+    useEffect(() => {
+        intervalRef.current = window.setInterval(() => {
+            countRef.current++; // No null check needed
+        }, 1000);
 
-    return () => {
-      clearInterval(intervalRef.current)
-    }
-  }, [])
+        return () => {
+            clearInterval(intervalRef.current);
+        };
+    }, []);
 }
 
 // Storing Previous Value
 function usePrevious<T>(value: T): T | undefined {
-  const ref = useRef<T | undefined>(undefined)
+    const ref = useRef<T | undefined>(undefined);
 
-  useEffect(() => {
-    ref.current = value
-  }, [value])
+    useEffect(() => {
+        ref.current = value;
+    }, [value]);
 
-  return ref.current
+    return ref.current;
 }
 
 function Counter({ count }: { count: number }) {
-  const prevCount = usePrevious(count)
+    const prevCount = usePrevious(count);
 
-  return (
-    <p>
-      Current: {count}, Previous: {prevCount ?? 'none'}
-    </p>
-  )
+    return (
+        <p>
+            Current: {count}, Previous: {prevCount ?? 'none'}
+        </p>
+    );
 }
 
 // Storing Callbacks
 function useEventCallback<T extends (...args: never[]) => unknown>(fn: T): T {
-  const ref = useRef<T>(fn)
+    const ref = useRef<T>(fn);
 
-  useEffect(() => {
-    ref.current = fn
-  }, [fn])
+    useEffect(() => {
+        ref.current = fn;
+    }, [fn]);
 
-  return useCallback(
-    ((...args) => ref.current(...args)) as T,
-    []
-  )
+    return useCallback(((...args) => ref.current(...args)) as T, []);
 }
 
 // Multiple Refs (Callback Refs)
-interface Item { id: string; name: string }
+interface Item {
+    id: string;
+    name: string;
+}
 
 function List({ items }: { items: Item[] }) {
-  const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map())
+    const itemRefs = useRef<Map<string, HTMLLIElement>>(new Map());
 
-  const setRef = (id: string) => (el: HTMLLIElement | null) => {
-    if (el) {
-      itemRefs.current.set(id, el)
-    } else {
-      itemRefs.current.delete(id)
-    }
-  }
+    const setRef = (id: string) => (el: HTMLLIElement | null) => {
+        if (el) {
+            itemRefs.current.set(id, el);
+        } else {
+            itemRefs.current.delete(id);
+        }
+    };
 
-  const scrollToItem = (id: string) => {
-    itemRefs.current.get(id)?.scrollIntoView()
-  }
+    const scrollToItem = (id: string) => {
+        itemRefs.current.get(id)?.scrollIntoView();
+    };
 
-  return (
-    <ul>
-      {items.map(item => (
-        <li key={item.id} ref={setRef(item.id)}>
-          {item.name}
-        </li>
-      ))}
-    </ul>
-  )
+    return (
+        <ul>
+            {items.map((item) => (
+                <li key={item.id} ref={setRef(item.id)}>
+                    {item.name}
+                </li>
+            ))}
+        </ul>
+    );
 }
 ```
 
 **Benefits:**
+
 - DOM refs with `null` initial value create `RefObject<T>` with nullable current
 - Mutable refs with actual initial value create `MutableRefObject<T>` with non-nullable current
 - Optional chaining on DOM refs handles the "not yet attached" state cleanly

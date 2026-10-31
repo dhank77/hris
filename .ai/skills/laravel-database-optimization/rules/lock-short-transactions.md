@@ -1,7 +1,7 @@
 ---
 title: Keep Transactions as Short as Possible
 impact: HIGH
-impactDescription: "Reduces lock contention and connection hold time — prevents cascading timeouts"
+impactDescription: 'Reduces lock contention and connection hold time — prevents cascading timeouts'
 tags: transactions, locks, performance, contention
 ---
 
@@ -36,6 +36,7 @@ DB::transaction(function (): void {
 ```
 
 **Problems:**
+
 - External API latency extends lock duration from milliseconds to seconds
 - Other requests needing the same rows queue up, causing cascading timeouts
 - If the API call fails, the entire transaction rolls back — but the side effects (uploaded files, dispatched jobs) cannot be undone
@@ -72,6 +73,7 @@ dispatch(new SendOrderConfirmation($order))->afterCommit();
 ```
 
 **Benefits:**
+
 - Transaction holds locks only during fast database writes — milliseconds instead of seconds
 - Side effects like jobs and notifications only execute after successful commit
 - External service failures don't roll back valid database changes

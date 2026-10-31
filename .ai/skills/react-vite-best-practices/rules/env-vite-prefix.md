@@ -1,7 +1,7 @@
 ---
 title: Use VITE_ Prefix for Environment Variables
 impact: MEDIUM
-impactDescription: "Security and proper configuration"
+impactDescription: 'Security and proper configuration'
 tags: env, configuration, security, vite, environment-variables
 ---
 
@@ -22,8 +22,8 @@ APP_TITLE=My App
 
 ```typescript
 // ❌ Bad: Variables not exposed - returns undefined
-const apiKey = import.meta.env.API_KEY // undefined
-const title = import.meta.env.APP_TITLE // undefined
+const apiKey = import.meta.env.API_KEY; // undefined
+const title = import.meta.env.APP_TITLE; // undefined
 ```
 
 ```env
@@ -34,6 +34,7 @@ VITE_PRIVATE_KEY=...
 ```
 
 **Problems:**
+
 - Variables without `VITE_` prefix are not available in client code
 - Sensitive data with `VITE_` prefix is embedded in the bundle and visible to anyone
 - No type safety leads to runtime errors from undefined variables
@@ -55,15 +56,15 @@ API_SECRET=secret123
 
 ```typescript
 // ✅ Good: Access client-side variables
-const apiUrl = import.meta.env.VITE_API_URL
-const appTitle = import.meta.env.VITE_APP_TITLE
-const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true'
+const apiUrl = import.meta.env.VITE_API_URL;
+const appTitle = import.meta.env.VITE_APP_TITLE;
+const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true';
 
 // Built-in variables
-const isDev = import.meta.env.DEV
-const isProd = import.meta.env.PROD
-const mode = import.meta.env.MODE
-const baseUrl = import.meta.env.BASE_URL
+const isDev = import.meta.env.DEV;
+const isProd = import.meta.env.PROD;
+const mode = import.meta.env.MODE;
+const baseUrl = import.meta.env.BASE_URL;
 ```
 
 ```typescript
@@ -72,13 +73,13 @@ const baseUrl = import.meta.env.BASE_URL
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
-  readonly VITE_APP_TITLE: string
-  readonly VITE_ENABLE_ANALYTICS: string
+    readonly VITE_API_URL: string;
+    readonly VITE_APP_TITLE: string;
+    readonly VITE_ENABLE_ANALYTICS: string;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+    readonly env: ImportMetaEnv;
 }
 ```
 
@@ -98,16 +99,17 @@ VITE_API_URL=https://staging-api.example.com
 // ✅ Good: Runtime configuration for values that change without rebuild
 // public/config.js
 window.APP_CONFIG = {
-  apiUrl: 'https://api.example.com',
-}
+    apiUrl: 'https://api.example.com',
+};
 
 // src/config.ts
 export const config = {
-  apiUrl: window.APP_CONFIG?.apiUrl || import.meta.env.VITE_API_URL,
-}
+    apiUrl: window.APP_CONFIG?.apiUrl || import.meta.env.VITE_API_URL,
+};
 ```
 
 **Benefits:**
+
 - Prevents accidental exposure of secrets like database URLs and API keys
 - Clear separation between client-safe and server-only configuration
 - TypeScript declarations catch undefined variable access at compile time

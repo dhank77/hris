@@ -5,6 +5,7 @@ OWASP Top 10 security audit and secure coding guidelines for Laravel 13 + React/
 ## Overview
 
 This skill provides:
+
 - Full OWASP Top 10 security audit checklist mapped to Laravel 13 patterns
 - 6 React/Inertia.js-specific security checks (R1–R6)
 - Auto-detection of React + Inertia.js stack
@@ -14,6 +15,7 @@ This skill provides:
 ## Categories
 
 ### OWASP Top 10 Checklist (A01–A10)
+
 1. Broken Access Control (A01:2021) — CRITICAL
 2. Cryptographic Failures (A02:2021) — CRITICAL
 3. Injection — SQL, Mass Assignment, XSS (A03:2021) — CRITICAL
@@ -26,10 +28,12 @@ This skill provides:
 10. Server-Side Request Forgery — SSRF (A10:2021) — HIGH
 
 ### Additional Checks
+
 - Command Injection & Dangerous Functions
 - Security Headers
 
 ### React + Inertia.js Checks (R1–R6)
+
 - R1. XSS in React Components
 - R2. Inertia.js Data Exposure (Critical)
 - R3. CSRF in Inertia.js
@@ -40,11 +44,13 @@ This skill provides:
 ## Usage
 
 **Run a security audit:**
+
 - "Run OWASP audit on my Laravel app"
 - "Security review of app/Http/Controllers"
 - "Check my codebase for OWASP vulnerabilities"
 
 **Use as a secure coding reference:**
+
 - "How do I safely handle file uploads in Laravel?"
 - "How do I prevent XSS in React with Inertia?"
 - "What is the correct way to pass data from Laravel to Inertia?"

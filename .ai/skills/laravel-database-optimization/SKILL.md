@@ -3,8 +3,8 @@ name: laravel-database-optimization
 description: Laravel database optimization patterns. Use when writing Eloquent queries, creating migrations, configuring caching, debugging slow queries, or optimizing database performance. Triggers on tasks involving N+1 queries, indexing, Redis caching, pagination, or database transactions.
 license: MIT
 metadata:
-  author: agent-skills
-  version: "1.1.1"
+    author: agent-skills
+    version: '1.1.1'
 ---
 
 # Laravel Database Optimization
@@ -20,6 +20,7 @@ Comprehensive database optimization guide for Laravel 13 applications. Contains 
 ## When to Apply
 
 Reference these guidelines when:
+
 - Writing Eloquent queries or using the query builder
 - Diagnosing and fixing N+1 query problems
 - Adding database indexes to migrations
@@ -31,17 +32,17 @@ Reference these guidelines when:
 
 ## Rule Categories by Priority
 
-| Priority | Category | Impact | Prefix |
-|----------|----------|--------|--------|
-| 1 | Query Performance & N+1 | CRITICAL | `query-` |
-| 2 | Indexing Strategies | CRITICAL | `index-` |
-| 3 | Eloquent Optimization | HIGH | `eloquent-` |
-| 4 | Caching with Redis | HIGH | `cache-` |
-| 5 | Pagination & Large Datasets | HIGH | `data-` |
-| 6 | Transactions & Locking | HIGH | `lock-` |
-| 7 | Migrations | HIGH | `migrate-` |
-| 8 | Query Debugging | MEDIUM | `debug-` |
-| 9 | Naming & Structure | HIGH | `naming-` |
+| Priority | Category                    | Impact   | Prefix      |
+| -------- | --------------------------- | -------- | ----------- |
+| 1        | Query Performance & N+1     | CRITICAL | `query-`    |
+| 2        | Indexing Strategies         | CRITICAL | `index-`    |
+| 3        | Eloquent Optimization       | HIGH     | `eloquent-` |
+| 4        | Caching with Redis          | HIGH     | `cache-`    |
+| 5        | Pagination & Large Datasets | HIGH     | `data-`     |
+| 6        | Transactions & Locking      | HIGH     | `lock-`     |
+| 7        | Migrations                  | HIGH     | `migrate-`  |
+| 8        | Query Debugging             | MEDIUM   | `debug-`    |
+| 9        | Naming & Structure          | HIGH     | `naming-`   |
 
 ## Quick Reference
 
@@ -215,6 +216,7 @@ rules/_sections.md
 ```
 
 Each rule file contains:
+
 - YAML frontmatter with metadata (title, impact, tags)
 - Brief explanation of why it matters
 - Bad Example with explanation

@@ -17,8 +17,11 @@ tags: security, inertia, data-exposure, api-resources, props, react, owasp-r2
 
 ```html
 <!-- Everything in Inertia props is visible here — anyone can View Source -->
-<div id="app" data-page="{&quot;component&quot;:&quot;admin/settings/index&quot;,
-  &quot;props&quot;:{&quot;toyyibpay&quot;:{&quot;secret_key&quot;:&quot;sk_live_abc123...&quot;}}}">
+<div
+    id="app"
+    data-page='{"component":"admin/settings/index",
+  "props":{"toyyibpay":{"secret_key":"sk_live_abc123..."}}}'
+></div>
 ```
 
 ## Incorrect
@@ -84,6 +87,7 @@ return Inertia::render('student/dashboard', [
 ```
 
 **Problems:**
+
 - Full API keys in Inertia props are embedded in HTML source — no authentication required to read them
 - Raw Eloquent models include every column including `password`, `remember_token`, and any sensitive cast fields
 - Admin-only props are still in `data-page` HTML even if the React UI never renders them
@@ -219,12 +223,12 @@ Route::middleware(['auth', 'verified', 'role:student'])->group(function () {
 
 ## Recommended Patterns
 
-| Pattern | Use Case |
-|---------|----------|
-| `$model->only(['id', 'name', ...])` | Limit fields in Inertia props |
-| `new UserResource($user)` | Consistent field selection via API Resource |
-| `secret_key_masked` + `secret_key_set` | Show masked key — never full value |
-| `$request->user()->only([...])` | Shared auth props in HandleInertiaRequests |
+| Pattern                                       | Use Case                                           |
+| --------------------------------------------- | -------------------------------------------------- |
+| `$model->only(['id', 'name', ...])`           | Limit fields in Inertia props                      |
+| `new UserResource($user)`                     | Consistent field selection via API Resource        |
+| `secret_key_masked` + `secret_key_set`        | Show masked key — never full value                 |
+| `$request->user()->only([...])`               | Shared auth props in HandleInertiaRequests         |
 | Admin routes in `role:admin` middleware group | Ensure sensitive props never reach non-admin pages |
 
 Reference: [Inertia.js Shared Data](https://inertiajs.com/shared-data) | [Laravel API Resources](https://laravel.com/docs/13.x/eloquent-resources)

@@ -1,7 +1,7 @@
 ---
 title: Column Naming Conventions
 impact: HIGH
-impactDescription: "Laravel auto-generates foreign keys, timestamps, and casts based on column names"
+impactDescription: 'Laravel auto-generates foreign keys, timestamps, and casts based on column names'
 tags: naming, columns, conventions, foreign-keys
 ---
 
@@ -44,6 +44,7 @@ Schema::create('users', function (Blueprint $table) {
 ```
 
 **Problems:**
+
 - camelCase columns break Eloquent attribute accessors and mass assignment conventions
 - Non-standard FK names prevent `constrained()` and `belongsTo()` auto-resolution
 - Booleans without `is_`/`has_`/`can_` prefix are ambiguous (is `active` a scope, column, or method?)
@@ -104,6 +105,7 @@ class Comment extends Model
 ```
 
 **Benefits:**
+
 - `foreignId('user_id')->constrained()` auto-resolves table and column with zero configuration
 - `is_active`, `has_verified_email` clearly communicate boolean intent in queries and conditions
 - Standard `created_at`/`updated_at` work with Eloquent's `$timestamps` and date casting automatically

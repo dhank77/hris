@@ -1,7 +1,7 @@
 ---
 title: Enable preventLazyLoading in Development
 impact: CRITICAL
-impactDescription: "Catches N+1 bugs before they reach production"
+impactDescription: 'Catches N+1 bugs before they reach production'
 tags: lazy-loading, n-plus-one, development, debugging
 ---
 
@@ -31,6 +31,7 @@ foreach ($posts as $post) {
 ```
 
 **Problems:**
+
 - N+1 queries go completely undetected during development and code review
 - Performance regressions accumulate silently until production degrades noticeably
 - Developers have no feedback loop to learn about missing eager loads
@@ -61,6 +62,7 @@ foreach ($posts as $post) {
 ```
 
 **Benefits:**
+
 - Throws `LazyLoadingViolationException` immediately when a relationship is lazily loaded
 - Catches N+1 problems during development before they reach production
 - Safe to enable — only active in non-production environments, so production is never affected

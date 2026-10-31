@@ -9,30 +9,39 @@ This skill provides 33 rules across 9 categories for optimizing database perform
 ## Categories
 
 ### 1. Query Performance & N+1 (Critical)
+
 Eager loading, preventing lazy loading, and selecting only needed columns.
 
 ### 2. Indexing Strategies (Critical)
+
 Foreign key indexes, composite indexes, covering indexes, and full-text search.
 
 ### 3. Eloquent Optimization (High)
+
 Query builder for hot paths, withCount aggregates, subquery selects, and whereHas optimization.
 
 ### 4. Caching with Redis (High)
+
 Cache::remember patterns, cache invalidation, cache tags, and TTL strategies.
 
 ### 5. Pagination & Large Datasets (High)
+
 Cursor pagination, chunkById processing, lazy cursors, and avoiding unbounded queries.
 
 ### 6. Transactions & Locking (High)
+
 Short transactions, deadlock retry logic, and pessimistic locking.
 
 ### 7. Migrations (High)
+
 Zero-downtime migrations, concurrent index creation, and safe column additions.
 
 ### 8. Query Debugging (Medium)
+
 EXPLAIN ANALYZE, Laravel Debugbar, and slow query log monitoring.
 
 ### 9. Naming & Structure (High)
+
 Table, column, relationship, and migration naming conventions for Eloquent.
 
 ## Quick Start
@@ -61,6 +70,7 @@ $users = User::withCount('posts')->get();
 ## Usage
 
 This skill triggers automatically when:
+
 - Writing Eloquent queries or using the query builder
 - Adding database indexes to migrations
 - Implementing caching strategies

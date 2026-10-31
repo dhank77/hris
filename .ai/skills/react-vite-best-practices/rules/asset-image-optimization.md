@@ -1,7 +1,7 @@
 ---
 title: Optimize Image Loading and Format
 impact: HIGH
-impactDescription: "40-70% reduction in image payload"
+impactDescription: '40-70% reduction in image payload'
 tags: asset, images, optimization, webp, lazy-loading
 ---
 
@@ -28,6 +28,7 @@ function Gallery() {
 ```
 
 **Problems:**
+
 - No lazy loading — all images downloaded immediately
 - No responsive images — oversized images on small screens
 - No explicit dimensions — causes Cumulative Layout Shift (CLS)
@@ -101,18 +102,18 @@ function ResponsiveImage() {
 ```typescript
 // ✅ Good: Vite image optimization plugin
 // vite.config.ts
-import { defineConfig } from 'vite'
-import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+import { defineConfig } from 'vite';
+import { ViteImageOptimizer } from 'vite-plugin-image-optimizer';
 
 export default defineConfig({
-  plugins: [
-    ViteImageOptimizer({
-      png: { quality: 80 },
-      jpeg: { quality: 80 },
-      webp: { lossless: true },
-    }),
-  ],
-})
+    plugins: [
+        ViteImageOptimizer({
+            png: { quality: 80 },
+            jpeg: { quality: 80 },
+            webp: { lossless: true },
+        }),
+    ],
+});
 ```
 
 ```typescript
@@ -172,6 +173,7 @@ function Hero() {
 ```
 
 **Benefits:**
+
 - 40-70% reduction in image payload with modern formats (WebP, AVIF)
 - Better LCP (Largest Contentful Paint) with priority loading for hero images
 - Reduced CLS (Cumulative Layout Shift) by specifying explicit dimensions

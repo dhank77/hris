@@ -1,7 +1,7 @@
 ---
 title: Use Cache::remember() Pattern
 impact: HIGH
-impactDescription: "Atomic cache population eliminates redundant database queries and race conditions"
+impactDescription: 'Atomic cache population eliminates redundant database queries and race conditions'
 tags: cache, redis, remember, performance
 ---
 
@@ -30,6 +30,7 @@ return $products;
 ```
 
 **Problems:**
+
 - Race condition: concurrent requests during cache miss all execute the expensive query
 - Cache stampede on high-traffic endpoints — database gets hammered when cache expires
 - More code to maintain and more opportunities for bugs (e.g., forgetting to set TTL)
@@ -65,6 +66,7 @@ $userStats = Cache::remember(
 ```
 
 **Benefits:**
+
 - Atomic operation: only one request regenerates the cache on miss
 - Eliminates cache stampede — concurrent requests wait for or get the freshly cached value
 - Cleaner, less error-prone code with TTL and closure in a single call
