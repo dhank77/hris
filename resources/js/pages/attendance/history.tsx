@@ -1,8 +1,8 @@
 import { Head, router } from '@inertiajs/react';
 import { history, index as attendanceIndex } from '@/routes/attendance';
+import { PageHeader } from '@/components/page-header';
+import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import {
     Table,
     TableBody,
@@ -21,6 +21,20 @@ type Attendance = {
     late_minutes: number;
 };
 
+const periods = [
+    { value: 'daily', label: 'Harian' },
+    { value: 'weekly', label: 'Mingguan' },
+    { value: 'monthly', label: 'Bulanan' },
+];
+
+const formatTime = (iso: string | null) =>
+    iso
+        ? new Date(iso).toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+          })
+        : '--:--';
+
 export default function AttendanceHistory({
     attendances,
     period,
@@ -35,74 +49,79 @@ export default function AttendanceHistory({
     return (
         <>
             <Head title="Riwayat Absensi" />
-            <div className="flex flex-1 flex-col gap-4 p-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle>Riwayat Kehadiran</CardTitle>
-                        <div className="flex gap-2">
-                            {['daily', 'weekly', 'monthly'].map((p) => (
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 md:p-6">
+                <PageHeader
+                    title="Riwayat kehadiran"
+                    description="Catatan masuk dan pulang Anda."
+                    actions={
+                        <div className="flex gap-1.5" role="group" aria-label="Periode">
+                            {periods.map((p) => (
                                 <Button
-                                    key={p}
-                                    variant={
-                                        period === p ? 'default' : 'outline'
-                                    }
+                                    key={p.value}
+                                    variant={period === p.value ? 'default' : 'outline'}
                                     size="sm"
-                                    onClick={() => changePeriod(p)}
+                                    aria-pressed={period === p.value}
+                                    onClick={() => changePeriod(p.value)}
                                 >
-                                    {p}
+                                    {p.label}
                                 </Button>
                             ))}
                         </div>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Tanggal</TableHead>
-                                    <TableHead>Clock In</TableHead>
-                                    <TableHead>Clock Out</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Terlambat (mnt)</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {attendances.map((a) => (
-                                    <TableRow key={a.id}>
-                                        <TableCell>{a.date}</TableCell>
-                                        <TableCell>
-                                            {a.clock_in_at
-                                                ? new Date(
-                                                      a.clock_in_at,
-                                                  ).toLocaleTimeString()
-                                                : '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {a.clock_out_at
-                                                ? new Date(
-                                                      a.clock_out_at,
-                                                  ).toLocaleTimeString()
-                                                : '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge>{a.status}</Badge>
-                                        </TableCell>
-                                        <TableCell>{a.late_minutes}</TableCell>
-                                    </TableRow>
-                                ))}
-                                {attendances.length === 0 && (
+                    }
+                />
+
+                {attendances.length === 0 ? (
+                    <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+                        Belum ada catatan kehadiran pada periode ini.
+                    </p>
+                ) : (
+                    <>
+                        <ul className="grid divide-y rounded-xl border bg-card md:hidden">
+                            {attendances.map((a) => (
+                                <li key={a.id} className="grid gap-1.5 p-3">
+                                    <div className="flex items-center justify-between gap-2">
+                                        <span className="font-semibold">{a.date}</span>
+                                        <StatusBadge status={a.status} />
+                                    </div>
+                                    <p className="tabular text-sm text-muted-foreground">
+                                        {formatTime(a.clock_in_at)} – {formatTime(a.clock_out_at)}
+                                        {a.late_minutes > 0 && (
+                                            <span className="text-destructive">
+                                                {' '}· terlambat {a.late_minutes} mnt
+                                            </span>
+                                        )}
+                                    </p>
+                                </li>
+                            ))}
+                        </ul>
+                        <div className="hidden rounded-xl border bg-card md:block">
+                            <Table>
+                                <TableHeader>
                                     <TableRow>
-                                        <TableCell
-                                            colSpan={5}
-                                            className="text-center text-muted-foreground"
-                                        >
-                                            Tidak ada data
-                                        </TableCell>
+                                        <TableHead>Tanggal</TableHead>
+                                        <TableHead>Masuk</TableHead>
+                                        <TableHead>Pulang</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="text-right">Terlambat (mnt)</TableHead>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                                </TableHeader>
+                                <TableBody>
+                                    {attendances.map((a) => (
+                                        <TableRow key={a.id}>
+                                            <TableCell className="tabular">{a.date}</TableCell>
+                                            <TableCell className="tabular">{formatTime(a.clock_in_at)}</TableCell>
+                                            <TableCell className="tabular">{formatTime(a.clock_out_at)}</TableCell>
+                                            <TableCell>
+                                                <StatusBadge status={a.status} />
+                                            </TableCell>
+                                            <TableCell className="tabular text-right">{a.late_minutes}</TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    </>
+                )}
             </div>
         </>
     );

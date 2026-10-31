@@ -19,7 +19,7 @@ import { index as leaveIndex } from '@/routes/leave-requests';
 import { index as cashIndex } from '@/routes/cash-advances';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
+export const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),

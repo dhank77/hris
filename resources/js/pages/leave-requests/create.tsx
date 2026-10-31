@@ -1,7 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { store } from '@/routes/leave-requests';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { PageHeader } from '@/components/page-header';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
@@ -32,20 +32,20 @@ export default function LeaveRequestsCreate() {
     return (
         <>
             <Head title="Buat Pengajuan" />
-            <div className="flex flex-1 flex-col gap-4 p-4">
-                <Card className="max-w-2xl">
-                    <CardHeader>
-                        <CardTitle>Pengajuan Izin / Sakit / Cuti</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <form onSubmit={submit} className="space-y-4">
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 md:p-6">
+                <PageHeader
+                    title="Buat pengajuan"
+                    description="Ajukan izin, sakit, atau cuti. Atasan akan menerima pengajuan Anda."
+                />
+                <div className="w-full max-w-2xl">
+                        <form onSubmit={submit} className="grid gap-5">
                             <div className="grid gap-2">
-                                <Label>Jenis</Label>
+                                <Label htmlFor="type">Jenis</Label>
                                 <Select
                                     value={data.type}
                                     onValueChange={(v) => setData('type', v)}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger id="type">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -63,8 +63,9 @@ export default function LeaveRequestsCreate() {
                                 <InputError message={errors.type} />
                             </div>
                             <div className="grid gap-2">
-                                <Label>Tanggal Mulai</Label>
+                                <Label htmlFor="start_date">Tanggal mulai</Label>
                                 <Input
+                                    id="start_date"
                                     type="date"
                                     value={data.start_date}
                                     onChange={(e) =>
@@ -74,8 +75,9 @@ export default function LeaveRequestsCreate() {
                                 <InputError message={errors.start_date} />
                             </div>
                             <div className="grid gap-2">
-                                <Label>Tanggal Selesai</Label>
+                                <Label htmlFor="end_date">Tanggal selesai</Label>
                                 <Input
+                                    id="end_date"
                                     type="date"
                                     value={data.end_date}
                                     onChange={(e) =>
@@ -85,9 +87,10 @@ export default function LeaveRequestsCreate() {
                                 <InputError message={errors.end_date} />
                             </div>
                             <div className="grid gap-2">
-                                <Label>Alasan</Label>
+                                <Label htmlFor="reason">Alasan</Label>
                                 <textarea
-                                    className="min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                                    id="reason"
+                                    className="min-h-28 w-full rounded-lg border border-input bg-background px-3 py-2 text-base outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm"
                                     value={data.reason}
                                     onChange={(e) =>
                                         setData('reason', e.target.value)
@@ -96,8 +99,9 @@ export default function LeaveRequestsCreate() {
                                 <InputError message={errors.reason} />
                             </div>
                             <div className="grid gap-2">
-                                <Label>Lampiran (opsional)</Label>
+                                <Label htmlFor="attachment">Lampiran (opsional)</Label>
                                 <Input
+                                    id="attachment"
                                     type="file"
                                     onChange={(e) =>
                                         setData(
@@ -108,12 +112,11 @@ export default function LeaveRequestsCreate() {
                                 />
                                 <InputError message={errors.attachment} />
                             </div>
-                            <Button type="submit" disabled={processing}>
-                                Kirim
+                            <Button type="submit" size="lg" disabled={processing} className="w-full sm:w-fit">
+                                {processing ? 'Mengirim...' : 'Kirim pengajuan'}
                             </Button>
                         </form>
-                    </CardContent>
-                </Card>
+                </div>
             </div>
         </>
     );

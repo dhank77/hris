@@ -1,21 +1,16 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 import {
     approve,
     reject,
     index as leaveIndex,
     create as leaveCreate,
 } from '@/routes/leave-requests';
+import { ApprovalLine } from '@/components/approval-line';
+import type { ApprovalStop } from '@/components/approval-line';
+import { PageHeader } from '@/components/page-header';
+import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 
 type LeaveRequest = {
     id: number;
@@ -26,6 +21,31 @@ type LeaveRequest = {
     status: string;
     user?: { id: number; name: string };
 };
+
+const typeLabel: Record<string, string> = {
+    leave: 'Cuti',
+    sick: 'Sakit',
+    permission: 'Izin',
+};
+
+function leaveStops(status: string): ApprovalStop[] {
+    return [
+        { label: 'Diajukan', state: 'done' },
+        {
+            label: 'Atasan',
+            state:
+                status === 'approved'
+                    ? 'done'
+                    : status === 'rejected'
+                      ? 'rejected'
+                      : 'current',
+        },
+        {
+            label: status === 'rejected' ? 'Ditolak' : 'Disetujui',
+            state: status === 'approved' ? 'done' : 'upcoming',
+        },
+    ];
+}
 
 export default function LeaveRequestsIndex({
     leaveRequests,
@@ -44,79 +64,66 @@ export default function LeaveRequestsIndex({
     return (
         <>
             <Head title="Izin / Sakit / Cuti" />
-            <div className="flex flex-1 flex-col gap-4 p-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle>Pengajuan Izin, Sakit, Cuti</CardTitle>
-                        <Link href={leaveCreate.url()}>
-                            <Button>Buat Pengajuan</Button>
-                        </Link>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Karyawan</TableHead>
-                                    <TableHead>Jenis</TableHead>
-                                    <TableHead>Mulai</TableHead>
-                                    <TableHead>Selesai</TableHead>
-                                    <TableHead>Alasan</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Aksi</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {leaveRequests.map((lr) => (
-                                    <TableRow key={lr.id}>
-                                        <TableCell>{lr.user?.name}</TableCell>
-                                        <TableCell>{lr.type}</TableCell>
-                                        <TableCell>{lr.start_date}</TableCell>
-                                        <TableCell>{lr.end_date}</TableCell>
-                                        <TableCell className="max-w-xs truncate">
-                                            {lr.reason}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge>{lr.status}</Badge>
-                                        </TableCell>
-                                        <TableCell className="space-x-2">
-                                            {lr.status === 'pending' && (
-                                                <>
-                                                    <Button
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            doApprove(lr.id)
-                                                        }
-                                                    >
-                                                        Setujui
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="destructive"
-                                                        onClick={() =>
-                                                            doReject(lr.id)
-                                                        }
-                                                    >
-                                                        Tolak
-                                                    </Button>
-                                                </>
+            <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 md:p-6">
+                <PageHeader
+                    title="Izin, sakit, dan cuti"
+                    description="Pantau posisi setiap pengajuan di jalur persetujuan."
+                    actions={
+                        <Button asChild>
+                            <Link href={leaveCreate.url()}>
+                                <Plus aria-hidden="true" /> Buat pengajuan
+                            </Link>
+                        </Button>
+                    }
+                />
+
+                {leaveRequests.length === 0 ? (
+                    <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+                        Belum ada pengajuan. Pilih &quot;Buat pengajuan&quot; untuk memulai.
+                    </p>
+                ) : (
+                    <ul className="grid gap-3">
+                        {leaveRequests.map((lr) => (
+                            <li
+                                key={lr.id}
+                                className="grid gap-4 rounded-xl border bg-card p-4"
+                            >
+                                <div className="flex flex-wrap items-start justify-between gap-2">
+                                    <div className="grid gap-0.5">
+                                        <h2 className="text-lg font-semibold">
+                                            {typeLabel[lr.type] ?? lr.type}
+                                            {lr.user?.name && (
+                                                <span className="font-normal text-muted-foreground">
+                                                    {' '}· {lr.user.name}
+                                                </span>
                                             )}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {leaveRequests.length === 0 && (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={7}
-                                            className="text-center text-muted-foreground"
+                                        </h2>
+                                        <p className="tabular text-sm text-muted-foreground">
+                                            {lr.start_date} – {lr.end_date}
+                                        </p>
+                                    </div>
+                                    <StatusBadge status={lr.status} />
+                                </div>
+                                <p className="max-w-prose text-sm">{lr.reason}</p>
+                                <ApprovalLine stops={leaveStops(lr.status)} />
+                                {lr.status === 'pending' && (
+                                    <div className="flex flex-wrap gap-2">
+                                        <Button size="sm" onClick={() => doApprove(lr.id)}>
+                                            Setujui
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={() => doReject(lr.id)}
                                         >
-                                            Tidak ada data
-                                        </TableCell>
-                                    </TableRow>
+                                            Tolak
+                                        </Button>
+                                    </div>
                                 )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
         </>
     );
