@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\LeaveRequest;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class LeaveRequestController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): InertiaResponse
     {
         $user = $request->user();
         $query = LeaveRequest::with(['user', 'approver'])->orderByDesc('created_at');
@@ -27,12 +30,12 @@ class LeaveRequestController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): InertiaResponse
     {
         return Inertia::render('leave-requests/create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'type' => 'required|in:leave,sick,permission',
@@ -60,10 +63,13 @@ class LeaveRequestController extends Controller
         return redirect()->route('leave-requests.index');
     }
 
-    public function approve(Request $request, LeaveRequest $leaveRequest)
+    public function approve(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['supervisor', 'hr', 'admin'])) {
+            abort(403);
+        }
+        if ($user->role === 'supervisor' && $leaveRequest->user_id !== $user->id && ! User::where('id', $leaveRequest->user_id)->where('supervisor_id', $user->id)->exists()) {
             abort(403);
         }
         $leaveRequest->update([
@@ -85,10 +91,13 @@ class LeaveRequestController extends Controller
         return back();
     }
 
-    public function reject(Request $request, LeaveRequest $leaveRequest)
+    public function reject(Request $request, LeaveRequest $leaveRequest): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['supervisor', 'hr', 'admin'])) {
+            abort(403);
+        }
+        if ($user->role === 'supervisor' && $leaveRequest->user_id !== $user->id && ! User::where('id', $leaveRequest->user_id)->where('supervisor_id', $user->id)->exists()) {
             abort(403);
         }
         $leaveRequest->update([

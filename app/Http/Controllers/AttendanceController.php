@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class AttendanceController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): InertiaResponse
     {
         $user = $request->user();
         $today = Carbon::today()->toDateString();
@@ -38,7 +40,7 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'type' => 'required|in:clock_in,clock_out',
@@ -92,7 +94,7 @@ class AttendanceController extends Controller
         return back();
     }
 
-    public function history(Request $request)
+    public function history(Request $request): InertiaResponse
     {
         $user = $request->user();
         $period = $request->input('period', 'monthly'); // daily, weekly, monthly
@@ -114,7 +116,7 @@ class AttendanceController extends Controller
         ]);
     }
 
-    public function recap(Request $request)
+    public function recap(Request $request): InertiaResponse
     {
         // for supervisors/hr: view team recap
         $user = $request->user();

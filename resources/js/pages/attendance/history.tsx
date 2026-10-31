@@ -1,11 +1,16 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, router } from '@inertiajs/react';
 import { history, index as attendanceIndex } from '@/routes/attendance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 type Attendance = {
     id: number;
@@ -16,7 +21,13 @@ type Attendance = {
     late_minutes: number;
 };
 
-export default function AttendanceHistory({ attendances, period }: { attendances: Attendance[]; period: string }) {
+export default function AttendanceHistory({
+    attendances,
+    period,
+}: {
+    attendances: Attendance[];
+    period: string;
+}) {
     const changePeriod = (p: string) => {
         router.get(history.url(), { period: p }, { preserveState: true });
     };
@@ -30,7 +41,14 @@ export default function AttendanceHistory({ attendances, period }: { attendances
                         <CardTitle>Riwayat Kehadiran</CardTitle>
                         <div className="flex gap-2">
                             {['daily', 'weekly', 'monthly'].map((p) => (
-                                <Button key={p} variant={period === p ? 'default' : 'outline'} size="sm" onClick={() => changePeriod(p)}>
+                                <Button
+                                    key={p}
+                                    variant={
+                                        period === p ? 'default' : 'outline'
+                                    }
+                                    size="sm"
+                                    onClick={() => changePeriod(p)}
+                                >
                                     {p}
                                 </Button>
                             ))}
@@ -51,15 +69,34 @@ export default function AttendanceHistory({ attendances, period }: { attendances
                                 {attendances.map((a) => (
                                     <TableRow key={a.id}>
                                         <TableCell>{a.date}</TableCell>
-                                        <TableCell>{a.clock_in_at ? new Date(a.clock_in_at).toLocaleTimeString() : '-'}</TableCell>
-                                        <TableCell>{a.clock_out_at ? new Date(a.clock_out_at).toLocaleTimeString() : '-'}</TableCell>
-                                        <TableCell><Badge>{a.status}</Badge></TableCell>
+                                        <TableCell>
+                                            {a.clock_in_at
+                                                ? new Date(
+                                                      a.clock_in_at,
+                                                  ).toLocaleTimeString()
+                                                : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {a.clock_out_at
+                                                ? new Date(
+                                                      a.clock_out_at,
+                                                  ).toLocaleTimeString()
+                                                : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge>{a.status}</Badge>
+                                        </TableCell>
                                         <TableCell>{a.late_minutes}</TableCell>
                                     </TableRow>
                                 ))}
                                 {attendances.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center text-muted-foreground">Tidak ada data</TableCell>
+                                        <TableCell
+                                            colSpan={5}
+                                            className="text-center text-muted-foreground"
+                                        >
+                                            Tidak ada data
+                                        </TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

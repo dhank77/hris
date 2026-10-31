@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\CashAdvance;
 use App\Models\CashAdvanceInstallment;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class CashAdvanceController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): InertiaResponse
     {
         $user = $request->user();
         $query = CashAdvance::with(['user', 'installments'])->orderByDesc('created_at');
@@ -43,12 +45,12 @@ class CashAdvanceController extends Controller
         ]);
     }
 
-    public function create()
+    public function create(): InertiaResponse
     {
         return Inertia::render('cash-advances/create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'amount' => 'required|numeric|min:1',
@@ -75,8 +77,13 @@ class CashAdvanceController extends Controller
         return redirect()->route('cash-advances.index');
     }
 
-    public function show(CashAdvance $cashAdvance)
+    public function show(CashAdvance $cashAdvance): InertiaResponse
     {
+        $user = request()->user();
+        if ($cashAdvance->user_id !== $user->id && ! in_array($user->role, ['hr', 'admin', 'finance', 'supervisor'])) {
+            abort(403);
+        }
+
         $cashAdvance->load(['user', 'installments', 'level1Approver', 'financeApprover']);
 
         return Inertia::render('cash-advances/show', [
@@ -84,10 +91,13 @@ class CashAdvanceController extends Controller
         ]);
     }
 
-    public function approveLevel1(Request $request, CashAdvance $cashAdvance)
+    public function approveLevel1(Request $request, CashAdvance $cashAdvance): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['supervisor', 'hr', 'admin'])) {
+            abort(403);
+        }
+        if ($user->role === 'supervisor' && $cashAdvance->user_id !== $user->id && ! User::where('id', $cashAdvance->user_id)->where('supervisor_id', $user->id)->exists()) {
             abort(403);
         }
         if ($cashAdvance->status !== 'pending') {
@@ -102,7 +112,7 @@ class CashAdvanceController extends Controller
         return back();
     }
 
-    public function approveFinance(Request $request, CashAdvance $cashAdvance)
+    public function approveFinance(Request $request, CashAdvance $cashAdvance): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['finance', 'admin'])) {
@@ -135,10 +145,13 @@ class CashAdvanceController extends Controller
         return back();
     }
 
-    public function reject(Request $request, CashAdvance $cashAdvance)
+    public function reject(Request $request, CashAdvance $cashAdvance): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['supervisor', 'hr', 'finance', 'admin'])) {
+            abort(403);
+        }
+        if ($user->role === 'supervisor' && $cashAdvance->user_id !== $user->id && ! User::where('id', $cashAdvance->user_id)->where('supervisor_id', $user->id)->exists()) {
             abort(403);
         }
         $cashAdvance->update([
@@ -149,7 +162,7 @@ class CashAdvanceController extends Controller
         return back();
     }
 
-    public function disburse(Request $request, CashAdvance $cashAdvance)
+    public function disburse(Request $request, CashAdvance $cashAdvance): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['finance', 'admin'])) {
@@ -163,7 +176,7 @@ class CashAdvanceController extends Controller
         return back();
     }
 
-    public function markPaid(Request $request, CashAdvanceInstallment $installment)
+    public function markPaid(Request $request, CashAdvanceInstallment $installment): RedirectResponse
     {
         $user = $request->user();
         if (! in_array($user->role, ['finance', 'hr', 'admin'])) {
@@ -181,7 +194,7 @@ class CashAdvanceController extends Controller
         return back();
     }
 
-    public function deductPayroll(Request $request)
+    public function deductPayroll(Request $request): RedirectResponse
     {
         // auto-deduct all unpaid installments due this month or earlier
         $user = $request->user();

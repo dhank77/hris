@@ -1,10 +1,21 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { approve, reject, index as leaveIndex, create as leaveCreate } from '@/routes/leave-requests';
+import {
+    approve,
+    reject,
+    index as leaveIndex,
+    create as leaveCreate,
+} from '@/routes/leave-requests';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 
 type LeaveRequest = {
     id: number;
@@ -16,11 +27,18 @@ type LeaveRequest = {
     user?: { id: number; name: string };
 };
 
-export default function LeaveRequestsIndex({ leaveRequests }: { leaveRequests: LeaveRequest[] }) {
-    const doApprove = (id: number) => router.post(approve.url({ leaveRequest: id }));
+export default function LeaveRequestsIndex({
+    leaveRequests,
+}: {
+    leaveRequests: LeaveRequest[];
+}) {
+    const doApprove = (id: number) =>
+        router.post(approve.url({ leaveRequest: id }));
     const doReject = (id: number) => {
         const reason = prompt('Alasan penolakan?') || '';
-        router.post(reject.url({ leaveRequest: id }), { rejection_reason: reason });
+        router.post(reject.url({ leaveRequest: id }), {
+            rejection_reason: reason,
+        });
     };
 
     return (
@@ -54,13 +72,32 @@ export default function LeaveRequestsIndex({ leaveRequests }: { leaveRequests: L
                                         <TableCell>{lr.type}</TableCell>
                                         <TableCell>{lr.start_date}</TableCell>
                                         <TableCell>{lr.end_date}</TableCell>
-                                        <TableCell className="max-w-xs truncate">{lr.reason}</TableCell>
-                                        <TableCell><Badge>{lr.status}</Badge></TableCell>
+                                        <TableCell className="max-w-xs truncate">
+                                            {lr.reason}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge>{lr.status}</Badge>
+                                        </TableCell>
                                         <TableCell className="space-x-2">
                                             {lr.status === 'pending' && (
                                                 <>
-                                                    <Button size="sm" onClick={() => doApprove(lr.id)}>Setujui</Button>
-                                                    <Button size="sm" variant="destructive" onClick={() => doReject(lr.id)}>Tolak</Button>
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            doApprove(lr.id)
+                                                        }
+                                                    >
+                                                        Setujui
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="destructive"
+                                                        onClick={() =>
+                                                            doReject(lr.id)
+                                                        }
+                                                    >
+                                                        Tolak
+                                                    </Button>
                                                 </>
                                             )}
                                         </TableCell>
@@ -68,7 +105,12 @@ export default function LeaveRequestsIndex({ leaveRequests }: { leaveRequests: L
                                 ))}
                                 {leaveRequests.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={7} className="text-center text-muted-foreground">Tidak ada data</TableCell>
+                                        <TableCell
+                                            colSpan={7}
+                                            className="text-center text-muted-foreground"
+                                        >
+                                            Tidak ada data
+                                        </TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -81,7 +123,5 @@ export default function LeaveRequestsIndex({ leaveRequests }: { leaveRequests: L
 }
 
 LeaveRequestsIndex.layout = {
-    breadcrumbs: [
-        { title: 'Izin/Cuti', href: leaveIndex() },
-    ],
+    breadcrumbs: [{ title: 'Izin/Cuti', href: leaveIndex() }],
 };

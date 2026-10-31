@@ -5,7 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
 type Attendance = {
@@ -18,11 +25,20 @@ type Attendance = {
     clock_out_at: string | null;
 };
 
-export default function AttendanceRecap({ attendances, start, end }: { attendances: Attendance[]; start: string; end: string }) {
+export default function AttendanceRecap({
+    attendances,
+    start,
+    end,
+}: {
+    attendances: Attendance[];
+    start: string;
+    end: string;
+}) {
     const [s, setS] = useState(start);
     const [e, setE] = useState(end);
 
-    const apply = () => router.get(recap.url(), { start: s, end: e }, { preserveState: true });
+    const apply = () =>
+        router.get(recap.url(), { start: s, end: e }, { preserveState: true });
 
     return (
         <>
@@ -36,11 +52,21 @@ export default function AttendanceRecap({ attendances, start, end }: { attendanc
                         <div className="flex flex-wrap items-end gap-4">
                             <div>
                                 <Label htmlFor="start">Mulai</Label>
-                                <Input id="start" type="date" value={s} onChange={(ev) => setS(ev.target.value)} />
+                                <Input
+                                    id="start"
+                                    type="date"
+                                    value={s}
+                                    onChange={(ev) => setS(ev.target.value)}
+                                />
                             </div>
                             <div>
                                 <Label htmlFor="end">Selesai</Label>
-                                <Input id="end" type="date" value={e} onChange={(ev) => setE(ev.target.value)} />
+                                <Input
+                                    id="end"
+                                    type="date"
+                                    value={e}
+                                    onChange={(ev) => setE(ev.target.value)}
+                                />
                             </div>
                             <Button onClick={apply}>Terapkan</Button>
                         </div>
@@ -60,15 +86,34 @@ export default function AttendanceRecap({ attendances, start, end }: { attendanc
                                     <TableRow key={a.id}>
                                         <TableCell>{a.date}</TableCell>
                                         <TableCell>{a.user?.name}</TableCell>
-                                        <TableCell>{a.clock_in_at ? new Date(a.clock_in_at).toLocaleTimeString() : '-'}</TableCell>
-                                        <TableCell>{a.clock_out_at ? new Date(a.clock_out_at).toLocaleTimeString() : '-'}</TableCell>
-                                        <TableCell><Badge>{a.status}</Badge></TableCell>
+                                        <TableCell>
+                                            {a.clock_in_at
+                                                ? new Date(
+                                                      a.clock_in_at,
+                                                  ).toLocaleTimeString()
+                                                : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {a.clock_out_at
+                                                ? new Date(
+                                                      a.clock_out_at,
+                                                  ).toLocaleTimeString()
+                                                : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge>{a.status}</Badge>
+                                        </TableCell>
                                         <TableCell>{a.late_minutes}</TableCell>
                                     </TableRow>
                                 ))}
                                 {attendances.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={6} className="text-center text-muted-foreground">Tidak ada data</TableCell>
+                                        <TableCell
+                                            colSpan={6}
+                                            className="text-center text-muted-foreground"
+                                        >
+                                            Tidak ada data
+                                        </TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

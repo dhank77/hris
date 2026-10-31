@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Camera, Clock, MapPin, CheckCircle2 } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { store, index as attendanceIndex } from '@/routes/attendance';
@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import InputError from '@/components/input-error';
-
-import type { Auth } from '@/types';
 
 type Attendance = {
     id: number;
@@ -20,18 +18,21 @@ type Attendance = {
     clock_out_photo: string | null;
 };
 
-type PageProps = { auth: Auth };
-
 export default function AttendanceIndex({
     attendance,
     recap,
     today,
 }: {
     attendance: Attendance | null;
-    recap: { present: number; late: number; absent: number; leave: number; total: number };
+    recap: {
+        present: number;
+        late: number;
+        absent: number;
+        leave: number;
+        total: number;
+    };
     today: string;
 }) {
-    const { auth } = usePage<PageProps>().props;
     const videoRef = useRef<HTMLVideoElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const streamRef = useRef<MediaStream | null>(null);
@@ -51,9 +52,13 @@ export default function AttendanceIndex({
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
-                (pos) => setGeo({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                (pos) =>
+                    setGeo({
+                        lat: pos.coords.latitude,
+                        lng: pos.coords.longitude,
+                    }),
                 (err) => setGeoError(err.message),
-                { enableHighAccuracy: true }
+                { enableHighAccuracy: true },
             );
         } else {
             setGeoError('Geolocation tidak didukung browser.');
@@ -65,11 +70,13 @@ export default function AttendanceIndex({
 
     const startCamera = async () => {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: 'user' },
+            });
             streamRef.current = stream;
             if (videoRef.current) videoRef.current.srcObject = stream;
             setCameraOn(true);
-        } catch (e) {
+        } catch {
             alert('Tidak dapat mengakses kamera.');
         }
     };
@@ -83,12 +90,18 @@ export default function AttendanceIndex({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         ctx.drawImage(video, 0, 0);
-        canvas.toBlob((blob) => {
-            if (!blob) return;
-            const file = new File([blob], `selfie-${Date.now()}.jpg`, { type: 'image/jpeg' });
-            setData('photo', file);
-            setPhotoPreview(canvas.toDataURL('image/jpeg'));
-        }, 'image/jpeg', 0.9);
+        canvas.toBlob(
+            (blob) => {
+                if (!blob) return;
+                const file = new File([blob], `selfie-${Date.now()}.jpg`, {
+                    type: 'image/jpeg',
+                });
+                setData('photo', file);
+                setPhotoPreview(canvas.toDataURL('image/jpeg'));
+            },
+            'image/jpeg',
+            0.9,
+        );
     };
 
     const submit = (type: 'clock_in' | 'clock_out') => {
@@ -106,7 +119,14 @@ export default function AttendanceIndex({
         };
         // useForm setData is async-ish; instead use transform? Simpler: set then post in next tick
         setData(payload as any);
-        setTimeout(() => post(store.url(), { forceFormData: true, preserveScroll: true }), 50);
+        setTimeout(
+            () =>
+                post(store.url(), {
+                    forceFormData: true,
+                    preserveScroll: true,
+                }),
+            50,
+        );
     };
 
     const clockedIn = !!attendance?.clock_in_at;
@@ -123,21 +143,45 @@ export default function AttendanceIndex({
                     <CardContent className="space-y-4">
                         <div className="flex flex-wrap gap-4">
                             <div>
-                                <p className="text-sm text-muted-foreground">Clock In</p>
-                                <p className="font-medium">{attendance?.clock_in_at ? new Date(attendance.clock_in_at).toLocaleTimeString() : '-'}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Clock In
+                                </p>
+                                <p className="font-medium">
+                                    {attendance?.clock_in_at
+                                        ? new Date(
+                                              attendance.clock_in_at,
+                                          ).toLocaleTimeString()
+                                        : '-'}
+                                </p>
                             </div>
                             <div>
-                                <p className="text-sm text-muted-foreground">Clock Out</p>
-                                <p className="font-medium">{attendance?.clock_out_at ? new Date(attendance.clock_out_at).toLocaleTimeString() : '-'}</p>
+                                <p className="text-sm text-muted-foreground">
+                                    Clock Out
+                                </p>
+                                <p className="font-medium">
+                                    {attendance?.clock_out_at
+                                        ? new Date(
+                                              attendance.clock_out_at,
+                                          ).toLocaleTimeString()
+                                        : '-'}
+                                </p>
                             </div>
                             <div>
-                                <p className="text-sm text-muted-foreground">Status</p>
-                                <Badge>{attendance?.status ?? 'belum absen'}</Badge>
+                                <p className="text-sm text-muted-foreground">
+                                    Status
+                                </p>
+                                <Badge>
+                                    {attendance?.status ?? 'belum absen'}
+                                </Badge>
                             </div>
                             {attendance?.late_minutes ? (
                                 <div>
-                                    <p className="text-sm text-muted-foreground">Terlambat</p>
-                                    <p className="font-medium text-red-600">{attendance.late_minutes} menit</p>
+                                    <p className="text-sm text-muted-foreground">
+                                        Terlambat
+                                    </p>
+                                    <p className="font-medium text-red-600">
+                                        {attendance.late_minutes} menit
+                                    </p>
                                 </div>
                             ) : null}
                         </div>
@@ -145,7 +189,10 @@ export default function AttendanceIndex({
                         <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4" />
                             {geo ? (
-                                <span>Lokasi: {geo.lat.toFixed(5)}, {geo.lng.toFixed(5)}</span>
+                                <span>
+                                    Lokasi: {geo.lat.toFixed(5)},{' '}
+                                    {geo.lng.toFixed(5)}
+                                </span>
                             ) : geoError ? (
                                 <span className="text-red-600">{geoError}</span>
                             ) : (
@@ -156,17 +203,35 @@ export default function AttendanceIndex({
                         <div className="space-y-2">
                             {!cameraOn ? (
                                 <Button onClick={startCamera} variant="outline">
-                                    <Camera className="mr-2 h-4 w-4" /> Aktifkan Kamera (Selfie)
+                                    <Camera className="mr-2 h-4 w-4" /> Aktifkan
+                                    Kamera (Selfie)
                                 </Button>
                             ) : (
                                 <div className="space-y-2">
-                                    <video ref={videoRef} autoPlay playsInline className="w-full max-w-sm rounded-lg border" />
-                                    <canvas ref={canvasRef} className="hidden" />
-                                    <Button onClick={capturePhoto} variant="outline">Ambil Foto</Button>
+                                    <video
+                                        ref={videoRef}
+                                        autoPlay
+                                        playsInline
+                                        className="w-full max-w-sm rounded-lg border"
+                                    />
+                                    <canvas
+                                        ref={canvasRef}
+                                        className="hidden"
+                                    />
+                                    <Button
+                                        onClick={capturePhoto}
+                                        variant="outline"
+                                    >
+                                        Ambil Foto
+                                    </Button>
                                 </div>
                             )}
                             {photoPreview && (
-                                <img src={photoPreview} alt="selfie" className="w-32 rounded-lg border" />
+                                <img
+                                    src={photoPreview}
+                                    alt="selfie"
+                                    className="w-32 rounded-lg border"
+                                />
                             )}
                         </div>
 
@@ -181,10 +246,13 @@ export default function AttendanceIndex({
                             </Button>
                             <Button
                                 onClick={() => submit('clock_out')}
-                                disabled={processing || !clockedIn || clockedOut}
+                                disabled={
+                                    processing || !clockedIn || clockedOut
+                                }
                                 variant="secondary"
                             >
-                                <CheckCircle2 className="mr-2 h-4 w-4" /> Clock Out
+                                <CheckCircle2 className="mr-2 h-4 w-4" /> Clock
+                                Out
                             </Button>
                         </div>
                     </CardContent>
@@ -196,20 +264,36 @@ export default function AttendanceIndex({
                     </CardHeader>
                     <CardContent className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                         <div>
-                            <p className="text-sm text-muted-foreground">Hadir</p>
-                            <p className="text-2xl font-bold">{recap.present}</p>
+                            <p className="text-sm text-muted-foreground">
+                                Hadir
+                            </p>
+                            <p className="text-2xl font-bold">
+                                {recap.present}
+                            </p>
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Terlambat</p>
-                            <p className="text-2xl font-bold text-amber-600">{recap.late}</p>
+                            <p className="text-sm text-muted-foreground">
+                                Terlambat
+                            </p>
+                            <p className="text-2xl font-bold text-amber-600">
+                                {recap.late}
+                            </p>
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Absen</p>
-                            <p className="text-2xl font-bold text-red-600">{recap.absent}</p>
+                            <p className="text-sm text-muted-foreground">
+                                Absen
+                            </p>
+                            <p className="text-2xl font-bold text-red-600">
+                                {recap.absent}
+                            </p>
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Izin/Cuti/Sakit</p>
-                            <p className="text-2xl font-bold text-blue-600">{recap.leave}</p>
+                            <p className="text-sm text-muted-foreground">
+                                Izin/Cuti/Sakit
+                            </p>
+                            <p className="text-2xl font-bold text-blue-600">
+                                {recap.leave}
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
