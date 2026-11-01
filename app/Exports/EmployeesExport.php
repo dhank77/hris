@@ -58,4 +58,3 @@ class EmployeesExport implements FromCollection, ShouldAutoSize, WithHeadings, W
         ];
     }
 }
-

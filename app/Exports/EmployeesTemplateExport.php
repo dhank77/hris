@@ -66,4 +66,3 @@ class EmployeesTemplateExport implements FromArray, ShouldAutoSize, WithHeadings
         ];
     }
 }
-

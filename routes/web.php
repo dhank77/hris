@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
@@ -8,6 +9,11 @@ use App\Http\Controllers\LeaveRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::middleware(['guest'])->group(function () {
+    Route::get('auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('auth.google.redirect');
+    Route::get('auth/google/callback', [GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+});
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
