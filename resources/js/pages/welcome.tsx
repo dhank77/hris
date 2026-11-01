@@ -1,6 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { CalendarCheck, FileText, Wallet } from 'lucide-react';
-import { dashboard, login, register } from '@/routes';
+import { dashboard, login } from '@/routes';
 
 const stations = [
     { x: 60, label: 'Absen', y: 150 },
@@ -100,20 +100,12 @@ export default function Welcome() {
                                     Dasbor
                                 </Link>
                             ) : (
-                                <>
-                                    <Link
-                                        href={login()}
-                                        className="inline-flex h-10 items-center rounded-lg px-4 text-white transition-colors hover:bg-white/10"
-                                    >
-                                        Masuk
-                                    </Link>
-                                    <Link
-                                        href={register()}
-                                        className="inline-flex h-10 items-center rounded-lg border border-white/30 px-4 text-white transition-colors hover:bg-white/10"
-                                    >
-                                        Daftar
-                                    </Link>
-                                </>
+                                <Link
+                                    href={login()}
+                                    className="inline-flex h-10 items-center rounded-lg border border-white/30 px-4 text-white transition-colors hover:bg-white/10"
+                                >
+                                    Masuk
+                                </Link>
                             )}
                         </nav>
                     </header>
@@ -138,20 +130,12 @@ export default function Welcome() {
                                         Buka dasbor
                                     </Link>
                                 ) : (
-                                    <>
-                                        <Link
-                                            href={login()}
-                                            className={primaryCta}
-                                        >
-                                            Masuk
-                                        </Link>
-                                        <Link
-                                            href={register()}
-                                            className={secondaryCta}
-                                        >
-                                            Buat akun
-                                        </Link>
-                                    </>
+                                    <Link
+                                        href={login()}
+                                        className={primaryCta}
+                                    >
+                                        Masuk ke sistem
+                                    </Link>
                                 )}
                             </div>
                         </div>

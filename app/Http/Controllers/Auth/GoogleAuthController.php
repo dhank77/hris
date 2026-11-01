@@ -7,9 +7,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
@@ -50,31 +48,25 @@ class GoogleAuthController extends Controller
             ->orWhere('email', $email)
             ->first();
 
-        if ($user) {
-            $updates = [];
-            if (! $user->google_id) {
-                $updates['google_id'] = $googleUser->getId();
-            }
-            if (! $user->avatar && $googleUser->getAvatar()) {
-                $updates['avatar'] = $googleUser->getAvatar();
-            }
-            if (! $user->email_verified_at) {
-                $updates['email_verified_at'] = now();
-            }
-
-            if (! empty($updates)) {
-                $user->update($updates);
-            }
-        } else {
-            $user = User::create([
-                'name' => $googleUser->getName() ?: $googleUser->getNickname() ?: 'Google User',
-                'email' => $email,
-                'google_id' => $googleUser->getId(),
-                'avatar' => $googleUser->getAvatar(),
-                'email_verified_at' => now(),
-                'password' => Hash::make(Str::random(32)),
-                'role' => 'employee',
+        if (! $user) {
+            return redirect()->route('login')->withErrors([
+                'email' => 'Akun Google Anda belum terdaftar sebagai pegawai. Silakan hubungi admin atau HR.',
             ]);
+        }
+
+        $updates = [];
+        if (! $user->google_id) {
+            $updates['google_id'] = $googleUser->getId();
+        }
+        if (! $user->avatar && $googleUser->getAvatar()) {
+            $updates['avatar'] = $googleUser->getAvatar();
+        }
+        if (! $user->email_verified_at) {
+            $updates['email_verified_at'] = now();
+        }
+
+        if (! empty($updates)) {
+            $user->update($updates);
         }
 
         Auth::login($user, remember: true);
@@ -84,4 +76,3 @@ class GoogleAuthController extends Controller
         return redirect()->intended(route('dashboard', absolute: false));
     }
 }
-
