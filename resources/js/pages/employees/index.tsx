@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import {
@@ -9,12 +9,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Users } from 'lucide-react';
+import { Users, Plus, Pencil, Eye } from 'lucide-react';
+import { index as empIndex, show as empShow, edit as empEdit, create as empCreate } from '@/routes/employees';
 
 type Employee = {
     id: number;
     name: string;
     email: string;
+    avatar?: string | null;
     role: string;
     department?: string | null;
     position?: string | null;
@@ -32,18 +34,15 @@ const roleLabel: Record<string, string> = {
     admin: 'Admin',
 };
 
-const rupiah = (value: number | string) =>
-    new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0,
-    }).format(Number(value));
-
 export default function EmployeesIndex({
     employees,
 }: {
     employees: Employee[];
 }) {
+    const page = usePage();
+    const auth = (page.props as { auth?: { user?: { role?: string } } }).auth;
+    const isAdmin = auth?.user?.role === 'admin';
+
     return (
         <>
             <Head title="Data Pegawai" />
@@ -52,9 +51,18 @@ export default function EmployeesIndex({
                     title="Data Pegawai"
                     description="Informasi umum karyawan yang dibutuhkan HR."
                     actions={
-                        <Button variant="outline" size="sm">
-                            <Users aria-hidden="true" /> {employees.length} pegawai
-                        </Button>
+                        <>
+                            {isAdmin && (
+                                <Button asChild size="sm">
+                                    <Link href={empCreate.url()}>
+                                        <Plus aria-hidden="true" /> Tambah pegawai
+                                    </Link>
+                                </Button>
+                            )}
+                            <Button variant="outline" size="sm">
+                                <Users aria-hidden="true" /> {employees.length} pegawai
+                            </Button>
+                        </>
                     }
                 />
 
@@ -67,21 +75,36 @@ export default function EmployeesIndex({
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>Foto</TableHead>
                                     <TableHead>Nama</TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Peran</TableHead>
                                     <TableHead>Departemen</TableHead>
                                     <TableHead>Jabatan</TableHead>
-                                    <TableHead>Atasan</TableHead>
-                                    <TableHead>Limit Kasbon</TableHead>
-                                    <TableHead>Terpakai</TableHead>
-                                    <TableHead>Sisa</TableHead>
-                                    <TableHead>Bergabung</TableHead>
+                                    <TableHead>Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {employees.map((emp) => (
                                     <TableRow key={emp.id}>
+                                        <TableCell>
+                                            {emp.avatar ? (
+                                                <img
+                                                    src={`/storage/${emp.avatar}`}
+                                                    alt={emp.name}
+                                                    className="h-10 w-10 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-xs font-semibold">
+                                                    {emp.name
+                                                        .split(' ')
+                                                        .map((n) => n[0])
+                                                        .join('')
+                                                        .slice(0, 2)
+                                                        .toUpperCase()}
+                                                </div>
+                                            )}
+                                        </TableCell>
                                         <TableCell className="font-medium">
                                             {emp.name}
                                         </TableCell>
@@ -96,33 +119,37 @@ export default function EmployeesIndex({
                                             {emp.position || '—'}
                                         </TableCell>
                                         <TableCell>
-                                            {emp.supervisor?.name || '—'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {rupiah(emp.kasbon_limit)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {rupiah(emp.kasbon_used)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {rupiah(
-                                                Math.max(
-                                                    0,
-                                                    emp.kasbon_limit -
-                                                        emp.kasbon_used,
-                                                ),
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {emp.created_at
-                                                ? new Date(
-                                                      emp.created_at,
-                                                  ).toLocaleDateString('id-ID', {
-                                                      day: 'numeric',
-                                                      month: 'short',
-                                                      year: 'numeric',
-                                                  })
-                                                : '—'}
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    asChild
+                                                    size="sm"
+                                                    variant="outline"
+                                                >
+                                                    <Link
+                                                        href={empShow.url({
+                                                            employee: emp.id,
+                                                        })}
+                                                    >
+                                                        <Eye className="h-4 w-4" />
+                                                    </Link>
+                                                </Button>
+                                                {isAdmin && (
+                                                    <Button
+                                                        asChild
+                                                        size="sm"
+                                                        variant="outline"
+                                                    >
+                                                        <Link
+                                                            href={empEdit.url({
+                                                                employee:
+                                                                    emp.id,
+                                                            })}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Link>
+                                                    </Button>
+                                                )}
+                                            </div>
                                         </TableCell>
                                     </TableRow>
                                 ))}
