@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, Clock, FileText, Wallet } from 'lucide-react';
+import { LayoutGrid, Users, Clock, FileText, Wallet } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -14,6 +14,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { index as employeeIndex } from '@/routes/employees';
 import { index as attendanceIndex } from '@/routes/attendance';
 import { index as leaveIndex } from '@/routes/leave-requests';
 import { index as cashIndex } from '@/routes/cash-advances';
@@ -24,6 +25,11 @@ export const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Data Pegawai',
+        href: employeeIndex(),
+        icon: Users,
     },
     {
         title: 'Absensi',

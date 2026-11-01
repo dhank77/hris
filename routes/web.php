@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,9 @@ Route::inertia('/', 'welcome')->name('home');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', DashboardController::class)->name('dashboard');
+
+    // Employees (data pegawai)
+    Route::get('employees', [EmployeeController::class, 'index'])->name('employees.index');
 
     // Attendance
     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');

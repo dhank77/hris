@@ -9,7 +9,7 @@ export function MobileNav() {
     return (
         <nav
             aria-label="Menu utama"
-            className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-4 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
+            className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-sidebar-border bg-sidebar pb-[env(safe-area-inset-bottom)] md:hidden"
         >
             {mainNavItems.map((item) => {
                 const active = isCurrentUrl(item.href);
