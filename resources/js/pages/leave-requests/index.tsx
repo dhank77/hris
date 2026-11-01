@@ -1,16 +1,21 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-import {
-    approve,
-    reject,
-    index as leaveIndex,
-    create as leaveCreate,
-} from '@/routes/leave-requests';
-import { ApprovalLine } from '@/components/approval-line';
-import type { ApprovalStop } from '@/components/approval-line';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import {
+    index as leaveIndex,
+    create as leaveCreate,
+    show as leaveShow,
+} from '@/routes/leave-requests';
 
 type LeaveRequest = {
     id: number;
@@ -28,46 +33,25 @@ const typeLabel: Record<string, string> = {
     permission: 'Izin',
 };
 
-function leaveStops(status: string): ApprovalStop[] {
-    return [
-        { label: 'Diajukan', state: 'done' },
-        {
-            label: 'Atasan',
-            state:
-                status === 'approved'
-                    ? 'done'
-                    : status === 'rejected'
-                      ? 'rejected'
-                      : 'current',
-        },
-        {
-            label: status === 'rejected' ? 'Ditolak' : 'Disetujui',
-            state: status === 'approved' ? 'done' : 'upcoming',
-        },
-    ];
-}
+const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString('id-ID', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+    });
 
 export default function LeaveRequestsIndex({
     leaveRequests,
 }: {
     leaveRequests: LeaveRequest[];
 }) {
-    const doApprove = (id: number) =>
-        router.post(approve.url({ leaveRequest: id }));
-    const doReject = (id: number) => {
-        const reason = prompt('Alasan penolakan?') || '';
-        router.post(reject.url({ leaveRequest: id }), {
-            rejection_reason: reason,
-        });
-    };
-
     return (
         <>
             <Head title="Izin / Sakit / Cuti" />
             <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 md:p-6">
                 <PageHeader
                     title="Izin, sakit, dan cuti"
-                    description="Pantau posisi setiap pengajuan di jalur persetujuan."
+                    description="Daftar pengajuan. Buka detail untuk menyetujui atau menolak."
                     actions={
                         <Button asChild>
                             <Link href={leaveCreate.url()}>
@@ -82,47 +66,42 @@ export default function LeaveRequestsIndex({
                         Belum ada pengajuan. Pilih &quot;Buat pengajuan&quot; untuk memulai.
                     </p>
                 ) : (
-                    <ul className="grid gap-3">
-                        {leaveRequests.map((lr) => (
-                            <li
-                                key={lr.id}
-                                className="grid gap-4 rounded-xl border bg-card p-4"
-                            >
-                                <div className="flex flex-wrap items-start justify-between gap-2">
-                                    <div className="grid gap-0.5">
-                                        <h2 className="text-lg font-semibold">
-                                            {typeLabel[lr.type] ?? lr.type}
-                                            {lr.user?.name && (
-                                                <span className="font-normal text-muted-foreground">
-                                                    {' '}· {lr.user.name}
-                                                </span>
-                                            )}
-                                        </h2>
-                                        <p className="tabular text-sm text-muted-foreground">
-                                            {lr.start_date} – {lr.end_date}
-                                        </p>
-                                    </div>
-                                    <StatusBadge status={lr.status} />
-                                </div>
-                                <p className="max-w-prose text-sm">{lr.reason}</p>
-                                <ApprovalLine stops={leaveStops(lr.status)} />
-                                {lr.status === 'pending' && (
-                                    <div className="flex flex-wrap gap-2">
-                                        <Button size="sm" onClick={() => doApprove(lr.id)}>
-                                            Setujui
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            onClick={() => doReject(lr.id)}
-                                        >
-                                            Tolak
-                                        </Button>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="rounded-xl border bg-card">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Pegawai</TableHead>
+                                    <TableHead>Jenis</TableHead>
+                                    <TableHead>Tanggal</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="text-right">Aksi</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {leaveRequests.map((lr) => (
+                                    <TableRow key={lr.id}>
+                                        <TableCell className="font-medium">
+                                            {lr.user?.name ?? '-'}
+                                        </TableCell>
+                                        <TableCell>{typeLabel[lr.type] ?? lr.type}</TableCell>
+                                        <TableCell className="tabular whitespace-nowrap">
+                                            {formatDate(lr.start_date)} – {formatDate(lr.end_date)}
+                                        </TableCell>
+                                        <TableCell>
+                                            <StatusBadge status={lr.status} />
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Button asChild size="sm" variant="outline">
+                                                <Link href={leaveShow.url({ leaveRequest: lr.id })}>
+                                                    Detail
+                                                </Link>
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
                 )}
             </div>
         </>

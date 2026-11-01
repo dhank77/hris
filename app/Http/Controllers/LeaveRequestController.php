@@ -30,6 +30,23 @@ class LeaveRequestController extends Controller
         ]);
     }
 
+    public function show(Request $request, LeaveRequest $leaveRequest): InertiaResponse
+    {
+        $user = $request->user();
+        $isOwner = $leaveRequest->user_id === $user->id;
+        $isSupervisorOfOwner = $user->role === 'supervisor'
+            && User::where('id', $leaveRequest->user_id)->where('supervisor_id', $user->id)->exists();
+
+        if (! $isOwner && ! in_array($user->role, ['hr', 'admin']) && ! $isSupervisorOfOwner) {
+            abort(403);
+        }
+
+        return Inertia::render('leave-requests/show', [
+            'leaveRequest' => $leaveRequest->load(['user', 'approver']),
+            'canDecide' => in_array($user->role, ['hr', 'admin']) || $isSupervisorOfOwner || ($user->role === 'supervisor' && $isOwner),
+        ]);
+    }
+
     public function create(): InertiaResponse
     {
         return Inertia::render('leave-requests/create');

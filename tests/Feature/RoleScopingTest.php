@@ -115,3 +115,27 @@ test('only admins receive the all-employee dashboard overview', function () {
         ->where('overview.totalEmployees', 2)
     );
 });
+
+test('leave request detail is limited to the owner and approvers', function () {
+    $employee = User::factory()->create();
+    $other = User::factory()->create();
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $leave = LeaveRequest::create([
+        'user_id' => $employee->id,
+        'type' => 'leave',
+        'start_date' => Carbon::today(),
+        'end_date' => Carbon::today(),
+        'reason' => 'reason',
+        'status' => 'pending',
+    ]);
+
+    $this->actingAs($other)->get(route('leave-requests.show', $leave))->assertForbidden();
+
+    $this->actingAs($employee)->get(route('leave-requests.show', $leave))->assertOk();
+
+    $this->actingAs($admin)->get(route('leave-requests.show', $leave))->assertInertia(fn (Assert $page) => $page
+        ->component('leave-requests/show')
+        ->where('canDecide', true)
+    );
+});

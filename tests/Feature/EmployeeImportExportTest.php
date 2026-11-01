@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\EmployeesTemplateExport;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -19,10 +20,40 @@ test('non-admin users cannot import or export employees', function () {
         ->assertForbidden();
 
     $this->actingAs($employee)
+        ->get(route('employees.import.template'))
+        ->assertForbidden();
+
+    $this->actingAs($employee)
         ->post(route('employees.import'), [
             'file' => UploadedFile::fake()->create('employees.xls', 10),
         ])
         ->assertForbidden();
+});
+
+test('admin can download import template and upload it without errors', function () {
+    $admin = User::factory()->create([
+        'name' => 'Admin HRIS',
+        'email' => 'admin@example.com',
+        'role' => 'admin',
+    ]);
+
+    $downloadResponse = $this->actingAs($admin)->get(route('employees.import.template'));
+
+    $downloadResponse->assertOk();
+    $downloadResponse->assertDownload('template-import-pegawai.xls');
+
+    $rawTemplate = Excel::raw(new EmployeesTemplateExport, BaseExcel::XLS);
+    $file = UploadedFile::fake()->createWithContent('template-import-pegawai.xls', $rawTemplate);
+
+    $importResponse = $this->actingAs($admin)->post(route('employees.import'), [
+        'file' => $file,
+    ]);
+
+    $importResponse->assertRedirect(route('employees.index'));
+    $importResponse->assertSessionHasNoErrors();
+
+    expect(User::where('email', 'budi.santoso@example.com')->exists())->toBeTrue()
+        ->and(User::where('email', 'siti.aminah@example.com')->exists())->toBeTrue();
 });
 
 test('admin can export employees to xls', function () {

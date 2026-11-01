@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\EmployeesExport;
+use App\Exports\EmployeesTemplateExport;
 use App\Imports\EmployeesImport;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -190,6 +191,15 @@ class EmployeeController extends Controller
         }
 
         return redirect()->route('employees.index');
+    }
+
+    public function downloadTemplate(Request $request): BinaryFileResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        return Excel::download(new EmployeesTemplateExport, 'template-import-pegawai.xls', BaseExcel::XLS);
     }
 
     public function exportExcel(Request $request): BinaryFileResponse

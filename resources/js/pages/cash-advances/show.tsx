@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { ApprovalLine } from '@/components/approval-line';
 import type { ApprovalStop } from '@/components/approval-line';
 import { PageHeader } from '@/components/page-header';
@@ -12,7 +12,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { show as caShow, index as caIndex } from '@/routes/cash-advances';
+import {
+    show as caShow,
+    index as caIndex,
+    approveLevel1,
+    approveFinance,
+    reject as caReject,
+    disburse,
+} from '@/routes/cash-advances';
 import { pay } from '@/routes/cash-advances/installments';
 
 type Installment = {
@@ -90,6 +97,24 @@ export default function CashAdvancesShow({
 }) {
     const doPay = (id: number) => router.post(pay.url({ installment: id }));
 
+    const role = (
+        usePage().props as { auth?: { user?: { role?: string } } }
+    ).auth?.user?.role;
+    const canLevel1 = ['supervisor', 'hr', 'admin'].includes(role ?? '');
+    const canFinance = ['finance', 'admin'].includes(role ?? '');
+    const canReject = ['supervisor', 'hr', 'finance', 'admin'].includes(role ?? '');
+    const id = cashAdvance.id;
+    const doReject = () => {
+        const reason = prompt('Alasan penolakan?') || '';
+        router.post(caReject.url({ cashAdvance: id }), {
+            rejection_reason: reason,
+        });
+    };
+    const showActions =
+        (cashAdvance.status === 'pending' && (canLevel1 || canReject)) ||
+        (cashAdvance.status === 'approved_level1' && (canFinance || canReject)) ||
+        (cashAdvance.status === 'approved_finance' && canFinance);
+
     const facts = [
         { label: 'Karyawan', value: cashAdvance.user?.name },
         { label: 'Nominal', value: rupiah(cashAdvance.amount) },
@@ -109,6 +134,43 @@ export default function CashAdvancesShow({
                     description={cashAdvance.user?.name}
                     actions={<StatusBadge status={cashAdvance.status} />}
                 />
+
+                {showActions && (
+                    <div className="flex flex-wrap gap-2">
+                        {cashAdvance.status === 'pending' && canLevel1 && (
+                            <Button
+                                onClick={() =>
+                                    router.post(approveLevel1.url({ cashAdvance: id }))
+                                }
+                            >
+                                Setujui (atasan)
+                            </Button>
+                        )}
+                        {cashAdvance.status === 'approved_level1' && canFinance && (
+                            <Button
+                                onClick={() =>
+                                    router.post(approveFinance.url({ cashAdvance: id }))
+                                }
+                            >
+                                Setujui (finance)
+                            </Button>
+                        )}
+                        {cashAdvance.status === 'approved_finance' && canFinance && (
+                            <Button
+                                onClick={() =>
+                                    router.post(disburse.url({ cashAdvance: id }))
+                                }
+                            >
+                                Cairkan
+                            </Button>
+                        )}
+                        {cashAdvance.status !== 'approved_finance' && canReject && (
+                            <Button variant="destructive" onClick={doReject}>
+                                Tolak
+                            </Button>
+                        )}
+                    </div>
+                )}
 
                 <section
                     aria-labelledby="flow-heading"

@@ -19,12 +19,14 @@ type Attendance = {
     clock_out_at: string | null;
     status: string;
     late_minutes: number;
+    user?: { id: number; name: string };
 };
 
 const periods = [
     { value: 'daily', label: 'Harian' },
     { value: 'weekly', label: 'Mingguan' },
     { value: 'monthly', label: 'Bulanan' },
+    { value: 'all', label: 'Semua' },
 ];
 
 const formatTime = (iso: string | null) =>
@@ -80,7 +82,10 @@ export default function AttendanceHistory({
                             {attendances.map((a) => (
                                 <li key={a.id} className="grid gap-1.5 p-3">
                                     <div className="flex items-center justify-between gap-2">
-                                        <span className="font-semibold">{a.date}</span>
+                                        <span className="font-semibold">
+                                            {a.user?.name ? `${a.user.name} · ` : ''}
+                                            {a.date}
+                                        </span>
                                         <StatusBadge status={a.status} />
                                     </div>
                                     <p className="tabular text-sm text-muted-foreground">
@@ -98,6 +103,7 @@ export default function AttendanceHistory({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
+                                        <TableHead>Pegawai</TableHead>
                                         <TableHead>Tanggal</TableHead>
                                         <TableHead>Masuk</TableHead>
                                         <TableHead>Pulang</TableHead>
@@ -108,6 +114,7 @@ export default function AttendanceHistory({
                                 <TableBody>
                                     {attendances.map((a) => (
                                         <TableRow key={a.id}>
+                                            <TableCell className="font-medium">{a.user?.name}</TableCell>
                                             <TableCell className="tabular">{a.date}</TableCell>
                                             <TableCell className="tabular">{formatTime(a.clock_in_at)}</TableCell>
                                             <TableCell className="tabular">{formatTime(a.clock_out_at)}</TableCell>

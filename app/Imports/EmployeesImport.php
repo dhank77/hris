@@ -11,6 +11,17 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 class EmployeesImport implements SkipsEmptyRows, ToModel, WithHeadingRow, WithValidation
 {
     /**
+     * @param  array<string, mixed>  $row
+     */
+    public function isEmptyWhen(array $row): bool
+    {
+        $name = trim((string) ($row['name'] ?? $row['nama'] ?? ''));
+        $email = trim((string) ($row['email'] ?? ''));
+
+        return $name === '' && $email === '';
+    }
+
+    /**
      * @param  array<string, mixed>  $data
      * @return array<string, mixed>
      */
@@ -25,24 +36,35 @@ class EmployeesImport implements SkipsEmptyRows, ToModel, WithHeadingRow, WithVa
         $supervisor = $data['supervisor_id'] ?? $data['supervisor_email'] ?? $data['email_atasan'] ?? $data['supervisor'] ?? $data['atasan'] ?? null;
         $kasbonLimit = $data['kasbon_limit'] ?? $data['limit_kasbon'] ?? 0;
 
+        if (is_string($kasbonLimit) && ! is_numeric($kasbonLimit)) {
+            $cleanedLimit = preg_replace('/[^0-9-]/', '', $kasbonLimit);
+            $kasbonLimit = $cleanedLimit !== '' ? (float) $cleanedLimit : $kasbonLimit;
+        }
+
         $roleMap = [
             'karyawan' => 'employee',
+            'pegawai' => 'employee',
+            'staff' => 'employee',
             'employee' => 'employee',
             'supervisor' => 'supervisor',
+            'atasan' => 'supervisor',
             'hr' => 'hr',
+            'hrd' => 'hr',
             'finance' => 'finance',
+            'keuangan' => 'finance',
             'admin' => 'admin',
+            'administrator' => 'admin',
             '' => 'employee',
         ];
 
         return [
             'name' => is_string($name) ? trim($name) : $name,
-            'email' => is_string($email) ? trim($email) : $email,
+            'email' => is_string($email) ? strtolower(trim($email)) : $email,
             'password' => $password !== null && $password !== '' ? (string) $password : null,
             'role' => $roleMap[$rawRole] ?? $rawRole,
-            'department' => $department !== null && $department !== '' ? (string) $department : null,
-            'position' => $position !== null && $position !== '' ? (string) $position : null,
-            'supervisor' => $supervisor !== null && $supervisor !== '' ? (string) $supervisor : null,
+            'department' => $department !== null && $department !== '' ? trim((string) $department) : null,
+            'position' => $position !== null && $position !== '' ? trim((string) $position) : null,
+            'supervisor' => $supervisor !== null && $supervisor !== '' ? trim((string) $supervisor) : null,
             'kasbon_limit' => $kasbonLimit !== null && $kasbonLimit !== '' ? $kasbonLimit : 0,
         ];
     }
@@ -99,4 +121,3 @@ class EmployeesImport implements SkipsEmptyRows, ToModel, WithHeadingRow, WithVa
         return $user;
     }
 }
-

@@ -116,7 +116,7 @@ class AttendanceController extends Controller
             $scopedUserIds = collect([$user->id]);
         }
 
-        $query = Attendance::whereIn('user_id', $scopedUserIds)->orderByDesc('date');
+        $query = Attendance::with('user')->whereIn('user_id', $scopedUserIds)->orderByDesc('date');
 
         if ($period === 'weekly') {
             $query->whereBetween('date', [Carbon::now()->startOfWeek()->toDateString(), Carbon::now()->endOfWeek()->toDateString()]);

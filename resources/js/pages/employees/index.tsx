@@ -22,7 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Users, Plus, Pencil, Eye, Upload, FileSpreadsheet, FileText } from 'lucide-react';
+import { Users, Plus, Pencil, Eye, Upload, FileSpreadsheet, FileText, Download } from 'lucide-react';
 import {
     show as empShow,
     edit as empEdit,
@@ -30,6 +30,7 @@ import {
     importMethod as empImport,
 } from '@/routes/employees';
 import { excel as exportExcel, pdf as exportPdf } from '@/routes/employees/export';
+import { template as importTemplate } from '@/routes/employees/import';
 
 type Employee = {
     id: number;
@@ -109,13 +110,25 @@ export default function EmployeesIndex({
                                             <DialogHeader>
                                                 <DialogTitle>Import Data Pegawai</DialogTitle>
                                                 <DialogDescription>
-                                                    Unggah file Excel (.xls, .xlsx, .csv) dengan header kolom:{' '}
-                                                    <strong>Nama, Email, Password, Peran, Departemen, Jabatan, Atasan, Limit Kasbon</strong>.
+                                                    Gunakan template resmi agar format kolom sesuai dan data tidak bermasalah saat diimpor.
                                                 </DialogDescription>
                                             </DialogHeader>
+                                            <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/40 p-3 text-sm">
+                                                <div className="grid gap-0.5">
+                                                    <span className="font-medium">Template Import Pegawai (.xls)</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        Kolom: Nama, Email, Password, Peran, Departemen, Jabatan, Atasan, Limit Kasbon
+                                                    </span>
+                                                </div>
+                                                <Button asChild variant="secondary" size="sm">
+                                                    <a href={importTemplate.url()}>
+                                                        <Download aria-hidden="true" /> Unduh Template
+                                                    </a>
+                                                </Button>
+                                            </div>
                                             <form onSubmit={submitImport} className="grid gap-4">
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="import-file">File Excel</Label>
+                                                    <Label htmlFor="import-file">File Excel (.xls, .xlsx, .csv)</Label>
                                                     <Input
                                                         id="import-file"
                                                         type="file"
