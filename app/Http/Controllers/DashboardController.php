@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\CashAdvance;
 use App\Models\CashAdvanceInstallment;
 use App\Models\LeaveRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -22,7 +23,16 @@ class DashboardController extends Controller
             ->whereDate('date', $today)
             ->first();
 
-        $monthAttendances = Attendance::where('user_id', $user->id)
+        // scope for statistics: admin/hr all, supervisor team, employee self
+        if (in_array($user->role, ['hr', 'admin'])) {
+            $scopedUserIds = User::pluck('id');
+        } elseif ($user->role === 'supervisor') {
+            $scopedUserIds = User::where('supervisor_id', $user->id)->pluck('id')->push($user->id);
+        } else {
+            $scopedUserIds = collect([$user->id]);
+        }
+
+        $monthAttendances = Attendance::whereIn('user_id', $scopedUserIds)
             ->whereBetween('date', [
                 $today->copy()->startOfMonth()->toDateString(),
                 $today->copy()->endOfMonth()->toDateString(),
@@ -54,7 +64,7 @@ class DashboardController extends Controller
                 'absent' => $monthAttendances->where('status', 'absent')->count(),
                 'leave' => $monthAttendances->whereIn('status', ['leave', 'sick', 'permission'])->count(),
             ],
-            'pendingLeaveCount' => LeaveRequest::where('user_id', $user->id)
+            'pendingLeaveCount' => LeaveRequest::whereIn('user_id', $scopedUserIds)
                 ->where('status', 'pending')
                 ->count(),
             'kasbon' => [
@@ -76,4 +86,3 @@ class DashboardController extends Controller
         ]);
     }
 }
-

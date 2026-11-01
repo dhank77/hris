@@ -18,10 +18,19 @@ class AttendanceController extends Controller
         $today = Carbon::today()->toDateString();
         $attendance = Attendance::where('user_id', $user->id)->where('date', $today)->first();
 
+        // scope for recap statistics
+        if (in_array($user->role, ['hr', 'admin', 'finance'])) {
+            $scopedUserIds = User::pluck('id');
+        } elseif ($user->role === 'supervisor') {
+            $scopedUserIds = User::where('supervisor_id', $user->id)->pluck('id')->push($user->id);
+        } else {
+            $scopedUserIds = collect([$user->id]);
+        }
+
         // recap counts for current month
         $start = Carbon::now()->startOfMonth();
         $end = Carbon::now()->endOfMonth();
-        $monthAttendances = Attendance::where('user_id', $user->id)
+        $monthAttendances = Attendance::whereIn('user_id', $scopedUserIds)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
             ->get();
 
@@ -98,7 +107,16 @@ class AttendanceController extends Controller
     {
         $user = $request->user();
         $period = $request->input('period', 'monthly'); // daily, weekly, monthly
-        $query = Attendance::where('user_id', $user->id)->orderByDesc('date');
+
+        if (in_array($user->role, ['hr', 'admin', 'finance'])) {
+            $scopedUserIds = User::pluck('id');
+        } elseif ($user->role === 'supervisor') {
+            $scopedUserIds = User::where('supervisor_id', $user->id)->pluck('id')->push($user->id);
+        } else {
+            $scopedUserIds = collect([$user->id]);
+        }
+
+        $query = Attendance::whereIn('user_id', $scopedUserIds)->orderByDesc('date');
 
         if ($period === 'weekly') {
             $query->whereBetween('date', [Carbon::now()->startOfWeek()->toDateString(), Carbon::now()->endOfWeek()->toDateString()]);

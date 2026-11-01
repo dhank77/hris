@@ -1,7 +1,7 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { Camera, Clock, LogIn, LogOut, MapPin } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
-import { store, index as attendanceIndex } from '@/routes/attendance';
+import { store, index as attendanceIndex, history, recap as attendanceRecap } from '@/routes/attendance';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
@@ -154,7 +154,20 @@ export default function AttendanceIndex({
         <>
             <Head title="Absensi" />
             <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-4 md:p-6">
-                <PageHeader title="Absensi" description={today} />
+                <PageHeader
+                    title="Absensi"
+                    description={today}
+                    actions={
+                        <div className="flex gap-2">
+                            <Button asChild variant="outline" size="sm">
+                                <Link href={history.url()}>Riwayat</Link>
+                            </Button>
+                            <Button asChild variant="outline" size="sm">
+                                <Link href={attendanceRecap.url()}>Rekap</Link>
+                            </Button>
+                        </div>
+                    }
+                />
 
                 <section
                     aria-labelledby="today-heading"
