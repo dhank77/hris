@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\EmployeesExport;
 use App\Exports\EmployeesTemplateExport;
+use App\Http\Controllers\Concerns\HasTableQuery;
 use App\Imports\EmployeesImport;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -21,6 +22,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EmployeeController extends Controller
 {
+    use HasTableQuery;
+
     public function index(Request $request): InertiaResponse|RedirectResponse
     {
         $user = $request->user();
@@ -29,7 +32,7 @@ class EmployeeController extends Controller
             return $this->show($request, $user);
         }
 
-        $query = User::with('supervisor')->orderBy('name');
+        $query = User::with('supervisor');
 
         if (! in_array($user->role, ['hr', 'admin'])) {
             if ($user->role === 'supervisor') {
@@ -40,8 +43,28 @@ class EmployeeController extends Controller
             }
         }
 
+        $table = $this->tableQuery(
+            $request,
+            ['name', 'email', 'role', 'department', 'position'],
+            defaultSort: 'name',
+            defaultDir: 'asc',
+        );
+
+        if ($table['search'] !== '') {
+            $search = $table['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('department', 'like', "%{$search}%")
+                    ->orWhere('position', 'like', "%{$search}%");
+            });
+        }
+
+        $query->orderBy($table['sort'], $table['dir']);
+
         return Inertia::render('employees/index', [
-            'employees' => $query->get(),
+            'employees' => $query->paginate(15)->withQueryString(),
+            'filters' => $table,
         ]);
     }
 

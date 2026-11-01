@@ -1,6 +1,13 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
+import {
+    SortableHead,
+    TablePagination,
+    TableSearch,
+    readSearch,
+    readSort,
+} from '@/components/table-controls';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -16,6 +23,7 @@ import {
     show as caShow,
     deductPayroll,
 } from '@/routes/cash-advances';
+import type { Paginator } from '@/components/table-controls';
 
 type Installment = {
     id: number;
@@ -48,10 +56,13 @@ export default function CashAdvancesIndex({
     cashAdvances,
     stats,
 }: {
-    cashAdvances: CashAdvance[];
+    cashAdvances: Paginator<CashAdvance>;
     stats: Stats;
 }) {
     const doDeduct = () => router.post(deductPayroll.url());
+    const url = caIndex();
+    const { sort, dir } = readSort('created_at');
+    const search = readSearch();
 
     const summary = [
         { label: 'Limit kasbon', value: stats.limit },
@@ -95,25 +106,33 @@ export default function CashAdvancesIndex({
                         Daftar kasbon
                     </h2>
 
-                    {cashAdvances.length === 0 ? (
+                    {cashAdvances.data.length === 0 ? (
                         <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                            Belum ada pengajuan kasbon.
+                            {search
+                                ? `Tidak ada kasbon yang cocok dengan pencarian "${search}".`
+                                : 'Belum ada pengajuan kasbon.'}
                         </p>
                     ) : (
                         <div className="rounded-xl border bg-card">
+                            <TableSearch
+                                url={url}
+                                defaultValue={search}
+                                placeholder="Cari pegawai atau alasan..."
+                                className="p-3"
+                            />
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Pegawai</TableHead>
-                                        <TableHead className="text-right">Nominal</TableHead>
-                                        <TableHead>Tenor</TableHead>
+                                        <SortableHead label="Pegawai" field="user" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead label="Nominal" field="amount" currentSort={sort} currentDir={dir} url={url} className="text-right" />
+                                        <SortableHead label="Tenor" field="tenor_months" currentSort={sort} currentDir={dir} url={url} />
                                         <TableHead>Cicilan lunas</TableHead>
-                                        <TableHead>Status</TableHead>
+                                        <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
                                         <TableHead className="text-right">Aksi</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {cashAdvances.map((ca) => (
+                                    {cashAdvances.data.map((ca) => (
                                         <TableRow key={ca.id}>
                                             <TableCell className="font-medium">
                                                 {ca.user?.name ?? `Kasbon #${ca.id}`}
@@ -142,6 +161,7 @@ export default function CashAdvancesIndex({
                                     ))}
                                 </TableBody>
                             </Table>
+                            <TablePagination paginator={cashAdvances} url={url} className="border-t" />
                         </div>
                     )}
                 </section>

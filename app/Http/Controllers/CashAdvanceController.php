@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasTableQuery;
 use App\Models\CashAdvance;
 use App\Models\CashAdvanceInstallment;
 use App\Models\User;
@@ -13,10 +14,12 @@ use Inertia\Response as InertiaResponse;
 
 class CashAdvanceController extends Controller
 {
+    use HasTableQuery;
+
     public function index(Request $request): InertiaResponse
     {
         $user = $request->user();
-        $query = CashAdvance::with(['user', 'installments'])->orderByDesc('created_at');
+        $query = CashAdvance::with(['user', 'installments']);
 
         if (! in_array($user->role, ['hr', 'admin', 'finance', 'supervisor'])) {
             $query->where('user_id', $user->id);
@@ -25,7 +28,27 @@ class CashAdvanceController extends Controller
             $query->whereIn('user_id', $subIds->push($user->id));
         }
 
-        $advances = $query->get();
+        $table = $this->tableQuery(
+            $request,
+            ['amount', 'tenor_months', 'status', 'created_at', 'user'],
+            defaultSort: 'created_at',
+        );
+
+        if ($table['search'] !== '') {
+            $search = $table['search'];
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn ($user) => $user->where('name', 'like', "%{$search}%"))
+                    ->orWhere('reason', 'like', "%{$search}%");
+            });
+        }
+
+        if ($table['sort'] === 'user') {
+            $query->orderBy(User::select('name')->whereColumn('users.id', 'cash_advances.user_id'), $table['dir']);
+        } else {
+            $query->orderBy($table['sort'], $table['dir']);
+        }
+
+        $advances = $query->paginate(15)->withQueryString();
 
         // dashboard stats for current user
         $myAdvances = CashAdvance::where('user_id', $user->id)->get();
@@ -35,6 +58,7 @@ class CashAdvanceController extends Controller
 
         return Inertia::render('cash-advances/index', [
             'cashAdvances' => $advances,
+            'filters' => $table,
             'stats' => [
                 'limit' => (float) $user->kasbon_limit,
                 'used' => (float) $user->kasbon_used,

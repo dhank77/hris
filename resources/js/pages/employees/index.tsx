@@ -2,6 +2,13 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
 import { PageHeader } from '@/components/page-header';
+import {
+    SortableHead,
+    TablePagination,
+    TableSearch,
+    readSearch,
+    readSort,
+} from '@/components/table-controls';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -24,6 +31,7 @@ import {
 } from '@/components/ui/table';
 import { Users, Plus, Pencil, Eye, Upload, FileSpreadsheet, FileText, Download } from 'lucide-react';
 import {
+    index as empIndex,
     show as empShow,
     edit as empEdit,
     create as empCreate,
@@ -31,6 +39,8 @@ import {
 } from '@/routes/employees';
 import { excel as exportExcel, pdf as exportPdf } from '@/routes/employees/export';
 import { template as importTemplate } from '@/routes/employees/import';
+
+import type { Paginator } from '@/components/table-controls';
 
 type Employee = {
     id: number;
@@ -57,12 +67,15 @@ const roleLabel: Record<string, string> = {
 export default function EmployeesIndex({
     employees,
 }: {
-    employees: Employee[];
+    employees: Paginator<Employee>;
 }) {
     const page = usePage();
     const auth = (page.props as { auth?: { user?: { role?: string } } }).auth;
     const isAdmin = auth?.user?.role === 'admin';
     const [importOpen, setImportOpen] = useState(false);
+    const url = empIndex();
+    const { sort, dir } = readSort('name', 'asc');
+    const search = readSearch();
 
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
         file: null as File | null,
@@ -178,32 +191,40 @@ export default function EmployeesIndex({
                                 </>
                             )}
                             <Button variant="outline" size="sm">
-                                <Users aria-hidden="true" /> {employees.length} pegawai
+                                <Users aria-hidden="true" /> {employees.total} pegawai
                             </Button>
                         </>
                     }
                 />
 
-                {employees.length === 0 ? (
+                {employees.data.length === 0 ? (
                     <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                        Belum ada data pegawai.
+                        {search
+                            ? `Tidak ada pegawai yang cocok dengan pencarian "${search}".`
+                            : 'Belum ada data pegawai.'}
                     </p>
                 ) : (
                     <div className="overflow-x-auto rounded-xl border bg-card">
+                        <TableSearch
+                            url={url}
+                            defaultValue={search}
+                            placeholder="Cari nama, email, departemen..."
+                            className="p-3"
+                        />
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Foto</TableHead>
-                                    <TableHead>Nama</TableHead>
-                                    <TableHead>Email</TableHead>
-                                    <TableHead>Peran</TableHead>
-                                    <TableHead>Departemen</TableHead>
-                                    <TableHead>Jabatan</TableHead>
+                                    <SortableHead label="Nama" field="name" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Email" field="email" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Peran" field="role" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Departemen" field="department" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Jabatan" field="position" currentSort={sort} currentDir={dir} url={url} />
                                     <TableHead>Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {employees.map((emp) => (
+                                {employees.data.map((emp) => (
                                     <TableRow key={emp.id}>
                                         <TableCell>
                                             {emp.avatar ? (
@@ -273,6 +294,7 @@ export default function EmployeesIndex({
                                 ))}
                             </TableBody>
                         </Table>
+                        <TablePagination paginator={employees} url={url} className="border-t" />
                     </div>
                 )}
             </div>

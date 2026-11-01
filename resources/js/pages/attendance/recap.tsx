@@ -1,8 +1,16 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { recap, index as attendanceIndex } from '@/routes/attendance';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
+import {
+    SortableHead,
+    TablePagination,
+    TableSearch,
+    navigateTable,
+    readSearch,
+    readSort,
+} from '@/components/table-controls';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +22,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import type { Paginator } from '@/components/table-controls';
 
 type Attendance = {
     id: number;
@@ -38,15 +47,17 @@ export default function AttendanceRecap({
     start,
     end,
 }: {
-    attendances: Attendance[];
+    attendances: Paginator<Attendance>;
     start: string;
     end: string;
 }) {
     const [s, setS] = useState(start);
     const [e, setE] = useState(end);
+    const url = recap();
+    const { sort, dir } = readSort('date');
+    const search = readSearch();
 
-    const apply = () =>
-        router.get(recap.url(), { start: s, end: e }, { preserveState: true });
+    const apply = () => navigateTable(url, { start: s, end: e });
 
     return (
         <>
@@ -79,16 +90,24 @@ export default function AttendanceRecap({
                     <Button onClick={apply} className="col-span-2 sm:col-span-1">
                         Terapkan
                     </Button>
+                    <TableSearch
+                        url={url}
+                        defaultValue={search}
+                        placeholder="Cari pegawai..."
+                        className="sm:ml-auto"
+                    />
                 </div>
 
-                {attendances.length === 0 ? (
+                {attendances.data.length === 0 ? (
                     <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                        Tidak ada data kehadiran pada rentang ini.
+                        {search
+                            ? `Tidak ada data kehadiran untuk pencarian "${search}".`
+                            : 'Tidak ada data kehadiran pada rentang ini.'}
                     </p>
                 ) : (
                     <>
                         <ul className="grid divide-y rounded-xl border bg-card md:hidden">
-                            {attendances.map((a) => (
+                            {attendances.data.map((a) => (
                                 <li key={a.id} className="grid gap-1.5 p-3">
                                     <div className="flex items-center justify-between gap-2">
                                         <span className="font-semibold">{a.user?.name}</span>
@@ -109,16 +128,16 @@ export default function AttendanceRecap({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Tanggal</TableHead>
-                                        <TableHead>Karyawan</TableHead>
+                                        <SortableHead label="Tanggal" field="date" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead label="Karyawan" field="user" currentSort={sort} currentDir={dir} url={url} />
                                         <TableHead>Masuk</TableHead>
                                         <TableHead>Pulang</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Terlambat (mnt)</TableHead>
+                                        <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead label="Terlambat (mnt)" field="late_minutes" currentSort={sort} currentDir={dir} url={url} className="text-right" />
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {attendances.map((a) => (
+                                    {attendances.data.map((a) => (
                                         <TableRow key={a.id}>
                                             <TableCell className="tabular">{a.date}</TableCell>
                                             <TableCell className="font-medium">{a.user?.name}</TableCell>
@@ -132,6 +151,7 @@ export default function AttendanceRecap({
                                     ))}
                                 </TableBody>
                             </Table>
+                            <TablePagination paginator={attendances} url={url} className="border-t" />
                         </div>
                     </>
                 )}

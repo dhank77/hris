@@ -18,12 +18,12 @@ test('employees only see their own attendance history and recap', function () {
 
     $this->get(route('attendance.history'))->assertInertia(fn (Assert $page) => $page
         ->component('attendance/history')
-        ->has('attendances', 1)
+        ->has('attendances.data', 1)
     );
 
     $this->get(route('attendance.recap'))->assertInertia(fn (Assert $page) => $page
         ->component('attendance/recap')
-        ->has('attendances', 1)
+        ->has('attendances.data', 1)
     );
 });
 
@@ -54,14 +54,14 @@ test('employees only see their own leave requests and admins see all', function 
 
     $this->get(route('leave-requests.index'))->assertInertia(fn (Assert $page) => $page
         ->component('leave-requests/index')
-        ->has('leaveRequests', 1)
+        ->has('leaveRequests.data', 1)
     );
 
     $this->actingAs($admin);
 
     $this->get(route('leave-requests.index'))->assertInertia(fn (Assert $page) => $page
         ->component('leave-requests/index')
-        ->has('leaveRequests', 2)
+        ->has('leaveRequests.data', 2)
     );
 });
 
@@ -92,14 +92,14 @@ test('employees only see their own cash advances and admins see all', function (
 
     $this->get(route('cash-advances.index'))->assertInertia(fn (Assert $page) => $page
         ->component('cash-advances/index')
-        ->has('cashAdvances', 1)
+        ->has('cashAdvances.data', 1)
     );
 
     $this->actingAs($admin);
 
     $this->get(route('cash-advances.index'))->assertInertia(fn (Assert $page) => $page
         ->component('cash-advances/index')
-        ->has('cashAdvances', 2)
+        ->has('cashAdvances.data', 2)
     );
 });
 

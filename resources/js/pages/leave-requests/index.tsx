@@ -2,6 +2,13 @@ import { Head, Link } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
+import {
+    SortableHead,
+    TablePagination,
+    TableSearch,
+    readSearch,
+    readSort,
+} from '@/components/table-controls';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -16,6 +23,7 @@ import {
     create as leaveCreate,
     show as leaveShow,
 } from '@/routes/leave-requests';
+import type { Paginator } from '@/components/table-controls';
 
 type LeaveRequest = {
     id: number;
@@ -43,8 +51,12 @@ const formatDate = (iso: string) =>
 export default function LeaveRequestsIndex({
     leaveRequests,
 }: {
-    leaveRequests: LeaveRequest[];
+    leaveRequests: Paginator<LeaveRequest>;
 }) {
+    const url = leaveIndex();
+    const { sort, dir } = readSort('created_at');
+    const search = readSearch();
+
     return (
         <>
             <Head title="Izin / Sakit / Cuti" />
@@ -61,24 +73,32 @@ export default function LeaveRequestsIndex({
                     }
                 />
 
-                {leaveRequests.length === 0 ? (
+                {leaveRequests.data.length === 0 ? (
                     <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                        Belum ada pengajuan. Pilih &quot;Buat pengajuan&quot; untuk memulai.
+                        {search
+                            ? `Tidak ada pengajuan yang cocok dengan pencarian "${search}".`
+                            : 'Belum ada pengajuan. Pilih "Buat pengajuan" untuk memulai.'}
                     </p>
                 ) : (
                     <div className="rounded-xl border bg-card">
+                        <TableSearch
+                            url={url}
+                            defaultValue={search}
+                            placeholder="Cari pegawai atau alasan..."
+                            className="p-3"
+                        />
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Pegawai</TableHead>
-                                    <TableHead>Jenis</TableHead>
-                                    <TableHead>Tanggal</TableHead>
-                                    <TableHead>Status</TableHead>
+                                    <SortableHead label="Pegawai" field="user" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Jenis" field="type" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Tanggal" field="start_date" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
                                     <TableHead className="text-right">Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {leaveRequests.map((lr) => (
+                                {leaveRequests.data.map((lr) => (
                                     <TableRow key={lr.id}>
                                         <TableCell className="font-medium">
                                             {lr.user?.name ?? '-'}
@@ -101,6 +121,7 @@ export default function LeaveRequestsIndex({
                                 ))}
                             </TableBody>
                         </Table>
+                        <TablePagination paginator={leaveRequests} url={url} className="border-t" />
                     </div>
                 )}
             </div>

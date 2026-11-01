@@ -1,7 +1,16 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import type { Paginator } from '@/components/table-controls';
 import { history, index as attendanceIndex } from '@/routes/attendance';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
+import {
+    SortableHead,
+    TablePagination,
+    TableSearch,
+    navigateTable,
+    readSearch,
+    readSort,
+} from '@/components/table-controls';
 import { Button } from '@/components/ui/button';
 import {
     Table,
@@ -41,11 +50,15 @@ export default function AttendanceHistory({
     attendances,
     period,
 }: {
-    attendances: Attendance[];
+    attendances: Paginator<Attendance>;
     period: string;
 }) {
+    const url = history();
+    const { sort, dir } = readSort('date');
+    const search = readSearch();
+
     const changePeriod = (p: string) => {
-        router.get(history.url(), { period: p }, { preserveState: true });
+        navigateTable(url, { period: p });
     };
 
     return (
@@ -56,30 +69,40 @@ export default function AttendanceHistory({
                     title="Riwayat kehadiran"
                     description="Catatan masuk dan pulang Anda."
                     actions={
-                        <div className="flex gap-1.5" role="group" aria-label="Periode">
-                            {periods.map((p) => (
-                                <Button
-                                    key={p.value}
-                                    variant={period === p.value ? 'default' : 'outline'}
-                                    size="sm"
-                                    aria-pressed={period === p.value}
-                                    onClick={() => changePeriod(p.value)}
-                                >
-                                    {p.label}
-                                </Button>
-                            ))}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <TableSearch
+                                url={url}
+                                defaultValue={search}
+                                placeholder="Cari pegawai..."
+                                className="sm:w-48"
+                            />
+                            <div className="flex gap-1.5" role="group" aria-label="Periode">
+                                {periods.map((p) => (
+                                    <Button
+                                        key={p.value}
+                                        variant={period === p.value ? 'default' : 'outline'}
+                                        size="sm"
+                                        aria-pressed={period === p.value}
+                                        onClick={() => changePeriod(p.value)}
+                                    >
+                                        {p.label}
+                                    </Button>
+                                ))}
+                            </div>
                         </div>
                     }
                 />
 
-                {attendances.length === 0 ? (
+                {attendances.data.length === 0 ? (
                     <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-                        Belum ada catatan kehadiran pada periode ini.
+                        {search
+                            ? `Tidak ada catatan kehadiran untuk pencarian "${search}".`
+                            : 'Belum ada catatan kehadiran pada periode ini.'}
                     </p>
                 ) : (
                     <>
                         <ul className="grid divide-y rounded-xl border bg-card md:hidden">
-                            {attendances.map((a) => (
+                            {attendances.data.map((a) => (
                                 <li key={a.id} className="grid gap-1.5 p-3">
                                     <div className="flex items-center justify-between gap-2">
                                         <span className="font-semibold">
@@ -100,19 +123,25 @@ export default function AttendanceHistory({
                             ))}
                         </ul>
                         <div className="hidden rounded-xl border bg-card md:block">
+                            <TableSearch
+                                url={url}
+                                defaultValue={search}
+                                placeholder="Cari pegawai..."
+                                className="p-3"
+                            />
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Pegawai</TableHead>
-                                        <TableHead>Tanggal</TableHead>
+                                        <SortableHead label="Pegawai" field="user" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead label="Tanggal" field="date" currentSort={sort} currentDir={dir} url={url} />
                                         <TableHead>Masuk</TableHead>
                                         <TableHead>Pulang</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="text-right">Terlambat (mnt)</TableHead>
+                                        <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead label="Terlambat (mnt)" field="late_minutes" currentSort={sort} currentDir={dir} url={url} className="text-right" />
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {attendances.map((a) => (
+                                    {attendances.data.map((a) => (
                                         <TableRow key={a.id}>
                                             <TableCell className="font-medium">{a.user?.name}</TableCell>
                                             <TableCell className="tabular">{a.date}</TableCell>
@@ -126,6 +155,7 @@ export default function AttendanceHistory({
                                     ))}
                                 </TableBody>
                             </Table>
+                            <TablePagination paginator={attendances} url={url} className="border-t" />
                         </div>
                     </>
                 )}

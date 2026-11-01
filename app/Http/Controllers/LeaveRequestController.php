@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasTableQuery;
 use App\Models\Attendance;
 use App\Models\LeaveRequest;
 use App\Models\User;
@@ -13,10 +14,12 @@ use Inertia\Response as InertiaResponse;
 
 class LeaveRequestController extends Controller
 {
+    use HasTableQuery;
+
     public function index(Request $request): InertiaResponse
     {
         $user = $request->user();
-        $query = LeaveRequest::with(['user', 'approver'])->orderByDesc('created_at');
+        $query = LeaveRequest::with(['user', 'approver']);
 
         if (! in_array($user->role, ['hr', 'admin', 'supervisor'])) {
             $query->where('user_id', $user->id);
@@ -25,8 +28,29 @@ class LeaveRequestController extends Controller
             $query->whereIn('user_id', $subIds->push($user->id));
         }
 
+        $table = $this->tableQuery(
+            $request,
+            ['type', 'status', 'start_date', 'created_at', 'user'],
+            defaultSort: 'created_at',
+        );
+
+        if ($table['search'] !== '') {
+            $search = $table['search'];
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', fn ($user) => $user->where('name', 'like', "%{$search}%"))
+                    ->orWhere('reason', 'like', "%{$search}%");
+            });
+        }
+
+        if ($table['sort'] === 'user') {
+            $query->orderBy(User::select('name')->whereColumn('users.id', 'leave_requests.user_id'), $table['dir']);
+        } else {
+            $query->orderBy($table['sort'], $table['dir']);
+        }
+
         return Inertia::render('leave-requests/index', [
-            'leaveRequests' => $query->get(),
+            'leaveRequests' => $query->paginate(15)->withQueryString(),
+            'filters' => $table,
         ]);
     }
 

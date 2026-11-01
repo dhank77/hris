@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Concerns\HasTableQuery;
 use App\Models\Attendance;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -12,6 +13,8 @@ use Inertia\Response as InertiaResponse;
 
 class AttendanceController extends Controller
 {
+    use HasTableQuery;
+
     public function index(Request $request): InertiaResponse
     {
         $user = $request->user();
@@ -116,7 +119,20 @@ class AttendanceController extends Controller
             $scopedUserIds = collect([$user->id]);
         }
 
-        $query = Attendance::with('user')->whereIn('user_id', $scopedUserIds)->orderByDesc('date');
+        $table = $this->tableQuery($request, ['date', 'status', 'late_minutes', 'user'], defaultSort: 'date');
+
+        $query = Attendance::with('user')->whereIn('user_id', $scopedUserIds);
+
+        if ($table['search'] !== '') {
+            $search = $table['search'];
+            $query->whereHas('user', fn ($user) => $user->where('name', 'like', "%{$search}%"));
+        }
+
+        if ($table['sort'] === 'user') {
+            $query->orderBy(User::select('name')->whereColumn('users.id', 'attendances.user_id'), $table['dir']);
+        } else {
+            $query->orderBy($table['sort'], $table['dir']);
+        }
 
         if ($period === 'weekly') {
             $query->whereBetween('date', [Carbon::now()->startOfWeek()->toDateString(), Carbon::now()->endOfWeek()->toDateString()]);
@@ -126,11 +142,10 @@ class AttendanceController extends Controller
             $query->where('date', Carbon::today()->toDateString());
         }
 
-        $attendances = $query->get();
-
         return Inertia::render('attendance/history', [
-            'attendances' => $attendances,
+            'attendances' => $query->paginate(15)->withQueryString(),
             'period' => $period,
+            'filters' => $table,
         ]);
     }
 
@@ -146,16 +161,28 @@ class AttendanceController extends Controller
         $start = $request->input('start', Carbon::now()->startOfMonth()->toDateString());
         $end = $request->input('end', Carbon::now()->endOfMonth()->toDateString());
 
-        $attendances = Attendance::whereIn('user_id', $users)
+        $table = $this->tableQuery($request, ['date', 'status', 'late_minutes', 'user'], defaultSort: 'date');
+
+        $query = Attendance::whereIn('user_id', $users)
             ->whereBetween('date', [$start, $end])
-            ->with('user')
-            ->orderByDesc('date')
-            ->get();
+            ->with('user');
+
+        if ($table['search'] !== '') {
+            $search = $table['search'];
+            $query->whereHas('user', fn ($user) => $user->where('name', 'like', "%{$search}%"));
+        }
+
+        if ($table['sort'] === 'user') {
+            $query->orderBy(User::select('name')->whereColumn('users.id', 'attendances.user_id'), $table['dir']);
+        } else {
+            $query->orderBy($table['sort'], $table['dir']);
+        }
 
         return Inertia::render('attendance/recap', [
-            'attendances' => $attendances,
+            'attendances' => $query->paginate(15)->withQueryString(),
             'start' => $start,
             'end' => $end,
+            'filters' => $table,
         ]);
     }
 }
