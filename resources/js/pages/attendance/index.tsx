@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Camera, Clock, LogIn, LogOut, MapPin } from 'lucide-react';
+import { Camera, Clock, LogIn, LogOut, MapPin, RotateCw } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import { store, index as attendanceIndex, history, recap as attendanceRecap } from '@/routes/attendance';
 import { Button } from '@/components/ui/button';
@@ -49,24 +49,62 @@ export default function AttendanceIndex({
         longitude: null as number | null,
     });
 
-    useEffect(() => {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) =>
-                    setGeo({
-                        lat: pos.coords.latitude,
-                        lng: pos.coords.longitude,
-                    }),
-                (err) => setGeoError(err.message),
-                { enableHighAccuracy: true },
-            );
-        } else {
-            setGeoError('Geolocation tidak didukung browser.');
+    const geoErrorMessage = (err: GeolocationPositionError): string => {
+        const isMac = /Mac/i.test(navigator.platform);
+        switch (err.code) {
+            case err.PERMISSION_DENIED:
+                return 'akses lokasi ditolak. Izinkan akses lokasi untuk situs ini di pengaturan browser, lalu coba lagi.';
+            case err.POSITION_UNAVAILABLE:
+                return isMac
+                    ? 'sumber lokasi tidak tersedia. Pastikan Location Services aktif dan browser Anda diizinkan mengambil lokasi (Setelan Sistem › Privasi & Keamanan › Location Services › centang Safari/Chrome Anda), lalu coba lagi.'
+                    : 'sumber lokasi tidak tersedia. Pastikan Location Services aktif, izinkan browser mengambil lokasi persis (di iPhone: Setelan › Privasi & Keamanan › Location Services › Safari Websites › While Using + Precise Location Aktif), lalu coba lagi.';
+            case err.TIMEOUT:
+                return 'waktu pengambilan lokasi habis. Coba lagi di area terbuka.';
+            default:
+                return err.message || 'lokasi tidak diketahui.';
         }
+    };
+
+    const requestGeo = (useFallback = false) => {
+        if (!navigator.geolocation) {
+            setGeoError('Geolocation tidak didukung browser.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (pos) =>
+                setGeo({
+                    lat: pos.coords.latitude,
+                    lng: pos.coords.longitude,
+                }),
+            (err) => {
+                // POSITION_UNAVAILABLE: coba sekali lagi tanpa high accuracy
+                if (err.code === err.POSITION_UNAVAILABLE && !useFallback) {
+                    requestGeo(true);
+                    return;
+                }
+                setGeoError(geoErrorMessage(err));
+            },
+            {
+                enableHighAccuracy: !useFallback,
+                timeout: 15000,
+                maximumAge: 60000,
+            },
+        );
+    };
+
+    useEffect(() => {
+        requestGeo();
         return () => {
             streamRef.current?.getTracks().forEach((t) => t.stop());
         };
     }, []);
+
+    // <video> baru ter-mount setelah cameraOn true; pasang stream saat itu
+    useEffect(() => {
+        if (cameraOn && videoRef.current && streamRef.current) {
+            videoRef.current.srcObject = streamRef.current;
+        }
+    }, [cameraOn]);
 
     const startCamera = async () => {
         try {
@@ -74,7 +112,6 @@ export default function AttendanceIndex({
                 video: { facingMode: 'user' },
             });
             streamRef.current = stream;
-            if (videoRef.current) videoRef.current.srcObject = stream;
             setCameraOn(true);
         } catch {
             alert('Tidak dapat mengakses kamera.');
@@ -220,8 +257,19 @@ export default function AttendanceIndex({
                                     </span>
                                 ) : geoError ? (
                                     <span className="text-destructive">
-                                        Lokasi gagal: {geoError}. Izinkan akses lokasi di
-                                        browser lalu muat ulang.
+                                        Lokasi gagal: {geoError}
+                                        <Button
+                                            type="button"
+                                            variant="link"
+                                            size="sm"
+                                            className="h-auto p-0 ps-1 align-baseline"
+                                            onClick={() => {
+                                                setGeo(null);
+                                                requestGeo();
+                                            }}
+                                        >
+                                            <RotateCw aria-hidden="true" /> Coba lagi
+                                        </Button>
                                     </span>
                                 ) : (
                                     <span>Mengambil lokasi...</span>
