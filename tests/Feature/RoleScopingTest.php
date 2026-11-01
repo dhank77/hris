@@ -4,8 +4,8 @@ use App\Models\Attendance;
 use App\Models\CashAdvance;
 use App\Models\LeaveRequest;
 use App\Models\User;
-use Inertia\Testing\AssertableInertia as Assert;
 use Illuminate\Support\Carbon;
+use Inertia\Testing\AssertableInertia as Assert;
 
 test('employees only see their own attendance history and recap', function () {
     $employee = User::factory()->create();
@@ -100,5 +100,18 @@ test('employees only see their own cash advances and admins see all', function (
     $this->get(route('cash-advances.index'))->assertInertia(fn (Assert $page) => $page
         ->component('cash-advances/index')
         ->has('cashAdvances', 2)
+    );
+});
+
+test('only admins receive the all-employee dashboard overview', function () {
+    $employee = User::factory()->create();
+    $admin = User::factory()->create(['role' => 'admin']);
+
+    $this->actingAs($employee)->get(route('dashboard'))->assertInertia(fn (Assert $page) => $page
+        ->where('overview', null)
+    );
+
+    $this->actingAs($admin)->get(route('dashboard'))->assertInertia(fn (Assert $page) => $page
+        ->where('overview.totalEmployees', 2)
     );
 });

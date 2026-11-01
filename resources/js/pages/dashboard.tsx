@@ -10,7 +10,17 @@ import { index as attendanceIndex } from '@/routes/attendance';
 import { index as cashIndex, show as cashShow } from '@/routes/cash-advances';
 import { create as leaveCreate, index as leaveIndex } from '@/routes/leave-requests';
 
+type Overview = {
+    totalEmployees: number;
+    presentToday: number;
+    lateToday: number;
+    onLeaveToday: number;
+    pendingCashAdvanceCount: number;
+    outstandingCashAdvance: number;
+};
+
 type Props = {
+    overview: Overview | null;
     today: {
         date: string;
         clock_in_at: string | null;
@@ -71,6 +81,7 @@ function kasbonStops(active: NonNullable<Props['kasbon']['active']>): ApprovalSt
 }
 
 export default function Dashboard({
+    overview,
     today,
     monthRecap,
     pendingLeaveCount,
@@ -92,6 +103,29 @@ export default function Dashboard({
                         year: 'numeric',
                     })}
                 />
+
+                {overview && (
+                    <section aria-labelledby="overview-heading" className="grid gap-3">
+                        <h2 id="overview-heading" className="text-lg font-semibold">
+                            Statistik seluruh pegawai
+                        </h2>
+                        <dl className="tabular grid grid-cols-2 gap-4 rounded-xl border bg-card p-5 md:grid-cols-3">
+                            {[
+                                ['Total pegawai', overview.totalEmployees],
+                                ['Hadir hari ini', overview.presentToday],
+                                ['Terlambat hari ini', overview.lateToday],
+                                ['Izin/cuti hari ini', overview.onLeaveToday],
+                                ['Kasbon menunggu', overview.pendingCashAdvanceCount],
+                                ['Sisa cicilan kasbon', rupiah(overview.outstandingCashAdvance)],
+                            ].map(([label, value]) => (
+                                <div key={label}>
+                                    <dt className="text-sm text-muted-foreground">{label}</dt>
+                                    <dd className="text-2xl font-bold">{value}</dd>
+                                </div>
+                            ))}
+                        </dl>
+                    </section>
+                )}
 
                 <section
                     aria-labelledby="today-heading"

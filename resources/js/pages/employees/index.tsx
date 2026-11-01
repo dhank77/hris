@@ -1,6 +1,19 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import InputError from '@/components/input-error';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Table,
     TableBody,
@@ -9,8 +22,14 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Users, Plus, Pencil, Eye } from 'lucide-react';
-import { index as empIndex, show as empShow, edit as empEdit, create as empCreate } from '@/routes/employees';
+import { Users, Plus, Pencil, Eye, Upload, FileSpreadsheet, FileText } from 'lucide-react';
+import {
+    show as empShow,
+    edit as empEdit,
+    create as empCreate,
+    importMethod as empImport,
+} from '@/routes/employees';
+import { excel as exportExcel, pdf as exportPdf } from '@/routes/employees/export';
 
 type Employee = {
     id: number;
@@ -42,6 +61,23 @@ export default function EmployeesIndex({
     const page = usePage();
     const auth = (page.props as { auth?: { user?: { role?: string } } }).auth;
     const isAdmin = auth?.user?.role === 'admin';
+    const [importOpen, setImportOpen] = useState(false);
+
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
+        file: null as File | null,
+    });
+
+    const submitImport = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(empImport.url(), {
+            forceFormData: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                reset();
+                setImportOpen(false);
+            },
+        });
+    };
 
     return (
         <>
@@ -53,11 +89,80 @@ export default function EmployeesIndex({
                     actions={
                         <>
                             {isAdmin && (
-                                <Button asChild size="sm">
-                                    <Link href={empCreate.url()}>
-                                        <Plus aria-hidden="true" /> Tambah pegawai
-                                    </Link>
-                                </Button>
+                                <>
+                                    <Dialog
+                                        open={importOpen}
+                                        onOpenChange={(open) => {
+                                            setImportOpen(open);
+                                            if (!open) {
+                                                reset();
+                                                clearErrors();
+                                            }
+                                        }}
+                                    >
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline" size="sm">
+                                                <Upload aria-hidden="true" /> Import XLS
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>Import Data Pegawai</DialogTitle>
+                                                <DialogDescription>
+                                                    Unggah file Excel (.xls, .xlsx, .csv) dengan header kolom:{' '}
+                                                    <strong>Nama, Email, Password, Peran, Departemen, Jabatan, Atasan, Limit Kasbon</strong>.
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <form onSubmit={submitImport} className="grid gap-4">
+                                                <div className="grid gap-2">
+                                                    <Label htmlFor="import-file">File Excel</Label>
+                                                    <Input
+                                                        id="import-file"
+                                                        type="file"
+                                                        accept=".xls,.xlsx,.csv"
+                                                        onChange={(e) =>
+                                                            setData('file', e.target.files?.[0] ?? null)
+                                                        }
+                                                    />
+                                                    <InputError message={errors.file} />
+                                                </div>
+                                                <DialogFooter>
+                                                    <Button
+                                                        type="button"
+                                                        variant="outline"
+                                                        onClick={() => setImportOpen(false)}
+                                                    >
+                                                        Batal
+                                                    </Button>
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={processing || !data.file}
+                                                    >
+                                                        {processing ? 'Mengimpor...' : 'Import'}
+                                                    </Button>
+                                                </DialogFooter>
+                                            </form>
+                                        </DialogContent>
+                                    </Dialog>
+
+                                    <Button asChild variant="outline" size="sm">
+                                        <a href={exportExcel.url()}>
+                                            <FileSpreadsheet aria-hidden="true" /> Export XLS
+                                        </a>
+                                    </Button>
+
+                                    <Button asChild variant="outline" size="sm">
+                                        <a href={exportPdf.url()}>
+                                            <FileText aria-hidden="true" /> Export PDF
+                                        </a>
+                                    </Button>
+
+                                    <Button asChild size="sm">
+                                        <Link href={empCreate.url()}>
+                                            <Plus aria-hidden="true" /> Tambah pegawai
+                                        </Link>
+                                    </Button>
+                                </>
                             )}
                             <Button variant="outline" size="sm">
                                 <Users aria-hidden="true" /> {employees.length} pegawai

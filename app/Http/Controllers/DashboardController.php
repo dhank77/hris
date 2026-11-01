@@ -51,7 +51,24 @@ class DashboardController extends Controller
                 ->first()
             : null;
 
+        $overview = null;
+        if (in_array($user->role, ['hr', 'admin'])) {
+            $overview = [
+                'totalEmployees' => User::count(),
+                'presentToday' => Attendance::whereDate('date', $today)
+                    ->whereIn('status', ['present', 'late'])
+                    ->count(),
+                'lateToday' => Attendance::whereDate('date', $today)->where('status', 'late')->count(),
+                'onLeaveToday' => Attendance::whereDate('date', $today)
+                    ->whereIn('status', ['leave', 'sick', 'permission'])
+                    ->count(),
+                'pendingCashAdvanceCount' => CashAdvance::whereIn('status', ['pending', 'approved_level1'])->count(),
+                'outstandingCashAdvance' => (float) CashAdvanceInstallment::where('paid', false)->sum('amount'),
+            ];
+        }
+
         return Inertia::render('dashboard', [
+            'overview' => $overview,
             'today' => [
                 'date' => $today->toDateString(),
                 'clock_in_at' => $todayAttendance?->clock_in_at?->toIso8601String(),

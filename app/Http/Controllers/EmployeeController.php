@@ -2,12 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EmployeesExport;
+use App\Imports\EmployeesImport;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Maatwebsite\Excel\Excel as BaseExcel;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Validators\ValidationException as ExcelValidationException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EmployeeController extends Controller
 {
@@ -153,5 +162,57 @@ class EmployeeController extends Controller
         $employee->save();
 
         return redirect()->route('employees.show', $employee);
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $request->validate([
+            'file' => ['required', 'file', 'mimes:xls,xlsx,csv', 'max:10240'],
+        ]);
+
+        try {
+            Excel::import(new EmployeesImport, $request->file('file'));
+        } catch (ExcelValidationException $e) {
+            $messages = collect($e->failures())
+                ->flatMap(fn ($failure) => array_map(
+                    fn (string $error) => "Baris {$failure->row()}: {$error}",
+                    $failure->errors()
+                ))
+                ->all();
+
+            throw ValidationException::withMessages([
+                'file' => $messages,
+            ]);
+        }
+
+        return redirect()->route('employees.index');
+    }
+
+    public function exportExcel(Request $request): BinaryFileResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        return Excel::download(new EmployeesExport, 'data-pegawai.xls', BaseExcel::XLS);
+    }
+
+    public function exportPdf(Request $request): Response
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $employees = User::with('supervisor')->orderBy('name')->get();
+
+        $pdf = Pdf::loadView('employees.pdf', [
+            'employees' => $employees,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('data-pegawai.pdf');
     }
 }
