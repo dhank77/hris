@@ -41,4 +41,9 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL').'/auth/google/callback'),
     ],
 
+    'qris' => [
+        // HMAC-SHA256 secret used to verify signed payment webhooks
+        'webhook_secret' => env('QRIS_WEBHOOK_SECRET'),
+    ],
+
 ];

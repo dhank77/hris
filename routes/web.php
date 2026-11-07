@@ -6,6 +6,7 @@ use App\Http\Controllers\CashAdvanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\Webhook\QrisPaymentWebhookController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -57,5 +58,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('cash-advances/installments/{installment}/qris', [CashAdvanceController::class, 'qris'])->name('cash-advances.installments.qris');
     Route::post('cash-advances/deduct-payroll', [CashAdvanceController::class, 'deductPayroll'])->name('cash-advances.deduct-payroll');
 });
+
+// QRIS payment webhook (signed, outside auth)
+Route::post('webhooks/qris', QrisPaymentWebhookController::class)->name('webhooks.qris');
 
 require __DIR__.'/settings.php';

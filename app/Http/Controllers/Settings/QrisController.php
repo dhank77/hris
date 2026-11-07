@@ -56,15 +56,11 @@ class QrisController extends Controller
         ]);
 
         if ($request->hasFile('qris_image')) {
-            $old = Setting::get('qris_static_image');
-            if ($old) {
-                Storage::disk('public')->delete($old);
-            }
+            $path = $request->file('qris_image')->store('qris', 'public');
 
-            Setting::put(
-                'qris_static_image',
-                $request->file('qris_image')->store('qris', 'public'),
-            );
+            if ($path !== false) {
+                Setting::put('qris_static_image', $path);
+            }
         }
 
         if ($request->filled('qris_payload')) {

@@ -276,14 +276,7 @@ class CashAdvanceController extends Controller
         if (! in_array($user->role, ['finance', 'hr', 'admin'])) {
             abort(403);
         }
-        $installment->update(['paid' => true, 'paid_at' => Carbon::now()]);
-
-        // if all paid, mark advance completed and reduce kasbon_used
-        $advance = $installment->cashAdvance;
-        if ($advance->installments()->where('paid', false)->count() === 0) {
-            $advance->update(['status' => 'completed']);
-            $advance->user->decrement('kasbon_used', $advance->amount);
-        }
+        $installment->markAsPaid();
 
         return back();
     }
@@ -300,12 +293,7 @@ class CashAdvanceController extends Controller
             ->where('due_date', '<=', $today)
             ->get();
         foreach ($due as $inst) {
-            $inst->update(['paid' => true, 'paid_at' => Carbon::now()]);
-            $advance = $inst->cashAdvance;
-            if ($advance->installments()->where('paid', false)->count() === 0) {
-                $advance->update(['status' => 'completed']);
-                $advance->user->decrement('kasbon_used', $advance->amount);
-            }
+            $inst->markAsPaid();
         }
 
         return back();

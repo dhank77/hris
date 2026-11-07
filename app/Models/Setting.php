@@ -6,14 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
-    /** @var array<int, string> */
     protected $primaryKey = 'key';
 
     public $incrementing = false;
 
     protected $keyType = 'string';
 
-    /** @var array<int, string> */
+    /** @var list<string> */
     protected $fillable = ['key', 'value'];
 
     /** @var array<string, mixed> */

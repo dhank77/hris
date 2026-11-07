@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 class CashAdvanceInstallment extends Model
 {
@@ -37,5 +38,20 @@ class CashAdvanceInstallment extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(CashAdvancePayment::class, 'cash_advance_installment_id');
+    }
+
+    /**
+     * Mark this installment paid, complete the advance when it is the last
+     * unpaid one, and release the employee's kasbon limit.
+     */
+    public function markAsPaid(): void
+    {
+        $this->update(['paid' => true, 'paid_at' => Carbon::now()]);
+
+        $advance = $this->cashAdvance;
+        if ($advance->installments()->where('paid', false)->doesntExist()) {
+            $advance->update(['status' => 'completed']);
+            $advance->user->decrement('kasbon_used', $advance->amount);
+        }
     }
 }
