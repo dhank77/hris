@@ -1,10 +1,14 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import QrisController from '@/actions/App/Http/Controllers/Settings/QrisController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { decodeQrImage } from '@/lib/decode-qr';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
+type ScanStatus = 'idle' | 'scanning' | 'ok' | 'fail';
 
 export default function QrisSettings({
     qrisPayload,
@@ -17,6 +21,38 @@ export default function QrisSettings({
     merchantName: string | null;
     payloadValid: boolean;
 }) {
+    const [scanStatus, setScanStatus] = useState<ScanStatus>('idle');
+
+    const handleImageSelected = async (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+        const file = event.target.files?.[0];
+        if (!file) {
+            return;
+        }
+
+        setScanStatus('scanning');
+
+        try {
+            const decoded = (await decodeQrImage(file))?.trim() ?? '';
+            const looksLikeQris =
+                decoded.startsWith('000201') && decoded.includes('6304');
+
+            const textarea = document.getElementById(
+                'qris_payload',
+            ) as HTMLTextAreaElement | null;
+
+            if (textarea && looksLikeQris) {
+                textarea.value = decoded;
+                textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                setScanStatus('ok');
+            } else {
+                setScanStatus('fail');
+            }
+        } catch {
+            setScanStatus('fail');
+        }
+    };
     return (
         <>
             <Head title="Pengaturan QRIS" />
@@ -53,6 +89,14 @@ export default function QrisSettings({
                     </div>
                 )}
 
+                {!qrisPayload && (
+                    <p className="text-sm text-amber-600 dark:text-amber-400">
+                        String QRIS belum diisi — QRIS dinamis belum bisa
+                        dibuat. Unggah gambar QRIS di bawah, string akan terisi
+                        otomatis.
+                    </p>
+                )}
+
                 {qrisImage && (
                     <div className="flex items-center gap-4 rounded-xl border bg-card p-4">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -84,11 +128,31 @@ export default function QrisSettings({
                                     type="file"
                                     name="qris_image"
                                     accept="image/png,image/jpeg,image/webp"
+                                    onChange={handleImageSelected}
                                 />
                                 <InputError
                                     className="mt-2"
                                     message={errors.qris_image}
                                 />
+                                {scanStatus === 'scanning' && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Membaca string QR dari gambar…
+                                    </p>
+                                )}
+                                {scanStatus === 'ok' && (
+                                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                                        ✓ String QRIS otomatis terisi dari
+                                        gambar — silakan periksa lalu simpan.
+                                    </p>
+                                )}
+                                {scanStatus === 'fail' && (
+                                    <p className="text-xs text-destructive">
+                                        QR tidak terbaca dari gambar. Ambil
+                                        ulang dengan gambar yang lebih
+                                        besar/tajam, atau tempel string hasil
+                                        scan secara manual di kolom bawah.
+                                    </p>
+                                )}
                             </div>
 
                             <div className="grid gap-2">
@@ -108,10 +172,10 @@ export default function QrisSettings({
                                     message={errors.qris_payload}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    Scan QRIS statis dengan aplikasi pembayaran
-                                    lalu salin stringnya (diawali 000201,
-                                    diakhiri 6304). String ini penting agar QRIS
-                                    dinamis dengan nominal bisa dibuat.
+                                    Diawali 000201, diakhiri 6304. String ini
+                                    yang dipakai membuat QRIS dinamis dengan
+                                    nominal — dan terisi otomatis saat gambar
+                                    diunggah.
                                 </p>
                             </div>
 

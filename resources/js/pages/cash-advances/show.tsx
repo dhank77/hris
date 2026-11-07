@@ -407,9 +407,10 @@ export default function CashAdvancesShow({
 
                         <p className="text-xs text-muted-foreground">
                             Kode unik bersifat tetap untuk cicilan ini dan sudah
-                            termasuk dalam nominal, sehingga mutasi pembayaran mudah
-                            dicocokkan dan bisa dikonfirmasi per kode. Setelah membayar,
-                            finance/admin akan memverifikasi dan menandai cicilan lunas.
+                            termasuk dalam nominal, sehingga mutasi pembayaran
+                            mudah dicocokkan dan bisa dikonfirmasi per kode.
+                            Setelah membayar, finance/admin akan memverifikasi
+                            dan menandai cicilan lunas.
                         </p>
                     </DialogContent>
                 </Dialog>
