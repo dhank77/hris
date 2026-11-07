@@ -48,7 +48,9 @@ export default function DeleteUser() {
                             Yakin ingin menghapus akun Anda?
                         </DialogTitle>
                         <DialogDescription>
-                            Setelah akun dihapus, seluruh data Anda ikut terhapus permanen. Masukkan kata sandi untuk mengonfirmasi penghapusan akun.
+                            Setelah akun dihapus, seluruh data Anda ikut
+                            terhapus permanen. Masukkan kata sandi untuk
+                            mengonfirmasi penghapusan akun.
                         </DialogDescription>
 
                         <Form
@@ -68,7 +70,7 @@ export default function DeleteUser() {
                                             className="sr-only"
                                         >
                                             Kata sandi
- </Label>
+                                        </Label>
 
                                         <PasswordInput
                                             id="password"
@@ -103,7 +105,7 @@ export default function DeleteUser() {
                                                 data-test="confirm-delete-user-button"
                                             >
                                                 Hapus akun
- </button>
+                                            </button>
                                         </Button>
                                     </DialogFooter>
                                 </>

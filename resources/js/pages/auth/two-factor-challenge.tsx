@@ -32,8 +32,7 @@ export default function TwoFactorChallenge() {
 
         return {
             title: 'Kode autentikasi',
-            description:
-                'Masukkan kode dari aplikasi autentikator Anda.',
+            description: 'Masukkan kode dari aplikasi autentikator Anda.',
             toggleText: 'masuk dengan kode pemulihan',
         };
     }, [showRecoveryInput]);
@@ -106,7 +105,8 @@ export default function TwoFactorChallenge() {
 
                             <Button
                                 type="submit"
-                                size="lg" className="w-full"
+                                size="lg"
+                                className="w-full"
                                 disabled={processing}
                             >
                                 Lanjutkan
@@ -116,7 +116,7 @@ export default function TwoFactorChallenge() {
                                 <span>atau </span>
                                 <button
                                     type="button"
-                                    className="cursor-pointer text-foreground underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! "
+                                    className="cursor-pointer text-foreground underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!"
                                     onClick={() =>
                                         toggleRecoveryMode(clearErrors)
                                     }

@@ -1,11 +1,12 @@
 ---
 version: 1
-slug: "resources-js-pages-dashboard-tsx"
-primary_target: "resources/js/pages/dashboard.tsx"
+slug: 'resources-js-pages-dashboard-tsx'
+primary_target: 'resources/js/pages/dashboard.tsx'
 related_targets: []
 ---
 
 ## Direction contract
+
 THESIS: Satu jalur untuk semua urusan kerja: HRIS sebagai peta jalur komuter, menolak dashboard abu-abu generik.
 OWN-WORLD: Sidebar navy pekat, biru jalur sebagai primary, kuning sinyal sebagai aksen, hijau/kuning/merah untuk status, Barlow tebal, angka tabular.
 STORY: Karyawan melihat status hari ini dan pengajuan mereka dalam hitungan detik lalu bertindak.

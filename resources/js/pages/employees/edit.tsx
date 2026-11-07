@@ -36,7 +36,9 @@ export default function EmployeesEdit({
         role: employee.role,
         department: employee.department ?? '',
         position: employee.position ?? '',
-        supervisor_id: employee.supervisor_id ? String(employee.supervisor_id) : '',
+        supervisor_id: employee.supervisor_id
+            ? String(employee.supervisor_id)
+            : '',
         kasbon_limit: String(employee.kasbon_limit ?? 0),
     });
 
@@ -88,10 +90,7 @@ export default function EmployeesEdit({
                             type="file"
                             accept="image/*"
                             onChange={(e) =>
-                                setData(
-                                    'avatar',
-                                    e.target.files?.[0] ?? null,
-                                )
+                                setData('avatar', e.target.files?.[0] ?? null)
                             }
                         />
                         <InputError message={errors.avatar} />
@@ -142,10 +141,7 @@ export default function EmployeesEdit({
                             type="password"
                             value={data.password_confirmation}
                             onChange={(e) =>
-                                setData(
-                                    'password_confirmation',
-                                    e.target.value,
-                                )
+                                setData('password_confirmation', e.target.value)
                             }
                         />
                     </div>

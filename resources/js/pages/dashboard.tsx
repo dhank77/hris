@@ -8,7 +8,10 @@ import { Button } from '@/components/ui/button';
 import { dashboard } from '@/routes';
 import { index as attendanceIndex } from '@/routes/attendance';
 import { index as cashIndex, show as cashShow } from '@/routes/cash-advances';
-import { create as leaveCreate, index as leaveIndex } from '@/routes/leave-requests';
+import {
+    create as leaveCreate,
+    index as leaveIndex,
+} from '@/routes/leave-requests';
 
 type Overview = {
     totalEmployees: number;
@@ -27,7 +30,12 @@ type Props = {
         clock_out_at: string | null;
         status: string | null;
     };
-    monthRecap: { present: number; late: number; absent: number; leave: number };
+    monthRecap: {
+        present: number;
+        late: number;
+        absent: number;
+        leave: number;
+    };
     pendingLeaveCount: number;
     kasbon: {
         limit: number;
@@ -62,14 +70,19 @@ const formatTime = (iso: string | null) =>
 const formatDate = (iso: string, options: Intl.DateTimeFormatOptions) =>
     new Date(iso).toLocaleDateString('id-ID', options);
 
-function kasbonStops(active: NonNullable<Props['kasbon']['active']>): ApprovalStop[] {
+function kasbonStops(
+    active: NonNullable<Props['kasbon']['active']>,
+): ApprovalStop[] {
     const rejected = active.status === 'rejected';
     const reached = {
         level1: !!active.approved_level1_at,
         finance: !!active.approved_finance_at,
         disbursed: !!active.disbursed_at,
     };
-    const stage = (done: boolean, previousDone: boolean): ApprovalStop['state'] =>
+    const stage = (
+        done: boolean,
+        previousDone: boolean,
+    ): ApprovalStop['state'] =>
         done ? 'done' : previousDone && !rejected ? 'current' : 'upcoming';
 
     return [
@@ -105,8 +118,14 @@ export default function Dashboard({
                 />
 
                 {overview && (
-                    <section aria-labelledby="overview-heading" className="grid gap-3">
-                        <h2 id="overview-heading" className="text-lg font-semibold">
+                    <section
+                        aria-labelledby="overview-heading"
+                        className="grid gap-3"
+                    >
+                        <h2
+                            id="overview-heading"
+                            className="text-lg font-semibold"
+                        >
                             Statistik seluruh pegawai
                         </h2>
                         <dl className="tabular grid grid-cols-2 gap-4 rounded-xl border bg-card p-5 md:grid-cols-3">
@@ -115,12 +134,22 @@ export default function Dashboard({
                                 ['Hadir hari ini', overview.presentToday],
                                 ['Terlambat hari ini', overview.lateToday],
                                 ['Izin/cuti hari ini', overview.onLeaveToday],
-                                ['Kasbon menunggu', overview.pendingCashAdvanceCount],
-                                ['Sisa cicilan kasbon', rupiah(overview.outstandingCashAdvance)],
+                                [
+                                    'Kasbon menunggu',
+                                    overview.pendingCashAdvanceCount,
+                                ],
+                                [
+                                    'Sisa cicilan kasbon',
+                                    rupiah(overview.outstandingCashAdvance),
+                                ],
                             ].map(([label, value]) => (
                                 <div key={label}>
-                                    <dt className="text-sm text-muted-foreground">{label}</dt>
-                                    <dd className="text-2xl font-bold">{value}</dd>
+                                    <dt className="text-sm text-muted-foreground">
+                                        {label}
+                                    </dt>
+                                    <dd className="text-2xl font-bold">
+                                        {value}
+                                    </dd>
                                 </div>
                             ))}
                         </dl>
@@ -175,8 +204,14 @@ export default function Dashboard({
                 </section>
 
                 <div className="grid gap-6 md:grid-cols-2">
-                    <section aria-labelledby="recap-heading" className="grid gap-3">
-                        <h2 id="recap-heading" className="text-lg font-semibold">
+                    <section
+                        aria-labelledby="recap-heading"
+                        className="grid gap-3"
+                    >
+                        <h2
+                            id="recap-heading"
+                            className="text-lg font-semibold"
+                        >
                             Bulan ini
                         </h2>
                         <dl className="tabular grid grid-cols-4 divide-x divide-border rounded-xl border bg-card">
@@ -186,8 +221,13 @@ export default function Dashboard({
                                 ['Alpa', monthRecap.absent],
                                 ['Izin', monthRecap.leave],
                             ].map(([label, value]) => (
-                                <div key={label} className="grid gap-1 px-3 py-4 text-center">
-                                    <dd className="text-2xl font-bold">{value}</dd>
+                                <div
+                                    key={label}
+                                    className="grid gap-1 px-3 py-4 text-center"
+                                >
+                                    <dd className="text-2xl font-bold">
+                                        {value}
+                                    </dd>
                                     <dt className="text-xs font-semibold text-muted-foreground">
                                         {label}
                                     </dt>
@@ -196,8 +236,14 @@ export default function Dashboard({
                         </dl>
                     </section>
 
-                    <section aria-labelledby="leave-heading" className="grid gap-3">
-                        <h2 id="leave-heading" className="text-lg font-semibold">
+                    <section
+                        aria-labelledby="leave-heading"
+                        className="grid gap-3"
+                    >
+                        <h2
+                            id="leave-heading"
+                            className="text-lg font-semibold"
+                        >
                             Izin/Cuti
                         </h2>
                         <div className="flex items-center justify-between gap-4 rounded-xl border bg-card p-4">
@@ -228,9 +274,15 @@ export default function Dashboard({
                     </section>
                 </div>
 
-                <section aria-labelledby="kasbon-heading" className="grid gap-3">
+                <section
+                    aria-labelledby="kasbon-heading"
+                    className="grid gap-3"
+                >
                     <div className="flex items-center justify-between gap-3">
-                        <h2 id="kasbon-heading" className="text-lg font-semibold">
+                        <h2
+                            id="kasbon-heading"
+                            className="text-lg font-semibold"
+                        >
                             Kasbon
                         </h2>
                         <Button asChild variant="ghost" size="sm">
@@ -270,14 +322,20 @@ export default function Dashboard({
                             <div className="grid gap-4">
                                 <div className="flex items-center justify-between gap-3">
                                     <Link
-                                        href={cashShow({ cashAdvance: kasbon.active.id })}
+                                        href={cashShow({
+                                            cashAdvance: kasbon.active.id,
+                                        })}
                                         className="tabular text-sm font-semibold hover:underline"
                                     >
                                         Kasbon {rupiah(kasbon.active.amount)}
                                     </Link>
-                                    <StatusBadge status={kasbon.active.status} />
+                                    <StatusBadge
+                                        status={kasbon.active.status}
+                                    />
                                 </div>
-                                <ApprovalLine stops={kasbonStops(kasbon.active)} />
+                                <ApprovalLine
+                                    stops={kasbonStops(kasbon.active)}
+                                />
                             </div>
                         ) : (
                             <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">

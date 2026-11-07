@@ -54,7 +54,9 @@ export default function ManageTwoFactor(props: Props) {
             {twoFactorEnabled ? (
                 <div className="flex flex-col items-start justify-start space-y-4">
                     <p className="text-sm text-muted-foreground">
-                        Anda akan diminta memasukkan PIN acak saat masuk. PIN diambil dari aplikasi autentikator (TOTP) di ponsel Anda.
+                        Anda akan diminta memasukkan PIN acak saat masuk. PIN
+                        diambil dari aplikasi autentikator (TOTP) di ponsel
+                        Anda.
                     </p>
 
                     <div className="relative inline">
@@ -80,7 +82,9 @@ export default function ManageTwoFactor(props: Props) {
             ) : (
                 <div className="flex flex-col items-start justify-start space-y-4">
                     <p className="text-sm text-muted-foreground">
-                        Jika diaktifkan, Anda akan diminta memasukkan PIN saat masuk. PIN diambil dari aplikasi autentikator (TOTP) di ponsel Anda.
+                        Jika diaktifkan, Anda akan diminta memasukkan PIN saat
+                        masuk. PIN diambil dari aplikasi autentikator (TOTP) di
+                        ponsel Anda.
                     </p>
 
                     <div>

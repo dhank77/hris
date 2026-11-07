@@ -90,11 +90,37 @@ export default function LeaveRequestsIndex({
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <SortableHead label="Pegawai" field="user" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Jenis" field="type" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Tanggal" field="start_date" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
-                                    <TableHead className="text-right">Aksi</TableHead>
+                                    <SortableHead
+                                        label="Pegawai"
+                                        field="user"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Jenis"
+                                        field="type"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Tanggal"
+                                        field="start_date"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Status"
+                                        field="status"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <TableHead className="text-right">
+                                        Aksi
+                                    </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -103,16 +129,27 @@ export default function LeaveRequestsIndex({
                                         <TableCell className="font-medium">
                                             {lr.user?.name ?? '-'}
                                         </TableCell>
-                                        <TableCell>{typeLabel[lr.type] ?? lr.type}</TableCell>
+                                        <TableCell>
+                                            {typeLabel[lr.type] ?? lr.type}
+                                        </TableCell>
                                         <TableCell className="tabular whitespace-nowrap">
-                                            {formatDate(lr.start_date)} – {formatDate(lr.end_date)}
+                                            {formatDate(lr.start_date)} –{' '}
+                                            {formatDate(lr.end_date)}
                                         </TableCell>
                                         <TableCell>
                                             <StatusBadge status={lr.status} />
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            <Button asChild size="sm" variant="outline">
-                                                <Link href={leaveShow.url({ leaveRequest: lr.id })}>
+                                            <Button
+                                                asChild
+                                                size="sm"
+                                                variant="outline"
+                                            >
+                                                <Link
+                                                    href={leaveShow.url({
+                                                        leaveRequest: lr.id,
+                                                    })}
+                                                >
                                                     Detail
                                                 </Link>
                                             </Button>
@@ -121,7 +158,11 @@ export default function LeaveRequestsIndex({
                                 ))}
                             </TableBody>
                         </Table>
-                        <TablePagination paginator={leaveRequests} url={url} className="border-t" />
+                        <TablePagination
+                            paginator={leaveRequests}
+                            url={url}
+                            className="border-t"
+                        />
                     </div>
                 )}
             </div>

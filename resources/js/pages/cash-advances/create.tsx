@@ -27,8 +27,7 @@ export default function CashAdvancesCreate() {
 
     const amount = Number(data.amount);
     const tenor = Number(data.tenor_months);
-    const estimate =
-        amount > 0 && tenor > 0 ? Math.ceil(amount / tenor) : null;
+    const estimate = amount > 0 && tenor > 0 ? Math.ceil(amount / tenor) : null;
 
     return (
         <>

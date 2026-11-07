@@ -20,7 +20,7 @@ export function ApprovalLine({
     return (
         <ol
             className={cn(
-                'grid gap-0 sm:grid-flow-col sm:auto-cols-fr',
+                'grid gap-0 sm:auto-cols-fr sm:grid-flow-col',
                 className,
             )}
         >

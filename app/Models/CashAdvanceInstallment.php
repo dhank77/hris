@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CashAdvanceInstallment extends Model
 {
@@ -30,5 +31,11 @@ class CashAdvanceInstallment extends Model
     public function cashAdvance(): BelongsTo
     {
         return $this->belongsTo(CashAdvance::class);
+    }
+
+    /** @return HasMany<CashAdvancePayment, $this> */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(CashAdvancePayment::class, 'cash_advance_installment_id');
     }
 }

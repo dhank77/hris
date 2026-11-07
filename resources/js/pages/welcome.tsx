@@ -117,9 +117,9 @@ export default function Welcome() {
                                 aplikasi.
                             </h1>
                             <p className="mt-5 max-w-prose text-lg text-pretty text-sidebar-foreground/80">
-                                Urusan kepegawaian harian jadi jelas: dari
-                                catat kehadiran sampai pengajuan disetujui,
-                                semuanya terlacak di satu jalur.
+                                Urusan kepegawaian harian jadi jelas: dari catat
+                                kehadiran sampai pengajuan disetujui, semuanya
+                                terlacak di satu jalur.
                             </p>
                             <div className="mt-8 flex flex-wrap gap-3">
                                 {auth.user ? (
@@ -130,10 +130,7 @@ export default function Welcome() {
                                         Buka dasbor
                                     </Link>
                                 ) : (
-                                    <Link
-                                        href={login()}
-                                        className={primaryCta}
-                                    >
+                                    <Link href={login()} className={primaryCta}>
                                         Masuk ke sistem
                                     </Link>
                                 )}

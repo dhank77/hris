@@ -1,9 +1,17 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, useHttp, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import { ApprovalLine } from '@/components/approval-line';
 import type { ApprovalStop } from '@/components/approval-line';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {
     Table,
     TableBody,
@@ -20,7 +28,10 @@ import {
     reject as caReject,
     disburse,
 } from '@/routes/cash-advances';
-import { pay } from '@/routes/cash-advances/installments';
+import {
+    qris as installmentQris,
+    pay,
+} from '@/routes/cash-advances/installments';
 
 type Installment = {
     id: number;
@@ -95,14 +106,36 @@ export default function CashAdvancesShow({
 }: {
     cashAdvance: CashAdvance;
 }) {
-    const doPay = (id: number) => router.post(pay.url({ installment: id }));
+    type QrisResponse = {
+        code: number;
+        base_amount: number;
+        amount: number;
+        image: string | null;
+        static_image: string | null;
+        merchant: string | null;
+    };
 
-    const role = (
-        usePage().props as { auth?: { user?: { role?: string } } }
-    ).auth?.user?.role;
+    const http = useHttp<Record<string, never>>({});
+    const [paying, setPaying] = useState<Installment | null>(null);
+    const [qris, setQris] = useState<QrisResponse | null>(null);
+
+    const doBayar = (ins: Installment) => {
+        setQris(null);
+        setPaying(ins);
+        http.post(installmentQris.url({ installment: ins.id }), {
+            onSuccess: (data) => setQris(data as unknown as QrisResponse),
+            onHttpException: () => setPaying(null),
+        });
+    };
+
+    const role = (usePage().props as { auth?: { user?: { role?: string } } })
+        .auth?.user?.role;
     const canLevel1 = ['supervisor', 'hr', 'admin'].includes(role ?? '');
     const canFinance = ['finance', 'admin'].includes(role ?? '');
-    const canReject = ['supervisor', 'hr', 'finance', 'admin'].includes(role ?? '');
+    const canMarkPaid = ['finance', 'hr', 'admin'].includes(role ?? '');
+    const canReject = ['supervisor', 'hr', 'finance', 'admin'].includes(
+        role ?? '',
+    );
     const id = cashAdvance.id;
     const doReject = () => {
         const reason = prompt('Alasan penolakan?') || '';
@@ -112,7 +145,8 @@ export default function CashAdvancesShow({
     };
     const showActions =
         (cashAdvance.status === 'pending' && (canLevel1 || canReject)) ||
-        (cashAdvance.status === 'approved_level1' && (canFinance || canReject)) ||
+        (cashAdvance.status === 'approved_level1' &&
+            (canFinance || canReject)) ||
         (cashAdvance.status === 'approved_finance' && canFinance);
 
     const facts = [
@@ -140,35 +174,49 @@ export default function CashAdvancesShow({
                         {cashAdvance.status === 'pending' && canLevel1 && (
                             <Button
                                 onClick={() =>
-                                    router.post(approveLevel1.url({ cashAdvance: id }))
+                                    router.post(
+                                        approveLevel1.url({ cashAdvance: id }),
+                                    )
                                 }
                             >
                                 Setujui (atasan)
                             </Button>
                         )}
-                        {cashAdvance.status === 'approved_level1' && canFinance && (
-                            <Button
-                                onClick={() =>
-                                    router.post(approveFinance.url({ cashAdvance: id }))
-                                }
-                            >
-                                Setujui (finance)
-                            </Button>
-                        )}
-                        {cashAdvance.status === 'approved_finance' && canFinance && (
-                            <Button
-                                onClick={() =>
-                                    router.post(disburse.url({ cashAdvance: id }))
-                                }
-                            >
-                                Cairkan
-                            </Button>
-                        )}
-                        {cashAdvance.status !== 'approved_finance' && canReject && (
-                            <Button variant="destructive" onClick={doReject}>
-                                Tolak
-                            </Button>
-                        )}
+                        {cashAdvance.status === 'approved_level1' &&
+                            canFinance && (
+                                <Button
+                                    onClick={() =>
+                                        router.post(
+                                            approveFinance.url({
+                                                cashAdvance: id,
+                                            }),
+                                        )
+                                    }
+                                >
+                                    Setujui (finance)
+                                </Button>
+                            )}
+                        {cashAdvance.status === 'approved_finance' &&
+                            canFinance && (
+                                <Button
+                                    onClick={() =>
+                                        router.post(
+                                            disburse.url({ cashAdvance: id }),
+                                        )
+                                    }
+                                >
+                                    Cairkan
+                                </Button>
+                            )}
+                        {cashAdvance.status !== 'approved_finance' &&
+                            canReject && (
+                                <Button
+                                    variant="destructive"
+                                    onClick={doReject}
+                                >
+                                    Tolak
+                                </Button>
+                            )}
                     </div>
                 )}
 
@@ -182,7 +230,10 @@ export default function CashAdvancesShow({
                     <ApprovalLine stops={kasbonStops(cashAdvance)} />
                 </section>
 
-                <section aria-labelledby="detail-heading" className="grid gap-3">
+                <section
+                    aria-labelledby="detail-heading"
+                    className="grid gap-3"
+                >
                     <h2 id="detail-heading" className="text-lg font-semibold">
                         Rincian
                     </h2>
@@ -199,7 +250,9 @@ export default function CashAdvancesShow({
                             <dt className="text-sm text-muted-foreground">
                                 Alasan
                             </dt>
-                            <dd className="max-w-prose">{cashAdvance.reason}</dd>
+                            <dd className="max-w-prose">
+                                {cashAdvance.reason}
+                            </dd>
                         </div>
                     </dl>
                 </section>
@@ -230,7 +283,9 @@ export default function CashAdvancesShow({
                             <TableBody>
                                 {cashAdvance.installments.map((ins) => (
                                     <TableRow key={ins.id}>
-                                        <TableCell>{ins.period_number}</TableCell>
+                                        <TableCell>
+                                            {ins.period_number}
+                                        </TableCell>
                                         <TableCell>
                                             {formatDate(ins.due_date) ??
                                                 ins.due_date}
@@ -246,17 +301,32 @@ export default function CashAdvancesShow({
                                             />
                                         </TableCell>
                                         <TableCell className="text-right">
-                                            {!ins.paid && (
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    onClick={() =>
-                                                        doPay(ins.id)
-                                                    }
-                                                >
-                                                    Tandai lunas
-                                                </Button>
-                                            )}
+                                            {!ins.paid &&
+                                                (canMarkPaid ? (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() =>
+                                                            router.post(
+                                                                pay.url({
+                                                                    installment:
+                                                                        ins.id,
+                                                                }),
+                                                            )
+                                                        }
+                                                    >
+                                                        Tandai lunas
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            doBayar(ins)
+                                                        }
+                                                    >
+                                                        Bayar
+                                                    </Button>
+                                                ))}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -264,6 +334,85 @@ export default function CashAdvancesShow({
                         </Table>
                     </div>
                 </section>
+
+                <Dialog
+                    open={paying !== null}
+                    onOpenChange={(open) => {
+                        if (!open) {
+                            setPaying(null);
+                            setQris(null);
+                        }
+                    }}
+                >
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle>Bayar via QRIS</DialogTitle>
+                            <DialogDescription>
+                                Cicilan periode {paying?.period_number} — jatuh
+                                tempo{' '}
+                                {formatDate(paying?.due_date) ??
+                                    paying?.due_date}
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        {http.processing ? (
+                            <p className="py-8 text-center text-sm text-muted-foreground">
+                                Membuat kode QRIS…
+                            </p>
+                        ) : qris?.image ? (
+                            <div className="flex flex-col items-center gap-3">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={qris.image}
+                                    alt="QRIS dinamis"
+                                    width={260}
+                                    height={260}
+                                />
+                                <p className="tabular text-2xl font-bold">
+                                    {rupiah(qris.amount)}
+                                </p>
+                                <p className="rounded-md bg-muted px-2 py-1 text-xs font-semibold">
+                                    Kode unik: {qris.code}
+                                </p>
+                                {qris.merchant && (
+                                    <p className="text-xs text-muted-foreground">
+                                        {qris.merchant}
+                                    </p>
+                                )}
+                            </div>
+                        ) : qris?.static_image ? (
+                            <div className="flex flex-col items-center gap-3">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src={qris.static_image}
+                                    alt="QRIS statis"
+                                    width={260}
+                                    height={260}
+                                />
+                                <p className="tabular text-2xl font-bold">
+                                    {rupiah(qris.amount)}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                    QRIS statis — pastikan membayar tepat{' '}
+                                    <strong>{rupiah(qris.amount)}</strong>{' '}
+                                    (termasuk kode unik).
+                                </p>
+                            </div>
+                        ) : (
+                            <p className="py-8 text-center text-sm text-muted-foreground">
+                                QRIS belum diatur. Hubungi admin untuk
+                                mengunggah QRIS statis di menu Pengaturan.
+                            </p>
+                        )}
+
+                        <p className="text-xs text-muted-foreground">
+                            Kode unik bersifat tetap untuk cicilan ini dan sudah
+                            termasuk dalam nominal, sehingga mutasi pembayaran mudah
+                            dicocokkan dan bisa dikonfirmasi per kode. Setelah membayar,
+                            finance/admin akan memverifikasi dan menandai cicilan lunas.
+                        </p>
+                    </DialogContent>
+                </Dialog>
             </div>
         </>
     );

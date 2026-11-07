@@ -52,10 +52,7 @@ export default function EmployeesCreate({
                             type="file"
                             accept="image/*"
                             onChange={(e) =>
-                                setData(
-                                    'avatar',
-                                    e.target.files?.[0] ?? null,
-                                )
+                                setData('avatar', e.target.files?.[0] ?? null)
                             }
                         />
                         <InputError message={errors.avatar} />
@@ -104,10 +101,7 @@ export default function EmployeesCreate({
                             type="password"
                             value={data.password_confirmation}
                             onChange={(e) =>
-                                setData(
-                                    'password_confirmation',
-                                    e.target.value,
-                                )
+                                setData('password_confirmation', e.target.value)
                             }
                         />
                     </div>

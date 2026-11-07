@@ -70,7 +70,8 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                 <DialogContent>
                     <DialogTitle>Hapus passkey</DialogTitle>
                     <DialogDescription>
-                        Yakin ingin menghapus passkey "{passkey.name}"? Passkey ini tidak bisa lagi dipakai untuk masuk.
+                        Yakin ingin menghapus passkey "{passkey.name}"? Passkey
+                        ini tidak bisa lagi dipakai untuk masuk.
                     </DialogDescription>
                     <DialogFooter className="gap-2">
                         <DialogClose asChild>

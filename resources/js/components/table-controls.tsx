@@ -141,15 +141,19 @@ export function TablePagination<T>({
     return (
         <div
             className={cn(
-                'flex flex-wrap items-center justify-between gap-3 py-3 text-sm px-3',
+                'flex flex-wrap items-center justify-between gap-3 px-3 py-3 text-sm',
                 className,
             )}
         >
             <p className="text-muted-foreground">
-                Halaman <span className="font-medium text-foreground">{paginator.current_page}</span> dari{' '}
-                {paginator.last_page} ·{' '}
+                Halaman{' '}
+                <span className="font-medium text-foreground">
+                    {paginator.current_page}
+                </span>{' '}
+                dari {paginator.last_page} ·{' '}
                 <span className="tabular">
-                    {paginator.from ?? 0}–{paginator.to ?? 0} / {paginator.total} data
+                    {paginator.from ?? 0}–{paginator.to ?? 0} /{' '}
+                    {paginator.total} data
                 </span>
             </p>
             <div className="flex gap-2">
@@ -210,7 +214,9 @@ export function SortableHead({
                         ? 'text-foreground'
                         : 'text-muted-foreground hover:text-foreground',
                 )}
-                onClick={() => navigateTable(url, { sort: field, dir: nextDir })}
+                onClick={() =>
+                    navigateTable(url, { sort: field, dir: nextDir })
+                }
                 aria-label={`Urutkan berdasarkan ${label}`}
             >
                 {label}

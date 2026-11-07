@@ -87,7 +87,10 @@ export default function AttendanceRecap({
                             onChange={(ev) => setE(ev.target.value)}
                         />
                     </div>
-                    <Button onClick={apply} className="col-span-2 sm:col-span-1">
+                    <Button
+                        onClick={apply}
+                        className="col-span-2 sm:col-span-1"
+                    >
                         Terapkan
                     </Button>
                     <TableSearch
@@ -110,14 +113,18 @@ export default function AttendanceRecap({
                             {attendances.data.map((a) => (
                                 <li key={a.id} className="grid gap-1.5 p-3">
                                     <div className="flex items-center justify-between gap-2">
-                                        <span className="font-semibold">{a.user?.name}</span>
+                                        <span className="font-semibold">
+                                            {a.user?.name}
+                                        </span>
                                         <StatusBadge status={a.status} />
                                     </div>
                                     <p className="tabular text-sm text-muted-foreground">
-                                        {a.date} · {formatTime(a.clock_in_at)} – {formatTime(a.clock_out_at)}
+                                        {a.date} · {formatTime(a.clock_in_at)} –{' '}
+                                        {formatTime(a.clock_out_at)}
                                         {a.late_minutes > 0 && (
                                             <span className="text-destructive">
-                                                {' '}· terlambat {a.late_minutes} mnt
+                                                {' '}
+                                                · terlambat {a.late_minutes} mnt
                                             </span>
                                         )}
                                     </p>
@@ -128,30 +135,71 @@ export default function AttendanceRecap({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <SortableHead label="Tanggal" field="date" currentSort={sort} currentDir={dir} url={url} />
-                                        <SortableHead label="Karyawan" field="user" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead
+                                            label="Tanggal"
+                                            field="date"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                        />
+                                        <SortableHead
+                                            label="Karyawan"
+                                            field="user"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                        />
                                         <TableHead>Masuk</TableHead>
                                         <TableHead>Pulang</TableHead>
-                                        <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
-                                        <SortableHead label="Terlambat (mnt)" field="late_minutes" currentSort={sort} currentDir={dir} url={url} className="text-right" />
+                                        <SortableHead
+                                            label="Status"
+                                            field="status"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                        />
+                                        <SortableHead
+                                            label="Terlambat (mnt)"
+                                            field="late_minutes"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                            className="text-right"
+                                        />
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {attendances.data.map((a) => (
                                         <TableRow key={a.id}>
-                                            <TableCell className="tabular">{a.date}</TableCell>
-                                            <TableCell className="font-medium">{a.user?.name}</TableCell>
-                                            <TableCell className="tabular">{formatTime(a.clock_in_at)}</TableCell>
-                                            <TableCell className="tabular">{formatTime(a.clock_out_at)}</TableCell>
-                                            <TableCell>
-                                                <StatusBadge status={a.status} />
+                                            <TableCell className="tabular">
+                                                {a.date}
                                             </TableCell>
-                                            <TableCell className="tabular text-right">{a.late_minutes}</TableCell>
+                                            <TableCell className="font-medium">
+                                                {a.user?.name}
+                                            </TableCell>
+                                            <TableCell className="tabular">
+                                                {formatTime(a.clock_in_at)}
+                                            </TableCell>
+                                            <TableCell className="tabular">
+                                                {formatTime(a.clock_out_at)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <StatusBadge
+                                                    status={a.status}
+                                                />
+                                            </TableCell>
+                                            <TableCell className="tabular text-right">
+                                                {a.late_minutes}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
-                            <TablePagination paginator={attendances} url={url} className="border-t" />
+                            <TablePagination
+                                paginator={attendances}
+                                url={url}
+                                className="border-t"
+                            />
                         </div>
                     </>
                 )}

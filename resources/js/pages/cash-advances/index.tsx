@@ -80,7 +80,11 @@ export default function CashAdvancesIndex({
                     description="Daftar pengajuan kasbon. Buka detail untuk persetujuan dan cicilan."
                     actions={
                         <>
-                            <Button onClick={doDeduct} variant="outline" size="sm">
+                            <Button
+                                onClick={doDeduct}
+                                variant="outline"
+                                size="sm"
+                            >
                                 Potong gaji otomatis
                             </Button>
                             <Button asChild size="sm">
@@ -94,8 +98,12 @@ export default function CashAdvancesIndex({
                     <dl className="tabular grid grid-cols-2 gap-x-6 gap-y-4 rounded-xl border bg-card p-4 md:grid-cols-4">
                         {summary.map((item) => (
                             <div key={item.label}>
-                                <dt className="text-sm text-muted-foreground">{item.label}</dt>
-                                <dd className="text-lg font-bold">{rupiah(item.value)}</dd>
+                                <dt className="text-sm text-muted-foreground">
+                                    {item.label}
+                                </dt>
+                                <dd className="text-lg font-bold">
+                                    {rupiah(item.value)}
+                                </dd>
                             </div>
                         ))}
                     </dl>
@@ -123,19 +131,47 @@ export default function CashAdvancesIndex({
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <SortableHead label="Pegawai" field="user" currentSort={sort} currentDir={dir} url={url} />
-                                        <SortableHead label="Nominal" field="amount" currentSort={sort} currentDir={dir} url={url} className="text-right" />
-                                        <SortableHead label="Tenor" field="tenor_months" currentSort={sort} currentDir={dir} url={url} />
+                                        <SortableHead
+                                            label="Pegawai"
+                                            field="user"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                        />
+                                        <SortableHead
+                                            label="Nominal"
+                                            field="amount"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                            className="text-right"
+                                        />
+                                        <SortableHead
+                                            label="Tenor"
+                                            field="tenor_months"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                        />
                                         <TableHead>Cicilan lunas</TableHead>
-                                        <SortableHead label="Status" field="status" currentSort={sort} currentDir={dir} url={url} />
-                                        <TableHead className="text-right">Aksi</TableHead>
+                                        <SortableHead
+                                            label="Status"
+                                            field="status"
+                                            currentSort={sort}
+                                            currentDir={dir}
+                                            url={url}
+                                        />
+                                        <TableHead className="text-right">
+                                            Aksi
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {cashAdvances.data.map((ca) => (
                                         <TableRow key={ca.id}>
                                             <TableCell className="font-medium">
-                                                {ca.user?.name ?? `Kasbon #${ca.id}`}
+                                                {ca.user?.name ??
+                                                    `Kasbon #${ca.id}`}
                                             </TableCell>
                                             <TableCell className="tabular text-right">
                                                 {rupiah(ca.amount)}
@@ -144,15 +180,29 @@ export default function CashAdvancesIndex({
                                                 {ca.tenor_months} bln
                                             </TableCell>
                                             <TableCell className="tabular">
-                                                {ca.installments.filter((i) => i.paid).length}/
-                                                {ca.installments.length}
+                                                {
+                                                    ca.installments.filter(
+                                                        (i) => i.paid,
+                                                    ).length
+                                                }
+                                                /{ca.installments.length}
                                             </TableCell>
                                             <TableCell>
-                                                <StatusBadge status={ca.status} />
+                                                <StatusBadge
+                                                    status={ca.status}
+                                                />
                                             </TableCell>
                                             <TableCell className="text-right">
-                                                <Button asChild size="sm" variant="outline">
-                                                    <Link href={caShow.url({ cashAdvance: ca.id })}>
+                                                <Button
+                                                    asChild
+                                                    size="sm"
+                                                    variant="outline"
+                                                >
+                                                    <Link
+                                                        href={caShow.url({
+                                                            cashAdvance: ca.id,
+                                                        })}
+                                                    >
                                                         Detail
                                                     </Link>
                                                 </Button>
@@ -161,7 +211,11 @@ export default function CashAdvancesIndex({
                                     ))}
                                 </TableBody>
                             </Table>
-                            <TablePagination paginator={cashAdvances} url={url} className="border-t" />
+                            <TablePagination
+                                paginator={cashAdvances}
+                                url={url}
+                                className="border-t"
+                            />
                         </div>
                     )}
                 </section>

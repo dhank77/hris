@@ -40,7 +40,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                             <div className="my-6 flex items-center justify-start">
                                 <Button
-                                    size="lg" className="w-full"
+                                    size="lg"
+                                    className="w-full"
                                     disabled={processing}
                                     data-test="email-password-reset-link-button"
                                 >
@@ -65,5 +66,6 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
 ForgotPassword.layout = {
     title: 'Lupa kata sandi',
-    description: 'Masukkan email Anda untuk menerima tautan atur ulang kata sandi',
+    description:
+        'Masukkan email Anda untuk menerima tautan atur ulang kata sandi',
 };

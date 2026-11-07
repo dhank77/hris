@@ -1,154 +1,172 @@
 {
-  "schemaVersion": 2,
-  "generatedAt": "2026-10-31T22:24:45+08:00",
-  "title": "Design System: HRIS Jalur Komuter",
-  "extensions": {
-    "colorMeta": {
-      "primary": {
-        "role": "primary",
-        "displayName": "Biru Jalur Komuter",
-        "canonical": "oklch(0.5 0.17 258)",
-        "tonalRamp": [
-          "oklch(0.2 0.08 258)",
-          "oklch(0.3 0.12 258)",
-          "oklch(0.4 0.15 258)",
-          "oklch(0.5 0.17 258)",
-          "oklch(0.6 0.16 258)",
-          "oklch(0.7 0.14 258)",
-          "oklch(0.85 0.08 258)",
-          "oklch(0.95 0.03 258)"
+    "schemaVersion": 2,
+    "generatedAt": "2026-10-31T22:24:45+08:00",
+    "title": "Design System: HRIS Jalur Komuter",
+    "extensions": {
+        "colorMeta": {
+            "primary": {
+                "role": "primary",
+                "displayName": "Biru Jalur Komuter",
+                "canonical": "oklch(0.5 0.17 258)",
+                "tonalRamp": [
+                    "oklch(0.2 0.08 258)",
+                    "oklch(0.3 0.12 258)",
+                    "oklch(0.4 0.15 258)",
+                    "oklch(0.5 0.17 258)",
+                    "oklch(0.6 0.16 258)",
+                    "oklch(0.7 0.14 258)",
+                    "oklch(0.85 0.08 258)",
+                    "oklch(0.95 0.03 258)"
+                ]
+            },
+            "sidebar-primary": {
+                "role": "secondary",
+                "displayName": "Kuning Sinyal Transit",
+                "canonical": "oklch(0.82 0.16 85)",
+                "tonalRamp": [
+                    "oklch(0.25 0.06 70)",
+                    "oklch(0.35 0.09 75)",
+                    "oklch(0.5 0.12 80)",
+                    "oklch(0.65 0.14 82)",
+                    "oklch(0.82 0.16 85)",
+                    "oklch(0.88 0.13 87)",
+                    "oklch(0.93 0.08 90)",
+                    "oklch(0.97 0.04 90)"
+                ]
+            },
+            "sidebar": {
+                "role": "neutral",
+                "displayName": "Navy Pekat Shell",
+                "canonical": "oklch(0.24 0.06 258)",
+                "tonalRamp": [
+                    "oklch(0.12 0.03 258)",
+                    "oklch(0.18 0.04 258)",
+                    "oklch(0.24 0.06 258)",
+                    "oklch(0.35 0.07 258)",
+                    "oklch(0.5 0.06 258)",
+                    "oklch(0.7 0.04 258)",
+                    "oklch(0.88 0.02 258)",
+                    "oklch(0.96 0.01 258)"
+                ]
+            },
+            "success": {
+                "role": "neutral",
+                "displayName": "Hijau Jalur Aman",
+                "canonical": "oklch(0.52 0.14 152)",
+                "tonalRamp": [
+                    "oklch(0.2 0.06 152)",
+                    "oklch(0.35 0.1 152)",
+                    "oklch(0.52 0.14 152)",
+                    "oklch(0.65 0.15 152)",
+                    "oklch(0.78 0.12 152)",
+                    "oklch(0.88 0.08 152)",
+                    "oklch(0.95 0.045 152)",
+                    "oklch(0.98 0.02 152)"
+                ]
+            }
+        },
+        "typographyMeta": {
+            "display": {
+                "displayName": "Display (Barlow)",
+                "purpose": "Hero headline pada welcome dan auth."
+            },
+            "headline": {
+                "displayName": "Headline (Barlow)",
+                "purpose": "Judul utama halaman (PageHeader)."
+            },
+            "title": {
+                "displayName": "Title (Barlow)",
+                "purpose": "Judul modul atau seksi kartu."
+            },
+            "body": {
+                "displayName": "Body (Barlow)",
+                "purpose": "Teks paragraf dan formulir."
+            },
+            "label": {
+                "displayName": "Label (Barlow)",
+                "purpose": "Status badge, metadata, dan header tabel."
+            }
+        },
+        "shadows": [],
+        "motion": [
+            {
+                "name": "ease-out-standard",
+                "value": "cubic-bezier(0, 0, 0.2, 1)",
+                "purpose": "Transisi interaksi tombol dan dialog."
+            }
+        ],
+        "breakpoints": [
+            { "name": "sm", "value": "640px" },
+            { "name": "md", "value": "768px" },
+            { "name": "lg", "value": "1024px" }
         ]
-      },
-      "sidebar-primary": {
-        "role": "secondary",
-        "displayName": "Kuning Sinyal Transit",
-        "canonical": "oklch(0.82 0.16 85)",
-        "tonalRamp": [
-          "oklch(0.25 0.06 70)",
-          "oklch(0.35 0.09 75)",
-          "oklch(0.5 0.12 80)",
-          "oklch(0.65 0.14 82)",
-          "oklch(0.82 0.16 85)",
-          "oklch(0.88 0.13 87)",
-          "oklch(0.93 0.08 90)",
-          "oklch(0.97 0.04 90)"
-        ]
-      },
-      "sidebar": {
-        "role": "neutral",
-        "displayName": "Navy Pekat Shell",
-        "canonical": "oklch(0.24 0.06 258)",
-        "tonalRamp": [
-          "oklch(0.12 0.03 258)",
-          "oklch(0.18 0.04 258)",
-          "oklch(0.24 0.06 258)",
-          "oklch(0.35 0.07 258)",
-          "oklch(0.5 0.06 258)",
-          "oklch(0.7 0.04 258)",
-          "oklch(0.88 0.02 258)",
-          "oklch(0.96 0.01 258)"
-        ]
-      },
-      "success": {
-        "role": "neutral",
-        "displayName": "Hijau Jalur Aman",
-        "canonical": "oklch(0.52 0.14 152)",
-        "tonalRamp": [
-          "oklch(0.2 0.06 152)",
-          "oklch(0.35 0.1 152)",
-          "oklch(0.52 0.14 152)",
-          "oklch(0.65 0.15 152)",
-          "oklch(0.78 0.12 152)",
-          "oklch(0.88 0.08 152)",
-          "oklch(0.95 0.045 152)",
-          "oklch(0.98 0.02 152)"
-        ]
-      }
     },
-    "typographyMeta": {
-      "display": { "displayName": "Display (Barlow)", "purpose": "Hero headline pada welcome dan auth." },
-      "headline": { "displayName": "Headline (Barlow)", "purpose": "Judul utama halaman (PageHeader)." },
-      "title": { "displayName": "Title (Barlow)", "purpose": "Judul modul atau seksi kartu." },
-      "body": { "displayName": "Body (Barlow)", "purpose": "Teks paragraf dan formulir." },
-      "label": { "displayName": "Label (Barlow)", "purpose": "Status badge, metadata, dan header tabel." }
-    },
-    "shadows": [],
-    "motion": [
-      { "name": "ease-out-standard", "value": "cubic-bezier(0, 0, 0.2, 1)", "purpose": "Transisi interaksi tombol dan dialog." }
+    "components": [
+        {
+            "name": "Tombol Primer",
+            "kind": "button",
+            "refersTo": "button-primary",
+            "description": "Tombol aksi utama pada formulir dan konfirmasi dialog.",
+            "html": "<button class=\"ds-btn-primary\">Simpan Pengajuan</button>",
+            "css": ".ds-btn-primary { background: oklch(0.5 0.17 258); color: oklch(0.99 0.005 250); padding: 0.625rem 1.25rem; font-family: Barlow, sans-serif; font-weight: 600; font-size: 0.875rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-primary:hover { background: oklch(0.45 0.17 258); }"
+        },
+        {
+            "name": "Tombol Aksen Transit",
+            "kind": "button",
+            "refersTo": "button-accent",
+            "description": "Tombol sorotan untuk aksi paling mendesak (misal Absen Masuk di dashboard).",
+            "html": "<button class=\"ds-btn-accent\">Absen Masuk</button>",
+            "css": ".ds-btn-accent { background: oklch(0.82 0.16 85); color: oklch(0.24 0.06 258); padding: 0.75rem 1.5rem; font-family: Barlow, sans-serif; font-weight: 700; font-size: 1rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: opacity 0.15s ease; } .ds-btn-accent:hover { opacity: 0.92; }"
+        },
+        {
+            "name": "Status Badge",
+            "kind": "chip",
+            "refersTo": "badge-status",
+            "description": "Indikator pill untuk status pengajuan, absensi, atau kasbon.",
+            "html": "<span class=\"ds-badge-status\"><span class=\"ds-badge-dot\"></span>Disetujui</span>",
+            "css": ".ds-badge-status { display: inline-flex; align-items: center; gap: 0.375rem; background: oklch(0.95 0.045 152); color: oklch(0.52 0.14 152); padding: 0.125rem 0.625rem; border-radius: 9999px; font-family: Barlow, sans-serif; font-size: 0.75rem; font-weight: 600; } .ds-badge-dot { width: 0.375rem; height: 0.375rem; border-radius: 9999px; background: currentColor; }"
+        },
+        {
+            "name": "Kartu Kontainer",
+            "kind": "card",
+            "refersTo": "card-standard",
+            "description": "Kontainer dasar flat dengan border 1px tanpa bayangan.",
+            "html": "<div class=\"ds-card\"><h3>Ringkasan</h3><p>Informasi status dan rincian kerja.</p></div>",
+            "css": ".ds-card { background: oklch(1 0 0); border: 1px solid oklch(0.9 0.012 255); border-radius: 0.75rem; padding: 1.25rem; font-family: Barlow, sans-serif; color: oklch(0.22 0.04 258); }"
+        }
     ],
-    "breakpoints": [
-      { "name": "sm", "value": "640px" },
-      { "name": "md", "value": "768px" },
-      { "name": "lg", "value": "1024px" }
-    ]
-  },
-  "components": [
-    {
-      "name": "Tombol Primer",
-      "kind": "button",
-      "refersTo": "button-primary",
-      "description": "Tombol aksi utama pada formulir dan konfirmasi dialog.",
-      "html": "<button class=\"ds-btn-primary\">Simpan Pengajuan</button>",
-      "css": ".ds-btn-primary { background: oklch(0.5 0.17 258); color: oklch(0.99 0.005 250); padding: 0.625rem 1.25rem; font-family: Barlow, sans-serif; font-weight: 600; font-size: 0.875rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: background-color 0.15s ease; } .ds-btn-primary:hover { background: oklch(0.45 0.17 258); }"
-    },
-    {
-      "name": "Tombol Aksen Transit",
-      "kind": "button",
-      "refersTo": "button-accent",
-      "description": "Tombol sorotan untuk aksi paling mendesak (misal Absen Masuk di dashboard).",
-      "html": "<button class=\"ds-btn-accent\">Absen Masuk</button>",
-      "css": ".ds-btn-accent { background: oklch(0.82 0.16 85); color: oklch(0.24 0.06 258); padding: 0.75rem 1.5rem; font-family: Barlow, sans-serif; font-weight: 700; font-size: 1rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: opacity 0.15s ease; } .ds-btn-accent:hover { opacity: 0.92; }"
-    },
-    {
-      "name": "Status Badge",
-      "kind": "chip",
-      "refersTo": "badge-status",
-      "description": "Indikator pill untuk status pengajuan, absensi, atau kasbon.",
-      "html": "<span class=\"ds-badge-status\"><span class=\"ds-badge-dot\"></span>Disetujui</span>",
-      "css": ".ds-badge-status { display: inline-flex; align-items: center; gap: 0.375rem; background: oklch(0.95 0.045 152); color: oklch(0.52 0.14 152); padding: 0.125rem 0.625rem; border-radius: 9999px; font-family: Barlow, sans-serif; font-size: 0.75rem; font-weight: 600; } .ds-badge-dot { width: 0.375rem; height: 0.375rem; border-radius: 9999px; background: currentColor; }"
-    },
-    {
-      "name": "Kartu Kontainer",
-      "kind": "card",
-      "refersTo": "card-standard",
-      "description": "Kontainer dasar flat dengan border 1px tanpa bayangan.",
-      "html": "<div class=\"ds-card\"><h3>Ringkasan</h3><p>Informasi status dan rincian kerja.</p></div>",
-      "css": ".ds-card { background: oklch(1 0 0); border: 1px solid oklch(0.9 0.012 255); border-radius: 0.75rem; padding: 1.25rem; font-family: Barlow, sans-serif; color: oklch(0.22 0.04 258); }"
+    "narrative": {
+        "northStar": "Peta Rambu Komuter yang Tegas dan Efisien",
+        "overview": "Sistem desain HRIS Jalur Komuter dirancang untuk operasional harian yang cepat dan tanpa hambatan. Karyawan membuka aplikasi dari perangkat ponsel di perjalanan atau komputer kantor untuk menyelesaikan tugas inti dalam hitungan detik. Struktur visualnya mengambil disiplin dari sistem navigasi dan peta stasiun transit—kontras tinggi, informasi padat dan terbaca seketika, dengan navigasi yang langsung menuju tujuan tanpa dekorasi artifisial.",
+        "keyCharacteristics": [
+            "Operate Mode: Setiap elemen dirancang untuk pemindaian instan dan penyelesaian tugas cepat.",
+            "Elevation Berbasis Border: Tanpa drop-shadow buram, hierarki dibangun melalui kontras bidang dan 1px border.",
+            "Rambu Status Berwarna: Penanda status visual semantik konsisten.",
+            "Mobile-First dengan Bottom Rail: Navigasi bawah ramah jembol di ponsel."
+        ],
+        "rules": [
+            {
+                "name": "The Single Track Rule",
+                "body": "Warna aksen kuning sinyal hanya digunakan untuk satu tindakan utama paling penting per layar dan status berjalan; tidak disebar acak.",
+                "section": "colors"
+            },
+            {
+                "name": "The Tabular Discipline Rule",
+                "body": "Semua data waktu (jam:menit), tanggal, nominal mata uang (Rp), dan kuantitas numerik wajib menggunakan kelas .tabular.",
+                "section": "typography"
+            }
+        ],
+        "dos": [
+            "Gunakan bahasa Indonesia yang baku, ramah, dan ringkas pada seluruh teks UI.",
+            "Gunakan ApprovalLine untuk setiap alur verifikasi atau persetujuan berjenjang.",
+            "Pastikan target sentuh tombol aksi utama minimal 48px di ponsel.",
+            "Format seluruh nominal uang dengan format lokal IDR."
+        ],
+        "donts": [
+            "Jangan menambahkan bayangan blur dekoratif (box-shadow) atau teks gradien.",
+            "Jangan menaruh label kicker/eyebrow kecil di atas judul utama.",
+            "Jangan menumpuk kartu di dalam kartu (nested cards).",
+            "Jangan menggunakan ikon di luar Lucide Icons."
+        ]
     }
-  ],
-  "narrative": {
-    "northStar": "Peta Rambu Komuter yang Tegas dan Efisien",
-    "overview": "Sistem desain HRIS Jalur Komuter dirancang untuk operasional harian yang cepat dan tanpa hambatan. Karyawan membuka aplikasi dari perangkat ponsel di perjalanan atau komputer kantor untuk menyelesaikan tugas inti dalam hitungan detik. Struktur visualnya mengambil disiplin dari sistem navigasi dan peta stasiun transit—kontras tinggi, informasi padat dan terbaca seketika, dengan navigasi yang langsung menuju tujuan tanpa dekorasi artifisial.",
-    "keyCharacteristics": [
-      "Operate Mode: Setiap elemen dirancang untuk pemindaian instan dan penyelesaian tugas cepat.",
-      "Elevation Berbasis Border: Tanpa drop-shadow buram, hierarki dibangun melalui kontras bidang dan 1px border.",
-      "Rambu Status Berwarna: Penanda status visual semantik konsisten.",
-      "Mobile-First dengan Bottom Rail: Navigasi bawah ramah jembol di ponsel."
-    ],
-    "rules": [
-      {
-        "name": "The Single Track Rule",
-        "body": "Warna aksen kuning sinyal hanya digunakan untuk satu tindakan utama paling penting per layar dan status berjalan; tidak disebar acak.",
-        "section": "colors"
-      },
-      {
-        "name": "The Tabular Discipline Rule",
-        "body": "Semua data waktu (jam:menit), tanggal, nominal mata uang (Rp), dan kuantitas numerik wajib menggunakan kelas .tabular.",
-        "section": "typography"
-      }
-    ],
-    "dos": [
-      "Gunakan bahasa Indonesia yang baku, ramah, dan ringkas pada seluruh teks UI.",
-      "Gunakan ApprovalLine untuk setiap alur verifikasi atau persetujuan berjenjang.",
-      "Pastikan target sentuh tombol aksi utama minimal 48px di ponsel.",
-      "Format seluruh nominal uang dengan format lokal IDR."
-    ],
-    "donts": [
-      "Jangan menambahkan bayangan blur dekoratif (box-shadow) atau teks gradien.",
-      "Jangan menaruh label kicker/eyebrow kecil di atas judul utama.",
-      "Jangan menumpuk kartu di dalam kartu (nested cards).",
-      "Jangan menggunakan ikon di luar Lucide Icons."
-    ]
-  }
 }
-

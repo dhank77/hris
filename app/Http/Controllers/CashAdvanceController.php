@@ -5,12 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\HasTableQuery;
 use App\Models\CashAdvance;
 use App\Models\CashAdvanceInstallment;
+use App\Models\CashAdvancePayment;
+use App\Models\Setting;
 use App\Models\User;
+use chillerlan\QRCode\QRCode;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use QrisDinamis\Qris;
 
 class CashAdvanceController extends Controller
 {
@@ -198,6 +204,70 @@ class CashAdvanceController extends Controller
         $cashAdvance->update(['status' => 'disbursed', 'disbursed_at' => Carbon::now()]);
 
         return back();
+    }
+
+    /**
+     * Generate a unique-code dynamic QRIS for an installment (JSON).
+     */
+    public function qris(Request $request, CashAdvanceInstallment $installment): JsonResponse
+    {
+        $user = $request->user();
+        $advance = $installment->cashAdvance;
+        $canManage = in_array($user->role, ['finance', 'hr', 'admin']);
+        if ($advance->user_id !== $user->id && ! $canManage) {
+            abort(403);
+        }
+        if ($installment->paid) {
+            return response()->json(['error' => 'Cicilan ini sudah lunas.'], 422);
+        }
+
+        $baseAmount = (int) round((float) $installment->amount);
+
+        // the unique code is "pinned" to the installment: first press issues it,
+        // every later press reuses the same code so the nominal stays matched
+        $payment = $installment->payments()->latest()->first();
+        if ($payment === null) {
+            // the code must be unused by any other still-unpaid installment
+            do {
+                $paymentCode = random_int(1, 999);
+            } while (CashAdvancePayment::query()
+                ->where('code', $paymentCode)
+                ->whereHas('installment', fn ($q) => $q->where('paid', false))
+                ->exists());
+
+            $payment = CashAdvancePayment::create([
+                'cash_advance_installment_id' => $installment->id,
+                'code' => $paymentCode,
+                'amount' => $baseAmount + $paymentCode,
+            ]);
+        }
+
+        $amount = (int) $payment->amount;
+
+        $payload = Setting::get('qris_static_payload');
+        $image = null;
+        $staticImage = Setting::get('qris_static_image');
+        $merchant = null;
+
+        if ($payload && Qris::isValid($payload) && $amount > 0) {
+            try {
+                $dynamic = Qris::convert($payload, $amount);
+                $image = (new QRCode)->render($dynamic);
+                $merchant = Qris::parse($payload)->merchantName;
+            } catch (\Throwable) {
+                $image = null;
+            }
+        }
+
+        return response()->json([
+            'id' => $payment->id,
+            'code' => (int) $payment->code,
+            'base_amount' => $baseAmount,
+            'amount' => $amount,
+            'image' => $image,
+            'static_image' => $staticImage ? Storage::disk('public')->url($staticImage) : null,
+            'merchant' => $merchant,
+        ]);
     }
 
     public function markPaid(Request $request, CashAdvanceInstallment $installment): RedirectResponse

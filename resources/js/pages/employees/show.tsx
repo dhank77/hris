@@ -2,7 +2,11 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Pencil } from 'lucide-react';
-import { show as empShow, edit as empEdit, index as empIndex } from '@/routes/employees';
+import {
+    show as empShow,
+    edit as empEdit,
+    index as empIndex,
+} from '@/routes/employees';
 
 type Employee = {
     id: number;
@@ -33,11 +37,7 @@ const rupiah = (value: number | string) =>
         maximumFractionDigits: 0,
     }).format(Number(value));
 
-export default function EmployeesShow({
-    employee,
-}: {
-    employee: Employee;
-}) {
+export default function EmployeesShow({ employee }: { employee: Employee }) {
     const page = usePage();
     const auth = (page.props as { auth?: { user?: { role?: string } } }).auth;
     const isAdmin = auth?.user?.role === 'admin';
@@ -150,7 +150,7 @@ export default function EmployeesShow({
                             <dt className="text-sm text-muted-foreground">
                                 Limit Kasbon
                             </dt>
-                            <dd className="font-medium tabular">
+                            <dd className="tabular font-medium">
                                 {rupiah(employee.kasbon_limit)}
                             </dd>
                         </div>
@@ -158,7 +158,7 @@ export default function EmployeesShow({
                             <dt className="text-sm text-muted-foreground">
                                 Terpakai
                             </dt>
-                            <dd className="font-medium tabular">
+                            <dd className="tabular font-medium">
                                 {rupiah(employee.kasbon_used)}
                             </dd>
                         </div>
@@ -166,7 +166,7 @@ export default function EmployeesShow({
                             <dt className="text-sm text-muted-foreground">
                                 Sisa Limit
                             </dt>
-                            <dd className="font-medium tabular">
+                            <dd className="tabular font-medium">
                                 {rupiah(
                                     Math.max(
                                         0,

@@ -82,7 +82,7 @@ export default function Profile(_props: {
                                     data-test="update-profile-button"
                                 >
                                     Simpan
- </Button>
+                                </Button>
                             </div>
                         </>
                     )}

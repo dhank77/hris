@@ -63,7 +63,8 @@ export default function LeaveRequestsShow({
     leaveRequest: LeaveRequest;
     canDecide: boolean;
 }) {
-    const doApprove = () => router.post(approve.url({ leaveRequest: leaveRequest.id }));
+    const doApprove = () =>
+        router.post(approve.url({ leaveRequest: leaveRequest.id }));
     const doReject = () => {
         const reason = prompt('Alasan penolakan?') || '';
         router.post(reject.url({ leaveRequest: leaveRequest.id }), {
@@ -73,7 +74,10 @@ export default function LeaveRequestsShow({
 
     const facts = [
         { label: 'Pegawai', value: leaveRequest.user?.name },
-        { label: 'Jenis', value: typeLabel[leaveRequest.type] ?? leaveRequest.type },
+        {
+            label: 'Jenis',
+            value: typeLabel[leaveRequest.type] ?? leaveRequest.type,
+        },
         { label: 'Mulai', value: formatDate(leaveRequest.start_date) },
         { label: 'Selesai', value: formatDate(leaveRequest.end_date) },
         { label: 'Diputuskan oleh', value: leaveRequest.approver?.name ?? '-' },
@@ -99,18 +103,28 @@ export default function LeaveRequestsShow({
                     <dl className="tabular grid gap-x-6 gap-y-4 rounded-xl border bg-card p-4 sm:grid-cols-2 md:grid-cols-3">
                         {facts.map((fact) => (
                             <div key={fact.label}>
-                                <dt className="text-sm text-muted-foreground">{fact.label}</dt>
+                                <dt className="text-sm text-muted-foreground">
+                                    {fact.label}
+                                </dt>
                                 <dd className="font-semibold">{fact.value}</dd>
                             </div>
                         ))}
                         <div className="sm:col-span-2 md:col-span-3">
-                            <dt className="text-sm text-muted-foreground">Alasan</dt>
-                            <dd className="max-w-prose">{leaveRequest.reason}</dd>
+                            <dt className="text-sm text-muted-foreground">
+                                Alasan
+                            </dt>
+                            <dd className="max-w-prose">
+                                {leaveRequest.reason}
+                            </dd>
                         </div>
                         {leaveRequest.rejection_reason && (
                             <div className="sm:col-span-2 md:col-span-3">
-                                <dt className="text-sm text-muted-foreground">Alasan penolakan</dt>
-                                <dd className="max-w-prose">{leaveRequest.rejection_reason}</dd>
+                                <dt className="text-sm text-muted-foreground">
+                                    Alasan penolakan
+                                </dt>
+                                <dd className="max-w-prose">
+                                    {leaveRequest.rejection_reason}
+                                </dd>
                             </div>
                         )}
                     </dl>

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import type { PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
+import { edit as editQris } from '@/routes/qris';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
 
@@ -30,6 +31,14 @@ const sidebarNavItems: NavItem[] = [
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
+    const { props } = usePage<{ auth: { user: { role?: string } } }>();
+    const navItems: NavItem[] =
+        props.auth?.user?.role === 'admin'
+            ? [
+                  ...sidebarNavItems,
+                  { title: 'QRIS', href: editQris(), icon: null },
+              ]
+            : sidebarNavItems;
 
     return (
         <div className="mx-auto w-full max-w-5xl px-4 py-6 md:px-6">
@@ -40,17 +49,19 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
-                    <nav className="flex gap-1 overflow-x-auto lg:flex-col lg:space-y-1"
+                    <nav
+                        className="flex gap-1 overflow-x-auto lg:flex-col lg:space-y-1"
                         aria-label="Settings"
                     >
-                        {sidebarNavItems.map((item, index) => (
+                        {navItems.map((item, index) => (
                             <Button
                                 key={`${toUrl(item.href)}-${index}`}
                                 size="default"
- variant="ghost"
+                                variant="ghost"
                                 asChild
                                 className={cn('justify-start lg:w-full', {
-                                    'bg-muted font-semibold text-foreground': isCurrentOrParentUrl(item.href),
+                                    'bg-muted font-semibold text-foreground':
+                                        isCurrentOrParentUrl(item.href),
                                 })}
                             >
                                 <Link href={item.href}>

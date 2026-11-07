@@ -72,11 +72,16 @@ export default function AuthSimpleLayout({
             </aside>
 
             <main className="flex flex-col items-center justify-center gap-8 p-6 md:p-12">
-                <Link href={home()} className="flex items-center gap-2 lg:hidden">
+                <Link
+                    href={home()}
+                    className="flex items-center gap-2 lg:hidden"
+                >
                     <span className="flex size-10 items-center justify-center rounded-lg bg-sidebar text-sidebar-primary">
                         <AppLogoIcon className="size-6 fill-current" />
                     </span>
-                    <span className="text-xl font-bold tracking-wide">HRIS</span>
+                    <span className="text-xl font-bold tracking-wide">
+                        HRIS
+                    </span>
                 </Link>
 
                 <div className="flex w-full max-w-sm flex-col gap-8">

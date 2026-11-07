@@ -54,6 +54,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('cash-advances/{cashAdvance}/reject', [CashAdvanceController::class, 'reject'])->name('cash-advances.reject');
     Route::post('cash-advances/{cashAdvance}/disburse', [CashAdvanceController::class, 'disburse'])->name('cash-advances.disburse');
     Route::post('cash-advances/installments/{installment}/pay', [CashAdvanceController::class, 'markPaid'])->name('cash-advances.installments.pay');
+    Route::post('cash-advances/installments/{installment}/qris', [CashAdvanceController::class, 'qris'])->name('cash-advances.installments.qris');
     Route::post('cash-advances/deduct-payroll', [CashAdvanceController::class, 'deductPayroll'])->name('cash-advances.deduct-payroll');
 });
 

@@ -25,7 +25,7 @@ import { confirm } from '@/routes/two-factor';
 
 function GridScanIcon() {
     return (
-        <div className="mb-3 rounded-full border border-border bg-card p-0.5  ">
+        <div className="mb-3 rounded-full border border-border bg-card p-0.5">
             <div className="relative overflow-hidden rounded-full border border-border bg-muted p-2.5">
                 <div className="absolute inset-0 grid grid-cols-5 opacity-50">
                     {Array.from({ length: 5 }, (_, i) => (
@@ -211,7 +211,7 @@ function TwoFactorVerificationStep({
                                 disabled={processing}
                             >
                                 Kembali
- </Button>
+                            </Button>
                             <Button
                                 type="submit"
                                 className="flex-1"
@@ -220,7 +220,7 @@ function TwoFactorVerificationStep({
                                 }
                             >
                                 Konfirmasi
- </Button>
+                            </Button>
                         </div>
                     </div>
                 </>

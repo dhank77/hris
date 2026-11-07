@@ -1,7 +1,12 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { Camera, Clock, LogIn, LogOut, MapPin, RotateCw } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
-import { store, index as attendanceIndex, history, recap as attendanceRecap } from '@/routes/attendance';
+import {
+    store,
+    index as attendanceIndex,
+    history,
+    recap as attendanceRecap,
+} from '@/routes/attendance';
 import { Button } from '@/components/ui/button';
 import { PageHeader } from '@/components/page-header';
 import { StatusBadge } from '@/components/status-badge';
@@ -182,7 +187,11 @@ export default function AttendanceIndex({
 
     const recapItems = [
         { label: 'Hadir', value: recap.present, tone: 'text-success' },
-        { label: 'Terlambat', value: recap.late, tone: 'text-warning-foreground' },
+        {
+            label: 'Terlambat',
+            value: recap.late,
+            tone: 'text-warning-foreground',
+        },
         { label: 'Alpa', value: recap.absent, tone: 'text-destructive' },
         { label: 'Izin/Cuti/Sakit', value: recap.leave, tone: 'text-info' },
     ];
@@ -211,7 +220,10 @@ export default function AttendanceIndex({
                     className="grid gap-5 rounded-xl border bg-card p-4 md:p-6"
                 >
                     <div className="flex items-center justify-between gap-3">
-                        <h2 id="today-heading" className="text-lg font-semibold">
+                        <h2
+                            id="today-heading"
+                            className="text-lg font-semibold"
+                        >
                             Hari ini
                         </h2>
                         {attendance?.status ? (
@@ -225,13 +237,17 @@ export default function AttendanceIndex({
 
                     <dl className="grid grid-cols-2 gap-4">
                         <div className="grid gap-1">
-                            <dt className="text-sm text-muted-foreground">Masuk</dt>
+                            <dt className="text-sm text-muted-foreground">
+                                Masuk
+                            </dt>
                             <dd className="tabular text-4xl font-bold md:text-5xl">
                                 {formatTime(attendance?.clock_in_at)}
                             </dd>
                         </div>
                         <div className="grid gap-1">
-                            <dt className="text-sm text-muted-foreground">Pulang</dt>
+                            <dt className="text-sm text-muted-foreground">
+                                Pulang
+                            </dt>
                             <dd className="tabular text-4xl font-bold md:text-5xl">
                                 {formatTime(attendance?.clock_out_at)}
                             </dd>
@@ -249,7 +265,10 @@ export default function AttendanceIndex({
                                 className="flex items-center gap-2 text-sm"
                                 role="status"
                             >
-                                <MapPin className="size-4 shrink-0" aria-hidden="true" />
+                                <MapPin
+                                    className="size-4 shrink-0"
+                                    aria-hidden="true"
+                                />
                                 {geo ? (
                                     <span className="tabular">
                                         Lokasi terkunci: {geo.lat.toFixed(5)},{' '}
@@ -268,7 +287,8 @@ export default function AttendanceIndex({
                                                 requestGeo();
                                             }}
                                         >
-                                            <RotateCw aria-hidden="true" /> Coba lagi
+                                            <RotateCw aria-hidden="true" /> Coba
+                                            lagi
                                         </Button>
                                     </span>
                                 ) : (
@@ -283,7 +303,8 @@ export default function AttendanceIndex({
                                     variant="outline"
                                     className="w-full sm:w-fit"
                                 >
-                                    <Camera aria-hidden="true" /> Aktifkan kamera (selfie)
+                                    <Camera aria-hidden="true" /> Aktifkan
+                                    kamera (selfie)
                                 </Button>
                             ) : (
                                 <div className="grid gap-2">
@@ -294,7 +315,10 @@ export default function AttendanceIndex({
                                         muted
                                         className="aspect-[4/3] w-full max-w-sm rounded-lg border bg-black object-cover"
                                     />
-                                    <canvas ref={canvasRef} className="hidden" />
+                                    <canvas
+                                        ref={canvasRef}
+                                        className="hidden"
+                                    />
                                     <Button
                                         type="button"
                                         onClick={capturePhoto}
@@ -302,7 +326,9 @@ export default function AttendanceIndex({
                                         className="w-full sm:w-fit"
                                     >
                                         <Camera aria-hidden="true" />
-                                        {photoPreview ? 'Ambil ulang foto' : 'Ambil foto'}
+                                        {photoPreview
+                                            ? 'Ambil ulang foto'
+                                            : 'Ambil foto'}
                                     </Button>
                                 </div>
                             )}
@@ -351,9 +377,16 @@ export default function AttendanceIndex({
                     </h2>
                     <dl className="grid grid-cols-2 divide-x divide-y rounded-xl border bg-card sm:grid-cols-4 sm:divide-y-0">
                         {recapItems.map((item) => (
-                            <div key={item.label} className="flex items-baseline justify-between gap-2 p-3">
-                                <dt className="text-sm text-muted-foreground">{item.label}</dt>
-                                <dd className={`tabular text-xl font-bold ${item.tone}`}>
+                            <div
+                                key={item.label}
+                                className="flex items-baseline justify-between gap-2 p-3"
+                            >
+                                <dt className="text-sm text-muted-foreground">
+                                    {item.label}
+                                </dt>
+                                <dd
+                                    className={`tabular text-xl font-bold ${item.tone}`}
+                                >
                                     {item.value}
                                 </dd>
                             </div>

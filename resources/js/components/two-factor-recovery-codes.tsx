@@ -60,7 +60,8 @@ export default function TwoFactorRecoveryCodes({
                     Kode pemulihan 2FA
                 </CardTitle>
                 <CardDescription>
-                    Kode pemulihan membantu Anda masuk kembali jika perangkat 2FA hilang. Simpan di pengelola kata sandi yang aman.
+                    Kode pemulihan membantu Anda masuk kembali jika perangkat
+                    2FA hilang. Simpan di pengelola kata sandi yang aman.
                 </CardDescription>
             </CardHeader>
             <CardContent>
@@ -75,7 +76,8 @@ export default function TwoFactorRecoveryCodes({
                             className="size-4"
                             aria-hidden="true"
                         />
-                        {codesAreVisible ? 'Sembunyikan' : 'Lihat'} kode pemulihan
+                        {codesAreVisible ? 'Sembunyikan' : 'Lihat'} kode
+                        pemulihan
                     </Button>
 
                     {canRegenerateCodes && (
@@ -92,7 +94,7 @@ export default function TwoFactorRecoveryCodes({
                                     aria-describedby="regenerate-warning"
                                 >
                                     <RefreshCw /> Buat ulang kode
- </Button>
+                                </Button>
                             )}
                         </Form>
                     )}
@@ -144,7 +146,13 @@ export default function TwoFactorRecoveryCodes({
 
                                 <div className="text-xs text-muted-foreground select-none">
                                     <p id="regenerate-warning">
-                                        Setiap kode pemulihan hanya berlaku sekali dan dihapus setelah dipakai. Butuh kode baru? Klik{' '}<span className="font-bold">Buat ulang kode</span>{' '}di atas.
+                                        Setiap kode pemulihan hanya berlaku
+                                        sekali dan dihapus setelah dipakai.
+                                        Butuh kode baru? Klik{' '}
+                                        <span className="font-bold">
+                                            Buat ulang kode
+                                        </span>{' '}
+                                        di atas.
                                     </p>
                                 </div>
                             </>

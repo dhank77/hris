@@ -29,7 +29,16 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Users, Plus, Pencil, Eye, Upload, FileSpreadsheet, FileText, Download } from 'lucide-react';
+import {
+    Users,
+    Plus,
+    Pencil,
+    Eye,
+    Upload,
+    FileSpreadsheet,
+    FileText,
+    Download,
+} from 'lucide-react';
 import {
     index as empIndex,
     show as empShow,
@@ -37,7 +46,10 @@ import {
     create as empCreate,
     importMethod as empImport,
 } from '@/routes/employees';
-import { excel as exportExcel, pdf as exportPdf } from '@/routes/employees/export';
+import {
+    excel as exportExcel,
+    pdf as exportPdf,
+} from '@/routes/employees/export';
 import { template as importTemplate } from '@/routes/employees/import';
 
 import type { Paginator } from '@/components/table-controls';
@@ -77,9 +89,10 @@ export default function EmployeesIndex({
     const { sort, dir } = readSort('name', 'asc');
     const search = readSearch();
 
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm({
-        file: null as File | null,
-    });
+    const { data, setData, post, processing, errors, reset, clearErrors } =
+        useForm({
+            file: null as File | null,
+        });
 
     const submitImport = (e: React.FormEvent) => {
         e.preventDefault();
@@ -116,55 +129,94 @@ export default function EmployeesIndex({
                                     >
                                         <DialogTrigger asChild>
                                             <Button variant="outline" size="sm">
-                                                <Upload aria-hidden="true" /> Import XLS
+                                                <Upload aria-hidden="true" />{' '}
+                                                Import XLS
                                             </Button>
                                         </DialogTrigger>
                                         <DialogContent>
                                             <DialogHeader>
-                                                <DialogTitle>Import Data Pegawai</DialogTitle>
+                                                <DialogTitle>
+                                                    Import Data Pegawai
+                                                </DialogTitle>
                                                 <DialogDescription>
-                                                    Gunakan template resmi agar format kolom sesuai dan data tidak bermasalah saat diimpor.
+                                                    Gunakan template resmi agar
+                                                    format kolom sesuai dan data
+                                                    tidak bermasalah saat
+                                                    diimpor.
                                                 </DialogDescription>
                                             </DialogHeader>
                                             <div className="flex items-center justify-between gap-3 rounded-lg border bg-muted/40 p-3 text-sm">
                                                 <div className="grid gap-0.5">
-                                                    <span className="font-medium">Template Import Pegawai (.xls)</span>
+                                                    <span className="font-medium">
+                                                        Template Import Pegawai
+                                                        (.xls)
+                                                    </span>
                                                     <span className="text-xs text-muted-foreground">
-                                                        Kolom: Nama, Email, Password, Peran, Departemen, Jabatan, Atasan, Limit Kasbon
+                                                        Kolom: Nama, Email,
+                                                        Password, Peran,
+                                                        Departemen, Jabatan,
+                                                        Atasan, Limit Kasbon
                                                     </span>
                                                 </div>
-                                                <Button asChild variant="secondary" size="sm">
-                                                    <a href={importTemplate.url()}>
-                                                        <Download aria-hidden="true" /> Unduh Template
+                                                <Button
+                                                    asChild
+                                                    variant="secondary"
+                                                    size="sm"
+                                                >
+                                                    <a
+                                                        href={importTemplate.url()}
+                                                    >
+                                                        <Download aria-hidden="true" />{' '}
+                                                        Unduh Template
                                                     </a>
                                                 </Button>
                                             </div>
-                                            <form onSubmit={submitImport} className="grid gap-4">
+                                            <form
+                                                onSubmit={submitImport}
+                                                className="grid gap-4"
+                                            >
                                                 <div className="grid gap-2">
-                                                    <Label htmlFor="import-file">File Excel (.xls, .xlsx, .csv)</Label>
+                                                    <Label htmlFor="import-file">
+                                                        File Excel (.xls, .xlsx,
+                                                        .csv)
+                                                    </Label>
                                                     <Input
                                                         id="import-file"
                                                         type="file"
                                                         accept=".xls,.xlsx,.csv"
                                                         onChange={(e) =>
-                                                            setData('file', e.target.files?.[0] ?? null)
+                                                            setData(
+                                                                'file',
+                                                                e.target
+                                                                    .files?.[0] ??
+                                                                    null,
+                                                            )
                                                         }
                                                     />
-                                                    <InputError message={errors.file} />
+                                                    <InputError
+                                                        message={errors.file}
+                                                    />
                                                 </div>
                                                 <DialogFooter>
                                                     <Button
                                                         type="button"
                                                         variant="outline"
-                                                        onClick={() => setImportOpen(false)}
+                                                        onClick={() =>
+                                                            setImportOpen(false)
+                                                        }
                                                     >
                                                         Batal
                                                     </Button>
                                                     <Button
                                                         type="submit"
-                                                        disabled={processing || !data.file}
+                                                        disabled={
+                                                            processing ||
+                                                            !data.file
+                                                        }
                                                     >
-                                                        {processing ? 'Mengimpor...' : 'Import'}
+                                                        {processing
+                                                            ? 'Mengimpor...'
+                                                            : 'Import'}
                                                     </Button>
                                                 </DialogFooter>
                                             </form>
@@ -173,25 +225,29 @@ export default function EmployeesIndex({
 
                                     <Button asChild variant="outline" size="sm">
                                         <a href={exportExcel.url()}>
-                                            <FileSpreadsheet aria-hidden="true" /> Export XLS
+                                            <FileSpreadsheet aria-hidden="true" />{' '}
+                                            Export XLS
                                         </a>
                                     </Button>
 
                                     <Button asChild variant="outline" size="sm">
                                         <a href={exportPdf.url()}>
-                                            <FileText aria-hidden="true" /> Export PDF
+                                            <FileText aria-hidden="true" />{' '}
+                                            Export PDF
                                         </a>
                                     </Button>
 
                                     <Button asChild size="sm">
                                         <Link href={empCreate.url()}>
-                                            <Plus aria-hidden="true" /> Tambah pegawai
+                                            <Plus aria-hidden="true" /> Tambah
+                                            pegawai
                                         </Link>
                                     </Button>
                                 </>
                             )}
                             <Button variant="outline" size="sm">
-                                <Users aria-hidden="true" /> {employees.total} pegawai
+                                <Users aria-hidden="true" /> {employees.total}{' '}
+                                pegawai
                             </Button>
                         </>
                     }
@@ -215,11 +271,41 @@ export default function EmployeesIndex({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Foto</TableHead>
-                                    <SortableHead label="Nama" field="name" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Email" field="email" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Peran" field="role" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Departemen" field="department" currentSort={sort} currentDir={dir} url={url} />
-                                    <SortableHead label="Jabatan" field="position" currentSort={sort} currentDir={dir} url={url} />
+                                    <SortableHead
+                                        label="Nama"
+                                        field="name"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Email"
+                                        field="email"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Peran"
+                                        field="role"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Departemen"
+                                        field="department"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
+                                    <SortableHead
+                                        label="Jabatan"
+                                        field="position"
+                                        currentSort={sort}
+                                        currentDir={dir}
+                                        url={url}
+                                    />
                                     <TableHead>Aksi</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -294,7 +380,11 @@ export default function EmployeesIndex({
                                 ))}
                             </TableBody>
                         </Table>
-                        <TablePagination paginator={employees} url={url} className="border-t" />
+                        <TablePagination
+                            paginator={employees}
+                            url={url}
+                            className="border-t"
+                        />
                     </div>
                 )}
             </div>
