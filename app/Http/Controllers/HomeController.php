@@ -12,7 +12,6 @@ class HomeController extends Controller
     public function __invoke(Request $request): InertiaResponse
     {
         $news = News::whereNotNull('published_at')
-            ->where('published_at', '<=', now())
             ->latest('published_at')
             ->limit(6)
             ->get(['id', 'title', 'body', 'published_at']);

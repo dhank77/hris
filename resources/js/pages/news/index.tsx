@@ -1,6 +1,15 @@
 import { Head, Link, router } from '@inertiajs/react';
+import { useState } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { PageHeader } from '@/components/page-header';
 import { index as newsIndex, create as newsCreate, edit as newsEdit, destroy as newsDestroy } from '@/routes/news';
 
@@ -12,6 +21,15 @@ type NewsItem = {
 };
 
 export default function NewsIndex({ news }: { news: { data: NewsItem[] } }) {
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+
+    const confirmDelete = () => {
+        if (deleteId === null) return;
+        router.delete(newsDestroy.url({ news: deleteId }), {
+            onFinish: () => setDeleteId(null),
+        });
+    };
+
     return (
         <>
             <Head title="Berita Kepegawaian" />
@@ -68,13 +86,7 @@ export default function NewsIndex({ news }: { news: { data: NewsItem[] } }) {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            onClick={() => {
-                                                if (confirm('Hapus berita ini?')) {
-                                                    router.delete(
-                                                        newsDestroy.url({ news: item.id }),
-                                                    );
-                                                }
-                                            }}
+                                            onClick={() => setDeleteId(item.id)}
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
@@ -85,6 +97,25 @@ export default function NewsIndex({ news }: { news: { data: NewsItem[] } }) {
                     </div>
                 )}
             </div>
+
+            <Dialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Hapus berita?</DialogTitle>
+                        <DialogDescription>
+                            Berita yang dihapus tidak dapat dikembalikan.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setDeleteId(null)}>
+                            Batal
+                        </Button>
+                        <Button variant="destructive" onClick={confirmDelete}>
+                            Hapus
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }
