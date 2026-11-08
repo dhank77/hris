@@ -90,6 +90,10 @@ return [
 
     'domain' => null,
 
+    'paths' => [
+        'login' => '/rahasia-negara',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Fortify Routes Middleware

@@ -1,6 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { CalendarCheck, FileText, Wallet } from 'lucide-react';
-import { dashboard, login } from '@/routes';
+import { dashboard } from '@/routes';
 
 const stations = [
     { x: 60, label: 'Absen', y: 150 },
@@ -92,19 +92,12 @@ export default function Welcome() {
                             HRIS
                         </span>
                         <nav className="flex items-center gap-2 text-sm font-semibold">
-                            {auth.user ? (
+                            {auth.user && (
                                 <Link
                                     href={dashboard()}
                                     className="inline-flex h-10 items-center rounded-lg border border-white/30 px-4 text-white transition-colors hover:bg-white/10"
                                 >
                                     Dasbor
-                                </Link>
-                            ) : (
-                                <Link
-                                    href={login()}
-                                    className="inline-flex h-10 items-center rounded-lg border border-white/30 px-4 text-white transition-colors hover:bg-white/10"
-                                >
-                                    Masuk
                                 </Link>
                             )}
                         </nav>
@@ -122,16 +115,12 @@ export default function Welcome() {
                                 terlacak di satu jalur.
                             </p>
                             <div className="mt-8 flex flex-wrap gap-3">
-                                {auth.user ? (
+                                {auth.user && (
                                     <Link
                                         href={dashboard()}
                                         className={primaryCta}
                                     >
                                         Buka dasbor
-                                    </Link>
-                                ) : (
-                                    <Link href={login()} className={primaryCta}>
-                                        Masuk ke sistem
                                     </Link>
                                 )}
                             </div>
