@@ -13,11 +13,14 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { usePage } from '@inertiajs/react';
+import { Newspaper } from 'lucide-react';
 import { dashboard } from '@/routes';
 import { index as employeeIndex } from '@/routes/employees';
 import { index as attendanceIndex } from '@/routes/attendance';
 import { index as leaveIndex } from '@/routes/leave-requests';
 import { index as cashIndex } from '@/routes/cash-advances';
+import { index as newsIndex } from '@/routes/news';
 import type { NavItem } from '@/types';
 
 export const mainNavItems: NavItem[] = [
@@ -51,6 +54,20 @@ export const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
+    const { auth } = usePage().props as { auth?: { user?: { role?: string } } };
+    const isAdmin = auth?.user?.role === 'admin';
+
+    const items: NavItem[] = isAdmin
+        ? [
+              ...mainNavItems,
+              {
+                  title: 'Berita Kepegawaian',
+                  href: newsIndex(),
+                  icon: Newspaper,
+              },
+          ]
+        : mainNavItems;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -66,7 +83,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={items} />
             </SidebarContent>
 
             <SidebarFooter>

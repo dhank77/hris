@@ -74,8 +74,18 @@ function LineIllustration() {
     );
 }
 
+type NewsItem = {
+    id: number;
+    title: string;
+    body: string;
+    published_at: string | null;
+};
+
 export default function Welcome() {
-    const { auth } = usePage().props;
+    const { auth, news } = usePage().props as {
+        auth?: { user?: { id: number; name: string; role?: string } | null };
+        news?: NewsItem[];
+    };
 
     const primaryCta =
         'inline-flex h-12 items-center justify-center rounded-lg bg-sidebar-primary px-6 text-base font-bold text-sidebar-primary-foreground transition-colors hover:bg-sidebar-primary/90 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar focus-visible:outline-none';
@@ -92,7 +102,7 @@ export default function Welcome() {
                             HRIS
                         </span>
                         <nav className="flex items-center gap-2 text-sm font-semibold">
-                            {auth.user && (
+                            {auth?.user && (
                                 <Link
                                     href={dashboard()}
                                     className="inline-flex h-10 items-center rounded-lg border border-white/30 px-4 text-white transition-colors hover:bg-white/10"
@@ -115,7 +125,7 @@ export default function Welcome() {
                                 terlacak di satu jalur.
                             </p>
                             <div className="mt-8 flex flex-wrap gap-3">
-                                {auth.user && (
+                                {auth?.user && (
                                     <Link
                                         href={dashboard()}
                                         className={primaryCta}
@@ -152,6 +162,40 @@ export default function Welcome() {
                             </li>
                         ))}
                     </ul>
+
+                    {news && news.length > 0 && (
+                        <section className="mt-16">
+                            <h2 className="text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+                                Berita Kepegawaian
+                            </h2>
+                            <div className="mt-6 grid gap-4 md:grid-cols-2">
+                                {news.map((item) => (
+                                    <article
+                                        key={item.id}
+                                        className="rounded-xl border bg-card p-5"
+                                    >
+                                        <h3 className="text-lg font-bold">
+                                            {item.title}
+                                        </h3>
+                                        <p className="mt-2 text-sm text-muted-foreground whitespace-pre-line">
+                                            {item.body}
+                                        </p>
+                                        {item.published_at && (
+                                            <time className="mt-3 block text-xs text-muted-foreground">
+                                                {new Date(
+                                                    item.published_at,
+                                                ).toLocaleDateString('id-ID', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric',
+                                                })}
+                                            </time>
+                                        )}
+                                    </article>
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </main>
             </div>
         </>
