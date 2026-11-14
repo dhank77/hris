@@ -1,0 +1,1 @@
+import{r as e,s as t}from"./wayfinder-yA05IgIp.js";import{t as n}from"./utils-DJPu_GY6.js";var r=e();function i({className:e=``,children:i,...a}){return(0,r.jsx)(t,{className:n(`text-foreground underline decoration-border underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current!`,e),...a,children:i})}export{i as t};
