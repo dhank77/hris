@@ -1,0 +1,18 @@
+---
+deployment:
+  tasks:
+    # Sesuaikan target folder produksi di cPanel (misalnya public_html atau folder subdomain)
+    - export DEPLOYPATH=${HOME}/public_html/
+
+    # Sinkronkan file dari repositori ke folder produksi tanpa menimpa .env, storage, dan vendor di server
+    - /usr/bin/rsync -av --delete --exclude='.git/' --exclude='.github/' --exclude='.cpanel.yml' --exclude='.env' --exclude='.env.*' --exclude='storage/' --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' --exclude='strix_runs/' --exclude='Archive.zip' --exclude='vendor.zip' ./ ${DEPLOYPATH}
+
+    # Pastikan direktori storage dan bootstrap/cache tersedia dan memiliki izin tulis
+    - /bin/mkdir -p ${DEPLOYPATH}storage/app/public ${DEPLOYPATH}storage/framework/cache/data ${DEPLOYPATH}storage/framework/sessions ${DEPLOYPATH}storage/framework/views ${DEPLOYPATH}storage/logs ${DEPLOYPATH}bootstrap/cache
+    - /bin/chmod -R 775 ${DEPLOYPATH}storage ${DEPLOYPATH}bootstrap/cache
+
+    # Install dependensi PHP produksi jika Composer tersedia di server cPanel
+    - cd ${DEPLOYPATH} && if command -v composer >/dev/null 2>&1; then composer install --no-dev --optimize-autoloader --no-interaction; elif [ -x /opt/cpanel/composer/bin/composer ]; then /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction; fi
+
+    # Jalankan migrasi & optimasi cache Laravel jika .env dan vendor sudah siap
+    - cd ${DEPLOYPATH} && if [ -f .env ] && [ -f vendor/autoload.php ]; then php artisan migrate --force && php artisan optimize; fi
