@@ -1,0 +1,15 @@
+<IfModule mod_negotiation.c>
+    Options -MultiViews -Indexes
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Block access to hidden files and sensitive project files in root (allow .well-known)
+    RewriteCond %{REQUEST_URI} !^/\.well-known/
+    RewriteRule ^(\.|composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml|phpstan\.neon|pint\.json|vite\.config\.ts|tsconfig\.json) - [F,L]
+
+    # Forward all requests to the public/ directory
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
