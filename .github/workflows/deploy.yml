@@ -1,0 +1,44 @@
+name: deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy-cpanel:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pull & Deploy on cPanel
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USERNAME: ${{ secrets.CPANEL_USERNAME }}
+          CPANEL_API_TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+          CPANEL_REPO_PATH: ${{ secrets.CPANEL_REPO_PATH }}
+        run: |
+          set -euo pipefail
+
+          HOST="${CPANEL_HOST#https://}"
+          HOST="${HOST#http://}"
+          HOST="${HOST%%/*}"
+          HOST="${HOST%%:*}"
+
+          echo "1. Menarik update terbaru dari GitHub ke cPanel..."
+          UPDATE_RES=$(curl -sS -X POST "https://${HOST}:2083/execute/VersionControl/update" \
+            -H "Authorization: cpanel ${CPANEL_USERNAME}:${CPANEL_API_TOKEN}" \
+            --data-urlencode "repository_root=${CPANEL_REPO_PATH}" \
+            --data-urlencode "branch=main")
+          echo "$UPDATE_RES"
+          echo "$UPDATE_RES" | jq -e '.status == 1' > /dev/null
+
+          echo "2. Menjalankan deployment (.cpanel.yml)..."
+          DEPLOY_RES=$(curl -sS -X POST "https://${HOST}:2083/execute/VersionControlDeployment/create" \
+            -H "Authorization: cpanel ${CPANEL_USERNAME}:${CPANEL_API_TOKEN}" \
+            --data-urlencode "repository_root=${CPANEL_REPO_PATH}")
+          echo "$DEPLOY_RES"
+          echo "$DEPLOY_RES" | jq -e '.status == 1' > /dev/null
