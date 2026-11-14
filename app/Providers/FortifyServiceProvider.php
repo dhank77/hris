@@ -5,13 +5,20 @@ namespace App\Providers;
 use App\Actions\Fortify\ResetUserPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
+use Laravel\Fortify\Events\RecoveryCodesGenerated;
+use Laravel\Fortify\Events\TwoFactorAuthenticationConfirmed;
+use Laravel\Fortify\Events\TwoFactorAuthenticationDisabled;
+use Laravel\Fortify\Events\TwoFactorAuthenticationEnabled;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use Laravel\Passkeys\Events\PasskeyDeleted;
+use Laravel\Passkeys\Events\PasskeyRegistered;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -31,6 +38,7 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+        $this->configureFlashToasts();
     }
 
     /**
@@ -68,6 +76,30 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/two-factor-challenge'));
 
         Fortify::confirmPasswordView(fn () => Inertia::render('auth/confirm-password'));
+    }
+
+    /**
+     * Flash a toast notification when an authentication action completes.
+     */
+    private function configureFlashToasts(): void
+    {
+        $events = [
+            TwoFactorAuthenticationEnabled::class => fn () => $this->flashToast('Autentikasi dua faktor diaktifkan.'),
+            TwoFactorAuthenticationConfirmed::class => fn () => $this->flashToast('Autentikasi dua faktor dikonfirmasi.'),
+            TwoFactorAuthenticationDisabled::class => fn () => $this->flashToast('Autentikasi dua faktor dinonaktifkan.'),
+            RecoveryCodesGenerated::class => fn () => $this->flashToast('Kode pemulihan baru berhasil dibuat.'),
+            PasskeyRegistered::class => fn () => $this->flashToast('Passkey berhasil ditambahkan.'),
+            PasskeyDeleted::class => fn () => $this->flashToast('Passkey berhasil dihapus.'),
+        ];
+
+        foreach ($events as $event => $listener) {
+            Event::listen($event, $listener);
+        }
+    }
+
+    private function flashToast(string $message, string $type = 'success'): void
+    {
+        Inertia::flash('toast', ['type' => $type, 'message' => __($message)]);
     }
 
     /**

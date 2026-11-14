@@ -131,6 +131,8 @@ class EmployeeController extends Controller
             'kasbon_used' => 0,
         ]);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Pegawai berhasil ditambahkan.')]);
+
         return redirect()->route('employees.index');
     }
 
@@ -185,6 +187,8 @@ class EmployeeController extends Controller
 
         $employee->save();
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Data pegawai berhasil diperbarui.')]);
+
         return redirect()->route('employees.show', $employee);
     }
 
@@ -201,6 +205,8 @@ class EmployeeController extends Controller
         try {
             Excel::import(new EmployeesImport, $request->file('file'));
         } catch (ExcelValidationException $e) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('Import data pegawai gagal.')]);
+
             $messages = collect($e->failures())
                 ->flatMap(fn ($failure) => array_map(
                     fn (string $error) => "Baris {$failure->row()}: {$error}",
@@ -212,6 +218,8 @@ class EmployeeController extends Controller
                 'file' => $messages,
             ]);
         }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Import data pegawai berhasil.')]);
 
         return redirect()->route('employees.index');
     }

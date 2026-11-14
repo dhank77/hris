@@ -52,6 +52,8 @@ class NewsController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Berita berhasil dipublikasikan.')]);
+
         return redirect()->route('news.index');
     }
 
@@ -80,6 +82,8 @@ class NewsController extends Controller
             'published_at' => $validated['published_at'] ?? $news->published_at,
         ]);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Berita berhasil diperbarui.')]);
+
         return redirect()->route('news.index');
     }
 
@@ -88,6 +92,8 @@ class NewsController extends Controller
         $this->ensureAdmin($request);
 
         $news->delete();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Berita berhasil dihapus.')]);
 
         return redirect()->route('news.index');
     }

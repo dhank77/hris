@@ -104,6 +104,8 @@ class CashAdvanceController extends Controller
             'status' => 'pending',
         ]);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Pengajuan kasbon berhasil dikirim.')]);
+
         return redirect()->route('cash-advances.index');
     }
 
@@ -131,6 +133,8 @@ class CashAdvanceController extends Controller
             abort(403);
         }
         if ($cashAdvance->status !== 'pending') {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('Status kasbon tidak valid untuk persetujuan atasan.')]);
+
             return back()->withErrors(['status' => 'Status tidak valid.']);
         }
         $cashAdvance->update([
@@ -138,6 +142,8 @@ class CashAdvanceController extends Controller
             'approved_level1_by' => $user->id,
             'approved_level1_at' => Carbon::now(),
         ]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Kasbon berhasil disetujui atasan.')]);
 
         return back();
     }
@@ -149,6 +155,8 @@ class CashAdvanceController extends Controller
             abort(403);
         }
         if ($cashAdvance->status !== 'approved_level1') {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('Status kasbon tidak valid untuk persetujuan finance.')]);
+
             return back()->withErrors(['status' => 'Status tidak valid.']);
         }
         $cashAdvance->update([
@@ -172,6 +180,8 @@ class CashAdvanceController extends Controller
         // update kasbon_used
         $cashAdvance->user->increment('kasbon_used', $cashAdvance->amount);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Kasbon berhasil disetujui finance.')]);
+
         return back();
     }
 
@@ -189,6 +199,8 @@ class CashAdvanceController extends Controller
             'rejection_reason' => $request->input('rejection_reason'),
         ]);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Kasbon ditolak.')]);
+
         return back();
     }
 
@@ -199,9 +211,13 @@ class CashAdvanceController extends Controller
             abort(403);
         }
         if ($cashAdvance->status !== 'approved_finance') {
+            Inertia::flash('toast', ['type' => 'error', 'message' => __('Kasbon belum siap dicairkan.')]);
+
             return back();
         }
         $cashAdvance->update(['status' => 'disbursed', 'disbursed_at' => Carbon::now()]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Kasbon berhasil dicairkan.')]);
 
         return back();
     }
@@ -278,6 +294,8 @@ class CashAdvanceController extends Controller
         }
         $installment->markAsPaid();
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Cicilan berhasil ditandai lunas.')]);
+
         return back();
     }
 
@@ -295,6 +313,13 @@ class CashAdvanceController extends Controller
         foreach ($due as $inst) {
             $inst->markAsPaid();
         }
+
+        Inertia::flash('toast', [
+            'type' => 'success',
+            'message' => $due->isEmpty()
+                ? __('Tidak ada cicilan yang jatuh tempo.')
+                : __(':count cicilan berhasil dipotong otomatis.', ['count' => $due->count()]),
+        ]);
 
         return back();
     }

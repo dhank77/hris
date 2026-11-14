@@ -101,6 +101,8 @@ class LeaveRequestController extends Controller
             'status' => 'pending',
         ]);
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Pengajuan cuti berhasil dikirim.')]);
+
         return redirect()->route('leave-requests.index');
     }
 
@@ -129,6 +131,8 @@ class LeaveRequestController extends Controller
             );
         }
 
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Pengajuan cuti berhasil disetujui.')]);
+
         return back();
     }
 
@@ -147,6 +151,8 @@ class LeaveRequestController extends Controller
             'approved_at' => Carbon::now(),
             'rejection_reason' => $request->input('rejection_reason'),
         ]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('Pengajuan cuti ditolak.')]);
 
         return back();
     }

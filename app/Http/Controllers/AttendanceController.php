@@ -75,6 +75,8 @@ class AttendanceController extends Controller
 
         if ($request->type === 'clock_in') {
             if ($attendance->clock_in_at) {
+                Inertia::flash('toast', ['type' => 'error', 'message' => __('Sudah clock in hari ini.')]);
+
                 return back()->withErrors(['clock_in' => 'Sudah clock in hari ini.']);
             }
             $now = Carbon::now();
@@ -88,11 +90,17 @@ class AttendanceController extends Controller
                 'status' => $lateMinutes > 0 ? 'late' : 'present',
                 'late_minutes' => $lateMinutes,
             ]);
+
+            Inertia::flash('toast', ['type' => 'success', 'message' => __('Clock in berhasil.')]);
         } else {
             if (! $attendance->clock_in_at) {
+                Inertia::flash('toast', ['type' => 'error', 'message' => __('Belum clock in.')]);
+
                 return back()->withErrors(['clock_out' => 'Belum clock in.']);
             }
             if ($attendance->clock_out_at) {
+                Inertia::flash('toast', ['type' => 'error', 'message' => __('Sudah clock out hari ini.')]);
+
                 return back()->withErrors(['clock_out' => 'Sudah clock out hari ini.']);
             }
             $attendance->update([
@@ -101,6 +109,8 @@ class AttendanceController extends Controller
                 'clock_out_lng' => $request->longitude,
                 'clock_out_photo' => $photoPath,
             ]);
+
+            Inertia::flash('toast', ['type' => 'success', 'message' => __('Clock out berhasil.')]);
         }
 
         return back();
