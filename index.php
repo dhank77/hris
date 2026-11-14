@@ -2,4 +2,4 @@
 
 include_once __DIR__ . '/public/index.php';
 
-# ini komentar
+# ini komentar, untuk testing cpanel.yml
