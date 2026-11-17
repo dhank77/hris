@@ -2,7 +2,7 @@
 deployment:
   tasks:
     # Sesuaikan target folder produksi di cPanel (misalnya public_html atau folder subdomain)
-    - export DEPLOYPATH=${HOME}/public_html/
+    - export DEPLOYPATH=${HOME}/repositories/hrislaravel
 
     # Sinkronkan file dari repositori ke folder produksi tanpa menimpa .env, storage, dan vendor di server
     - /usr/bin/rsync -av --delete --exclude='.git/' --exclude='.github/' --exclude='.cpanel.yml' --exclude='.env' --exclude='.env.*' --exclude='storage/' --exclude='vendor/' --exclude='node_modules/' --exclude='tests/' --exclude='strix_runs/' --exclude='Archive.zip' --exclude='vendor.zip' ./ ${DEPLOYPATH}
