@@ -71,3 +71,6 @@ strix_runs/host-docker-internal-8000_3668/vulnerabilities/vuln-0002.md
 strix_runs/host-docker-internal-8000_3668/vulnerabilities/vuln-0003.md
 strix_runs/host-docker-internal-8000_3668/vulnerabilities/vuln-0004.md
 vendor.zip
+.vercel
+.env*
+/supabase
