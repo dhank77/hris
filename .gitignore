@@ -74,3 +74,4 @@ vendor.zip
 .vercel
 .env*
 /supabase
+/.ai/skills/vercel-react-best-practices
