@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -24,6 +26,80 @@ class AuthController extends Controller
             return response()->json([
                 'message' => __('Email atau password salah.'),
             ], 401);
+        }
+
+        $deviceName = $validated['device_name'] ?? 'flutter-hris';
+        $accessToken = $user->createToken($deviceName)->plainTextToken;
+
+        return response()->json([
+            'access_token' => $accessToken,
+            'token_type' => 'Bearer',
+            'user' => $this->formatUser($user),
+        ]);
+    }
+
+    public function google(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'id_token' => ['nullable', 'string', 'required_without:access_token'],
+            'access_token' => ['nullable', 'string', 'required_without:id_token'],
+            'device_name' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $googleToken = (string) ($validated['id_token'] ?? $validated['access_token']);
+
+        try {
+            $googleUser = $this->resolveGoogleUser($googleToken);
+        } catch (\Throwable $e) {
+            Log::error('Google API Auth error: '.$e->getMessage());
+
+            return response()->json([
+                'message' => __('Gagal memverifikasi akun Google. Silakan coba lagi.'),
+            ], 401);
+        }
+
+        $googleId = $googleUser->getId();
+        $email = $googleUser->getEmail();
+
+        if (! $googleId && ! $email) {
+            return response()->json([
+                'message' => __('Akun Google Anda tidak memiliki identitas atau email yang valid.'),
+            ], 422);
+        }
+
+        $user = null;
+        if ($googleId) {
+            $user = User::where('google_id', $googleId)->first();
+        }
+        if (! $user && $email) {
+            $user = User::where('email', $email)->first();
+        }
+
+        if (! $user) {
+            return response()->json([
+                'message' => __('Akun Google Anda belum terdaftar sebagai pegawai. Silakan hubungi admin atau HR.'),
+            ], 403);
+        }
+
+        if ($user->google_id && $googleId && $user->google_id !== $googleId) {
+            return response()->json([
+                'message' => __('Akun pegawai ini sudah tertaut dengan akun Google yang berbeda.'),
+            ], 403);
+        }
+
+        $updates = [];
+        if (! $user->google_id && $googleId) {
+            $updates['google_id'] = $googleId;
+        }
+        if (! $user->avatar && $googleUser->getAvatar()) {
+            $updates['avatar'] = $googleUser->getAvatar();
+        }
+        if (! $user->email_verified_at) {
+            $updates['email_verified_at'] = now();
+        }
+
+        if (! empty($updates)) {
+            $user->update($updates);
         }
 
         $deviceName = $validated['device_name'] ?? 'flutter-hris';
@@ -80,5 +156,27 @@ class AuthController extends Controller
             'department' => $user->department,
             'position' => $user->position,
         ];
+    }
+
+    private function resolveGoogleUser(string $googleToken): \Laravel\Socialite\Contracts\User
+    {
+        try {
+            return Socialite::driver('google')->userFromToken($googleToken);
+        } catch (\Throwable $primaryException) {
+            $mobileClientId = config('services.google.mobile_client_id');
+            if (
+                ! is_string($mobileClientId)
+                || $mobileClientId === ''
+                || $mobileClientId === config('services.google.client_id')
+                || ! str_contains($primaryException->getMessage(), 'Invalid ID token audience')
+            ) {
+                throw $primaryException;
+            }
+
+            config(['services.google.client_id' => $mobileClientId]);
+            Socialite::forgetDrivers();
+
+            return Socialite::driver('google')->userFromToken($googleToken);
+        }
     }
 }

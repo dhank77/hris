@@ -37,6 +37,7 @@ return [
 
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
+        'mobile_client_id' => env('GOOGLE_MOBILE_CLIENT_ID', '606874341263-g023t9jdgigb9abmr8v3n85u19tss46p.apps.googleusercontent.com'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
         'redirect' => env('GOOGLE_REDIRECT_URI', env('APP_URL').'/auth/google/callback'),
     ],
