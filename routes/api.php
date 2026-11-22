@@ -26,5 +26,6 @@ Route::prefix('face')->name('api.face.')->middleware('auth:sanctum')->group(func
     Route::get('/', [FaceController::class, 'show'])->name('show');
     Route::post('register', [FaceController::class, 'register'])->name('register');
     Route::post('verify', [FaceController::class, 'verify'])->name('verify');
+    Route::post('{user}/allow-reregister', [FaceController::class, 'allowReregister'])->name('allow-reregister');
     Route::delete('/', [FaceController::class, 'destroy'])->name('destroy');
 });

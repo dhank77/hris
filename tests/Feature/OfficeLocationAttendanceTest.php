@@ -69,10 +69,24 @@ class OfficeLocationAttendanceTest extends TestCase
         $employee = User::factory()->create(['role' => 'employee']);
         Sanctum::actingAs($employee);
 
+        $embedding = array_fill(0, 192, 0.0);
+        $embedding[0] = 1.0;
+
+        // Belum registrasi wajah -> 422
+        $this->postJson('/api/attendance/clock-in', [
+            'latitude' => -6.2088,
+            'longitude' => 106.8456,
+            'face_embedding' => $embedding,
+        ])->assertStatus(422);
+
+        // Registrasi wajah pegawai
+        $this->postJson('/api/face/register', ['embedding' => $embedding])->assertOk();
+
         // Belum dikonfigurasi -> 422
         $this->postJson('/api/attendance/clock-in', [
             'latitude' => -6.2088,
             'longitude' => 106.8456,
+            'face_embedding' => $embedding,
         ])->assertStatus(422);
 
         // Konfigurasi kantor di Monas (-6.175392, 106.827153) radius 100m
@@ -83,18 +97,29 @@ class OfficeLocationAttendanceTest extends TestCase
             radiusMeters: 100,
         );
 
+        // Wajah tidak cocok -> 422
+        $wrongEmbedding = array_fill(0, 192, 0.0);
+        $wrongEmbedding[5] = 1.0;
+        $this->postJson('/api/attendance/clock-in', [
+            'latitude' => -6.175500,
+            'longitude' => 106.827200,
+            'face_embedding' => $wrongEmbedding,
+        ])->assertStatus(422);
+
         // Di luar radius (~3.7 km jauhnya) -> 422
         $this->postJson('/api/attendance/clock-in', [
             'latitude' => -6.2088,
             'longitude' => 106.8456,
+            'face_embedding' => $embedding,
         ])->assertStatus(422)
             ->assertJsonStructure(['message', 'distance_meters', 'radius_meters']);
 
-        // Di dalam radius (~20 meter dari titik kantor) -> 200
+        // Di dalam radius (~20 meter dari titik kantor) + wajah cocok -> 200
         $this->postJson('/api/attendance/clock-in', [
             'latitude' => -6.175500,
             'longitude' => 106.827200,
             'notes' => 'Hadir tepat waktu',
+            'face_embedding' => $embedding,
         ])->assertOk()
             ->assertJsonPath('attendance.notes', 'Hadir tepat waktu');
 
@@ -109,12 +134,14 @@ class OfficeLocationAttendanceTest extends TestCase
         $this->postJson('/api/attendance/clock-out', [
             'latitude' => -6.2088,
             'longitude' => 106.8456,
+            'face_embedding' => $embedding,
         ])->assertStatus(422);
 
-        // Clock out di dalam radius -> 200
+        // Clock out di dalam radius + wajah cocok -> 200
         $this->postJson('/api/attendance/clock-out', [
             'latitude' => -6.175450,
             'longitude' => 106.827180,
+            'face_embedding' => $embedding,
         ])->assertOk();
 
         // History endpoint mengembalikan 1 record

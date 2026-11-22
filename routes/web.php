@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('employees/{employee}', [EmployeeController::class, 'show'])->name('employees.show');
     Route::get('employees/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
     Route::put('employees/{employee}', [EmployeeController::class, 'update'])->name('employees.update');
+    Route::post('employees/{employee}/allow-face-reregister', [EmployeeController::class, 'allowFaceReregister'])->name('employees.allow-face-reregister');
 
     // Attendance
     Route::get('attendance', [AttendanceController::class, 'index'])->name('attendance.index');

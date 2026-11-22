@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attendance;
+use App\Models\User;
+use App\Services\FaceMatchingService;
 use App\Services\OfficeLocationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,6 +15,7 @@ class AttendanceController extends Controller
 {
     public function __construct(
         private readonly OfficeLocationService $officeLocation,
+        private readonly FaceMatchingService $faceMatching,
     ) {}
 
     public function today(Request $request): JsonResponse
@@ -71,7 +74,14 @@ class AttendanceController extends Controller
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'notes' => ['nullable', 'string', 'max:500'],
+            'face_embedding' => ['required', 'array', 'min:64', 'max:512'],
+            'face_embedding.*' => ['required', 'numeric'],
         ]);
+
+        $user = $request->user();
+        if ($faceError = $this->verifyFaceForAttendance($user, $validated['face_embedding'])) {
+            return $faceError;
+        }
 
         $radiusCheck = $this->officeLocation->validateWithinRadius(
             (float) $validated['latitude'],
@@ -86,7 +96,6 @@ class AttendanceController extends Controller
             ], 422);
         }
 
-        $user = $request->user();
         $today = Carbon::today()->toDateString();
 
         $attendance = Attendance::firstOrCreate(
@@ -126,7 +135,14 @@ class AttendanceController extends Controller
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'notes' => ['nullable', 'string', 'max:500'],
+            'face_embedding' => ['required', 'array', 'min:64', 'max:512'],
+            'face_embedding.*' => ['required', 'numeric'],
         ]);
+
+        $user = $request->user();
+        if ($faceError = $this->verifyFaceForAttendance($user, $validated['face_embedding'])) {
+            return $faceError;
+        }
 
         $radiusCheck = $this->officeLocation->validateWithinRadius(
             (float) $validated['latitude'],
@@ -141,7 +157,6 @@ class AttendanceController extends Controller
             ], 422);
         }
 
-        $user = $request->user();
         $today = Carbon::today()->toDateString();
 
         $attendance = Attendance::where('user_id', $user->id)
@@ -172,6 +187,31 @@ class AttendanceController extends Controller
             'attendance' => $this->formatAttendance($attendance->fresh()),
             'distance_meters' => $radiusCheck['distance_meters'],
         ]);
+    }
+
+    /**
+     * @param  array<int, mixed>  $faceEmbedding
+     */
+    private function verifyFaceForAttendance(User $user, array $faceEmbedding): ?JsonResponse
+    {
+        $check = $this->faceMatching->verifyAgainstProfile(
+            $user->faceProfile()->first(),
+            $faceEmbedding,
+        );
+
+        if (! $check['ok']) {
+            return response()->json(['message' => $check['message']], $check['status']);
+        }
+
+        if (! $check['matched']) {
+            return response()->json([
+                'message' => 'Verifikasi wajah gagal. Wajah tidak cocok dengan data yang terdaftar.',
+                'similarity' => $check['similarity'] ?? 0.0,
+                'threshold' => $check['threshold'] ?? FaceMatchingService::SIMILARITY_THRESHOLD,
+            ], 422);
+        }
+
+        return null;
     }
 
     /**

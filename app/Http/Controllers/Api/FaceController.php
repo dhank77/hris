@@ -4,19 +4,24 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\FaceProfile;
+use App\Models\User;
+use App\Services\FaceMatchingService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class FaceController extends Controller
 {
-    private const SIMILARITY_THRESHOLD = 0.75;
+    public function __construct(
+        private readonly FaceMatchingService $faceMatching,
+    ) {}
 
     public function show(Request $request): JsonResponse
     {
-        $profile = $request->user()->faceProfile;
+        $profile = $request->user()->faceProfile()->first();
 
         return response()->json([
             'registered' => $profile !== null,
+            'can_reregister' => $profile === null || (bool) $profile->can_reregister,
             'face_profile' => $profile ? $this->formatProfile($profile) : null,
         ]);
     }
@@ -29,19 +34,27 @@ class FaceController extends Controller
             'model_version' => ['nullable', 'string', 'max:64'],
         ]);
 
-        $normalized = $this->normalizeEmbedding($validated['embedding']);
+        $user = $request->user();
+        $existing = $user->faceProfile()->first();
+        if ($existing !== null && ! $existing->can_reregister) {
+            return response()->json([
+                'message' => 'Wajah sudah terdaftar. Hubungi admin untuk mengizinkan registrasi ulang.',
+            ], 403);
+        }
+
+        $normalized = $this->faceMatching->normalizeEmbedding($validated['embedding']);
         if ($normalized === null) {
             return response()->json([
                 'message' => 'Embedding wajah tidak valid (vektor nol).',
             ], 422);
         }
 
-        $user = $request->user();
         $profile = FaceProfile::updateOrCreate(
             ['user_id' => $user->id],
             [
                 'embedding' => $normalized,
                 'model_version' => $validated['model_version'] ?? 'mobilefacenet',
+                'can_reregister' => false,
                 'registered_at' => now(),
             ],
         );
@@ -49,6 +62,7 @@ class FaceController extends Controller
         return response()->json([
             'message' => 'Registrasi wajah berhasil disimpan.',
             'registered' => true,
+            'can_reregister' => false,
             'face_profile' => $this->formatProfile($profile),
         ]);
     }
@@ -60,105 +74,64 @@ class FaceController extends Controller
             'embedding.*' => ['required', 'numeric'],
         ]);
 
-        $profile = $request->user()->faceProfile;
-        if (! $profile) {
-            return response()->json([
-                'message' => 'Wajah belum terdaftar. Silakan lakukan registrasi wajah terlebih dahulu.',
-            ], 422);
-        }
+        $result = $this->faceMatching->verifyAgainstProfile(
+            $request->user()->faceProfile()->first(),
+            $validated['embedding'],
+        );
 
-        $candidate = $this->normalizeEmbedding($validated['embedding']);
-        if ($candidate === null) {
+        if (! $result['ok']) {
             return response()->json([
-                'message' => 'Embedding wajah tidak valid.',
-            ], 422);
+                'message' => $result['message'],
+            ], $result['status']);
         }
-
-        $stored = array_map('floatval', $profile->embedding);
-        if (count($candidate) !== count($stored)) {
-            return response()->json([
-                'message' => 'Dimensi embedding wajah tidak sesuai dengan data terdaftar.',
-            ], 422);
-        }
-
-        $similarity = $this->cosineSimilarity($stored, $candidate);
-        $distance = $this->euclideanDistance($stored, $candidate);
-        $matched = $similarity >= self::SIMILARITY_THRESHOLD;
 
         return response()->json([
-            'matched' => $matched,
-            'similarity' => round($similarity, 4),
-            'distance' => round($distance, 4),
-            'threshold' => self::SIMILARITY_THRESHOLD,
-            'message' => $matched
-                ? 'Wajah cocok dan berhasil diverifikasi.'
-                : 'Wajah tidak cocok dengan data yang terdaftar.',
+            'matched' => $result['matched'],
+            'similarity' => $result['similarity'],
+            'distance' => $result['distance'],
+            'threshold' => $result['threshold'],
+            'message' => $result['message'],
+        ]);
+    }
+
+    public function allowReregister(Request $request, User $user): JsonResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Hanya admin yang dapat mengizinkan registrasi ulang wajah.',
+            ], 403);
+        }
+
+        $profile = $user->faceProfile()->first();
+        if (! $profile) {
+            return response()->json([
+                'message' => 'Pegawai belum memiliki data wajah terdaftar.',
+            ], 422);
+        }
+
+        $profile->update(['can_reregister' => true]);
+
+        return response()->json([
+            'message' => 'Izin registrasi ulang wajah berhasil diberikan untuk '.$user->name.'.',
+            'can_reregister' => true,
         ]);
     }
 
     public function destroy(Request $request): JsonResponse
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Hanya admin yang dapat menghapus data wajah terdaftar.',
+            ], 403);
+        }
+
         $request->user()->faceProfile()?->delete();
 
         return response()->json([
             'message' => 'Data wajah berhasil dihapus.',
             'registered' => false,
+            'can_reregister' => true,
         ]);
-    }
-
-    /**
-     * @param  array<int, mixed>  $raw
-     * @return array<int, float>|null
-     */
-    private function normalizeEmbedding(array $raw): ?array
-    {
-        $values = array_map('floatval', array_values($raw));
-        $sumSquares = 0.0;
-        foreach ($values as $v) {
-            $sumSquares += $v * $v;
-        }
-        $norm = sqrt($sumSquares);
-        if ($norm <= 1e-12) {
-            return null;
-        }
-
-        return array_map(static fn (float $v): float => $v / $norm, $values);
-    }
-
-    /**
-     * @param  array<int, float>  $a
-     * @param  array<int, float>  $b
-     */
-    private function cosineSimilarity(array $a, array $b): float
-    {
-        $dot = 0.0;
-        $normA = 0.0;
-        $normB = 0.0;
-        $count = count($a);
-        for ($i = 0; $i < $count; $i++) {
-            $dot += $a[$i] * $b[$i];
-            $normA += $a[$i] * $a[$i];
-            $normB += $b[$i] * $b[$i];
-        }
-        $denom = sqrt($normA) * sqrt($normB);
-
-        return $denom > 1e-12 ? $dot / $denom : 0.0;
-    }
-
-    /**
-     * @param  array<int, float>  $a
-     * @param  array<int, float>  $b
-     */
-    private function euclideanDistance(array $a, array $b): float
-    {
-        $sum = 0.0;
-        $count = count($a);
-        for ($i = 0; $i < $count; $i++) {
-            $diff = $a[$i] - $b[$i];
-            $sum += $diff * $diff;
-        }
-
-        return sqrt($sum);
     }
 
     /**
@@ -169,6 +142,7 @@ class FaceController extends Controller
         return [
             'id' => $profile->id,
             'model_version' => $profile->model_version,
+            'can_reregister' => (bool) $profile->can_reregister,
             'registered_at' => $profile->registered_at?->toIso8601String(),
             'embedding' => array_map('floatval', $profile->embedding),
         ];

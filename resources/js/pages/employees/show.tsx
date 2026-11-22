@@ -1,7 +1,7 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
-import { Pencil } from 'lucide-react';
+import { Pencil, ScanFace } from 'lucide-react';
 import {
     show as empShow,
     edit as empEdit,
@@ -37,7 +37,20 @@ const rupiah = (value: number | string) =>
         maximumFractionDigits: 0,
     }).format(Number(value));
 
-export default function EmployeesShow({ employee }: { employee: Employee }) {
+type FaceStatus = {
+    registered: boolean;
+    can_reregister: boolean;
+    registered_at?: string | null;
+    model_version?: string | null;
+};
+
+export default function EmployeesShow({
+    employee,
+    faceStatus,
+}: {
+    employee: Employee;
+    faceStatus?: FaceStatus;
+}) {
     const page = usePage();
     const auth = (page.props as { auth?: { user?: { role?: string } } }).auth;
     const isAdmin = auth?.user?.role === 'admin';
@@ -173,6 +186,45 @@ export default function EmployeesShow({ employee }: { employee: Employee }) {
                                         employee.kasbon_limit -
                                             employee.kasbon_used,
                                     ),
+                                )}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt className="text-sm text-muted-foreground">
+                                Status Wajah
+                            </dt>
+                            <dd className="mt-1 flex flex-wrap items-center gap-2 font-medium">
+                                {faceStatus?.registered ? (
+                                    <>
+                                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
+                                            <ScanFace className="h-3.5 w-3.5" />
+                                            Terdaftar
+                                        </span>
+                                        {faceStatus.can_reregister ? (
+                                            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                                                Registrasi Ulang Diizinkan
+                                            </span>
+                                        ) : (
+                                            isAdmin && (
+                                                <Button
+                                                    type="button"
+                                                    size="sm"
+                                                    variant="outline"
+                                                    onClick={() =>
+                                                        router.post(
+                                                            `/employees/${employee.id}/allow-face-reregister`,
+                                                        )
+                                                    }
+                                                >
+                                                    Izinkan Registrasi Ulang Wajah
+                                                </Button>
+                                            )
+                                        )}
+                                    </>
+                                ) : (
+                                    <span className="text-sm text-muted-foreground">
+                                        Belum terdaftar
+                                    </span>
                                 )}
                             </dd>
                         </div>

@@ -79,9 +79,39 @@ class EmployeeController extends Controller
             abort(403);
         }
 
+        $employee->load('supervisor');
+        $faceProfile = $employee->faceProfile;
+
         return Inertia::render('employees/show', [
-            'employee' => $employee->load('supervisor'),
+            'employee' => $employee,
+            'faceStatus' => $faceProfile ? [
+                'registered' => true,
+                'can_reregister' => (bool) $faceProfile->can_reregister,
+                'registered_at' => $faceProfile->registered_at?->toIso8601String(),
+                'model_version' => $faceProfile->model_version,
+            ] : [
+                'registered' => false,
+                'can_reregister' => true,
+                'registered_at' => null,
+                'model_version' => null,
+            ],
         ]);
+    }
+
+    public function allowFaceReregister(Request $request, User $employee): RedirectResponse
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $faceProfile = $employee->faceProfile;
+        if (! $faceProfile) {
+            return back()->with('error', 'Pegawai ini belum melakukan registrasi wajah.');
+        }
+
+        $faceProfile->update(['can_reregister' => true]);
+
+        return back()->with('success', 'Izin registrasi ulang wajah untuk '.$employee->name.' telah diaktifkan.');
     }
 
     public function create(Request $request): InertiaResponse
