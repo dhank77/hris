@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\OfficeLocationController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\QrisController;
 use App\Http\Controllers\Settings\SecurityController;
@@ -11,6 +12,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    Route::get('settings/office-location', [OfficeLocationController::class, 'edit'])->name('office-location.edit');
+    Route::put('settings/office-location', [OfficeLocationController::class, 'update'])->name('office-location.update');
 
     Route::get('settings/qris', [QrisController::class, 'edit'])->name('qris.edit');
     Route::put('settings/qris', [QrisController::class, 'update'])->name('qris.update');

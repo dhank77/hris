@@ -6,6 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
+import { edit as editOfficeLocation } from '@/routes/office-location';
 import { edit } from '@/routes/profile';
 import { edit as editQris } from '@/routes/qris';
 import { edit as editSecurity } from '@/routes/security';
@@ -32,13 +33,22 @@ const sidebarNavItems: NavItem[] = [
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const { props } = usePage<{ auth: { user: { role?: string } } }>();
-    const navItems: NavItem[] =
-        props.auth?.user?.role === 'admin'
+    const role = props.auth?.user?.role;
+    const navItems: NavItem[] = [
+        ...sidebarNavItems,
+        ...(role === 'admin' || role === 'hr'
             ? [
-                  ...sidebarNavItems,
-                  { title: 'QRIS', href: editQris(), icon: null },
+                  {
+                      title: 'Lokasi Kantor',
+                      href: editOfficeLocation(),
+                      icon: null,
+                  },
               ]
-            : sidebarNavItems;
+            : []),
+        ...(role === 'admin'
+            ? [{ title: 'QRIS', href: editQris(), icon: null }]
+            : []),
+    ];
 
     return (
         <div className="mx-auto w-full max-w-5xl px-4 py-6 md:px-6">

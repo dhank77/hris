@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Concerns\HasTableQuery;
 use App\Models\Attendance;
 use App\Models\User;
+use App\Services\OfficeLocationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -14,6 +15,10 @@ use Inertia\Response as InertiaResponse;
 class AttendanceController extends Controller
 {
     use HasTableQuery;
+
+    public function __construct(
+        private readonly OfficeLocationService $officeLocation,
+    ) {}
 
     public function index(Request $request): InertiaResponse
     {
@@ -57,9 +62,20 @@ class AttendanceController extends Controller
         $request->validate([
             'type' => 'required|in:clock_in,clock_out',
             'photo' => 'nullable|image|max:4096',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
         ]);
+
+        $radiusCheck = $this->officeLocation->validateWithinRadius(
+            $request->filled('latitude') ? (float) $request->input('latitude') : null,
+            $request->filled('longitude') ? (float) $request->input('longitude') : null,
+        );
+
+        if (! $radiusCheck['allowed']) {
+            Inertia::flash('toast', ['type' => 'error', 'message' => $radiusCheck['message']]);
+
+            return back()->withErrors(['location' => $radiusCheck['message']]);
+        }
 
         $user = $request->user();
         $today = Carbon::today()->toDateString();
