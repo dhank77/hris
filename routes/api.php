@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FaceController;
+use App\Http\Controllers\Api\LeaveRequestController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')->name('api.auth.')->group(function (): void {
@@ -28,4 +29,11 @@ Route::prefix('face')->name('api.face.')->middleware('auth:sanctum')->group(func
     Route::post('verify', [FaceController::class, 'verify'])->name('verify');
     Route::post('{user}/allow-reregister', [FaceController::class, 'allowReregister'])->name('allow-reregister');
     Route::delete('/', [FaceController::class, 'destroy'])->name('destroy');
+});
+
+Route::prefix('leave-requests')->name('api.leave-requests.')->middleware('auth:sanctum')->group(function (): void {
+    Route::get('/', [LeaveRequestController::class, 'index'])->name('index');
+    Route::post('/', [LeaveRequestController::class, 'store'])->name('store');
+    Route::get('{leaveRequest}', [LeaveRequestController::class, 'show'])->name('show');
+    Route::delete('{leaveRequest}', [LeaveRequestController::class, 'destroy'])->name('destroy');
 });
